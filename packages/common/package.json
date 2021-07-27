@@ -1,0 +1,7 @@
+{
+  "name": "@leela/common",
+  "private": true,
+  "devDependencies": {
+    "eventemitter3": "^4.0.7"
+  }
+}

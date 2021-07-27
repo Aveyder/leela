@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "forceConsistentCasingInFileNames": true,
+        "removeComments": true,
+        "sourceMap": true,
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "lib": [
+            "ES2015",
+            "DOM"
+        ]
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}
