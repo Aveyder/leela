@@ -6,11 +6,13 @@ import OutgoingSystem from "./network/OutgoingSystem";
 import ConnectionSystem from "./network/ConnectionSystem";
 import {UPDATE_TIME} from "./constants/config";
 import {setIntervalAsync} from "./util/interval";
+import RoomSystem from "./network/RoomSystem";
 
 const network = new NetworkSystem();
 network.bootstrap();
 const sockets = new SocketSystem();
 const packets = new PacketSystem();
+const rooms = new RoomSystem(packets);
 const incoming = new IncomingSystem();
 const outgoing = new OutgoingSystem(
     sockets, packets.outgoing
@@ -27,6 +29,7 @@ function start() {
         outgoing.send();
 
         incoming.receivePacket(packets.incoming);
+        packets.incoming.length = 0;
     }, interval);
 }
 
