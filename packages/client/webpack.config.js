@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+const TSConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 let config = {
     mode: 'development',
@@ -40,7 +41,10 @@ let config = {
         ]
     },
     resolve: {
-        extensions: ['.ts', '.tsx', '.js']
+        extensions: ['.ts', '.tsx', '.js'],
+        plugins: [
+            new TSConfigPathsPlugin()
+        ]
     },
     plugins: [
         new CleanWebpackPlugin(),

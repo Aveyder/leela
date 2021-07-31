@@ -1,5 +1,4 @@
-import {ClientId, Data, Message, Packet} from "@leela/common/src/network/types";
-import {Opcode} from "@leela/common/src/network/opcodes";
+import {ClientId, Data, Message, Opcode, Packet} from "@leela/common";
 
 export default class PacketSystem {
 

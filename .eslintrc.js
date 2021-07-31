@@ -7,5 +7,16 @@ module.exports = {
     extends: [
         'eslint:recommended',
         'plugin:@typescript-eslint/recommended'
-    ]
+    ],
+    rules: {
+        'quotes': 'off',
+        '@typescript-eslint/quotes': [
+            'error',
+            'double',
+            {
+                avoidEscape: true,
+                allowTemplateLiterals: true
+            }
+        ]
+    }
 };

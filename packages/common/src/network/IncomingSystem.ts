@@ -19,7 +19,7 @@ export default class IncomingSystem {
     }
 
     public receive(input: string): void {
-        if (input.startsWith('[')) {
+        if (input.startsWith("[")) {
             const packet = JSON.parse(input) as Packet;
 
             this.receivePacket(packet);
