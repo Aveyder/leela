@@ -15,7 +15,7 @@ export default class RoomSystem {
     public add(room: RoomId, id: ClientId): void {
         const clients = this.rooms[room] || [];
 
-        if (clients.indexOf(id) != -1) {
+        if (clients.indexOf(id) == -1) {
             clients.push(id);
         }
 
