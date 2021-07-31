@@ -1,5 +1,5 @@
-import {Opcode} from "@leela/common/src/network/opcodes";
-import {Data, Message} from "@leela/common/src/network/types";
+import {Opcode} from "@leela/common";
+import {Data, Message} from "@leela/common";
 import {Socket} from "socket.io-client";
 
 export default class OutgoingSystem {

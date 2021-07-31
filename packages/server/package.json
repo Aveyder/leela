@@ -3,7 +3,7 @@
   "main": "dist/index.js",
   "private": true,
   "scripts": {
-    "dev": "tsc-watch -b --onSuccess 'node dist/index.js'",
+    "dev": "tsc-watch -b --onSuccess \"node dist/index.js\"",
     "build": "tsc -b",
     "start": "node dist/index.js"
   },
