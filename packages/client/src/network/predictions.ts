@@ -20,6 +20,14 @@ export class PredictionSystem {
         this.reset();
     }
 
+    public createSequence(id: SequenceId, reducer: TransactionReducer<State, Transaction>): void {
+        this.sequences[id] = {
+            index: -1,
+            transactions: [],
+            reducer
+        };
+    }
+
     public record(id: SequenceId, transaction: Transaction): void {
         const sequence = this.sequences[id];
 
@@ -39,14 +47,6 @@ export class PredictionSystem {
         transactions.splice(0, discard);
 
         return transactions.reduce(reducer, ackState);
-    }
-
-    public createSequence(id: SequenceId, reducer: TransactionReducer<State, Transaction>): void {
-        this.sequences[id] = {
-            index: -1,
-            transactions: [],
-            reducer
-        };
     }
 
     public reset(): void {
