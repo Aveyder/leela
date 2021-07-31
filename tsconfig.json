@@ -2,16 +2,15 @@
     "compilerOptions": {
         "forceConsistentCasingInFileNames": true,
         "removeComments": true,
+
         "sourceMap": true,
+
         "moduleResolution": "node",
         "resolveJsonModule": true,
-        "esModuleInterop": true,
-        "lib": [
-            "ES2015",
-            "DOM"
-        ]
+        "esModuleInterop": true
     },
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "dist"
     ]
 }

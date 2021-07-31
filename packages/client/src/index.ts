@@ -2,7 +2,7 @@ import "../scss/styles.scss";
 import {io} from "socket.io-client";
 import {SERVER_HOST} from "./constants/config";
 import OutgoingSystem from "./network/OutgoingSystem";
-import IncomingSystem from "@leela/common/src/network/IncomingSystem";
+import {IncomingSystem} from "@leela/common";
 
 const socket = io(SERVER_HOST);
 const incoming = new IncomingSystem();

@@ -1,5 +1,5 @@
-import {ClientId, Packet} from "@leela/common/src/network/types";
 import SocketSystem from "./SocketSystem";
+import {ClientId, Packet} from "@leela/common";
 
 export default class OutgoingSystem {
 

@@ -1,5 +1,5 @@
 import {Socket} from "socket.io";
-import {ClientId} from "@leela/common/src/network/types";
+import {ClientId} from "@leela/common";
 
 export default class SocketSystem {
 

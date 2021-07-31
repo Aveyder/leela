@@ -1,4 +1,4 @@
-import IncomingSystem from "@leela/common/src/network/IncomingSystem";
+import {IncomingSystem} from "@leela/common";
 import NetworkSystem from "./network/NetworkSystem";
 import SocketSystem from "./network/SocketSystem";
 import PacketSystem from "./network/PacketSystem";
