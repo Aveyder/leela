@@ -12,7 +12,7 @@ interface Sequence<S extends State, T extends Transaction> {
     reducer: TransactionReducer<S, T>;
 }
 
-export class PredictionSystem {
+export class ReconcileSystem {
 
     private sequences: Record<SequenceId, Sequence<State, Transaction>>;
 
@@ -37,7 +37,7 @@ export class PredictionSystem {
         }
     }
 
-    public reconcile<S extends State, T extends Transaction>(id: SequenceId, ackIndex: number, ackState: S): S {
+    public acknowledge<S extends State, T extends Transaction>(id: SequenceId, ackIndex: number, ackState: S): S {
         const sequence = this.sequences[id] as Sequence<S, T>;
 
         const {index, transactions, reducer} = sequence;
