@@ -1,9 +1,9 @@
-import {ClientId, Data} from "@leela/common";
+import {ClientId, ClientPacket} from "@leela/common";
 
-type IdentifiedData = [ClientId, ...Data];
+type AddressedPacket = [ClientId, ClientPacket];
 type RoomId = string;
 
 export {
-    IdentifiedData,
+    AddressedPacket,
     RoomId
 };

@@ -1,8 +1,9 @@
 const PORT = 3000;
 
-const UPDATE_TIME = 3;
+const SNAPSHOT_RATE = 20;
+const SNAPSHOT_INTERVAL_MS = 1000 / SNAPSHOT_RATE;
 
 export {
     PORT,
-    UPDATE_TIME
+    SNAPSHOT_INTERVAL_MS
 }

@@ -1,7 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
-const TSConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 let config = {
     mode: 'development',
@@ -42,9 +41,9 @@ let config = {
     },
     resolve: {
         extensions: ['.ts', '.tsx', '.js'],
-        plugins: [
-            new TSConfigPathsPlugin()
-        ]
+        alias: {
+            "@leela/common": path.resolve(__dirname, "../common/src")
+        }
     },
     plugins: [
         new CleanWebpackPlugin(),
@@ -53,7 +52,7 @@ let config = {
         })
     ],
     output: {
-        filename: '[name].bundle.js',
+        filename: '[name].[contenthash].js',
         path: path.resolve(__dirname, 'dist')
     },
     optimization: {

@@ -4,9 +4,10 @@ import SocketSystem from "./network/SocketSystem";
 import PacketSystem from "./network/PacketSystem";
 import OutgoingSystem from "./network/OutgoingSystem";
 import ConnectionSystem from "./network/ConnectionSystem";
-import {UPDATE_TIME} from "./constants/config";
-import {setIntervalAsync} from "./util/interval";
 import RoomSystem from "./network/RoomSystem";
+import Ticks from "./network/Ticks";
+import SimulationLoop from "./loops/SimulationLoop";
+import SnapshotLoop from "./loops/SnapshotLoop";
 
 const network = new NetworkSystem();
 network.bootstrap();
@@ -14,23 +15,19 @@ const sockets = new SocketSystem();
 const packets = new PacketSystem();
 const rooms = new RoomSystem(packets);
 const incoming = new IncomingSystem();
+const ticks = new Ticks();
 const outgoing = new OutgoingSystem(
-    sockets, packets.outgoing
+    sockets, packets.outgoing, ticks
 );
 const connections = new ConnectionSystem(
     network.io, sockets, packets
 );
 connections.init();
 
-function start() {
-    const interval = 1000 / UPDATE_TIME;
+const simulations = new SimulationLoop(
+    ticks, packets.incoming, incoming
+);
+const snapshots = new SnapshotLoop(outgoing);
 
-    setIntervalAsync(async () => {
-        outgoing.send();
-
-        incoming.receivePacket(packets.incoming);
-        packets.incoming.length = 0;
-    }, interval);
-}
-
-start();
+simulations.start();
+snapshots.start();

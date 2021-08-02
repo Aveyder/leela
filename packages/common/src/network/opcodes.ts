@@ -1,5 +1,6 @@
 enum Opcode {
-    JoinRequest
+    JoinRequest,
+    JoinResponse
 }
 
 export {
