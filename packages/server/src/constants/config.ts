@@ -1,9 +1,10 @@
+import {getSnapshotRate} from "@leela/common";
+
 const PORT = 3000;
 
-const SNAPSHOT_RATE = 20;
-const SNAPSHOT_INTERVAL_MS = 1000 / SNAPSHOT_RATE;
+const SNAPSHOT_RATE = getSnapshotRate();
 
 export {
     PORT,
-    SNAPSHOT_INTERVAL_MS
+    SNAPSHOT_RATE
 }

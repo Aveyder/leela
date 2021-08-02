@@ -5,9 +5,9 @@ import Ticks from "./Ticks";
 export default class OutgoingSystem {
 
     constructor(
+        private readonly ticks: Ticks,
         private readonly sockets: SocketSystem,
-        private readonly outgoing: Record<ClientId, Message[]>,
-        private readonly ticks: Ticks
+        private readonly outgoing: Record<ClientId, Message[]>
     ) {}
 
     public send(): void {

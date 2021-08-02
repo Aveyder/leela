@@ -1,4 +1,6 @@
 enum Opcode {
+    Handshake,
+    UpdateRate,
     JoinRequest,
     JoinResponse
 }

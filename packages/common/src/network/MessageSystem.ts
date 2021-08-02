@@ -3,7 +3,7 @@ import {ClientId, Data, Message} from "./types";
 import {OPCODE_EVENT_PREFIX} from "../constants/events";
 import {Opcode} from "./opcodes";
 
-export default class IncomingSystem {
+export default class MessageSystem {
 
     private readonly events: EventEmitter;
 
@@ -13,7 +13,7 @@ export default class IncomingSystem {
 
     public on(code: Opcode | string, callback: (data: Data, id?: ClientId) => void, context?: never): void {
         if (Number.isInteger(code)) {
-            code = IncomingSystem.opcodeEvent(code as Opcode);
+            code = MessageSystem.opcodeEvent(code as Opcode);
         }
         this.events.on(code as string, callback, context);
     }
@@ -29,7 +29,7 @@ export default class IncomingSystem {
     private receiveMessage(message: Message, id?: ClientId): void {
         const opcode = message.shift() as Opcode;
 
-        this.events.emit(IncomingSystem.opcodeEvent(opcode), message as Data, id);
+        this.events.emit(MessageSystem.opcodeEvent(opcode), message as Data, id);
     }
 
     private static opcodeEvent(opcode: Opcode): string {

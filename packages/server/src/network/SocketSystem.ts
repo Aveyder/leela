@@ -20,4 +20,8 @@ export default class SocketSystem {
     public remove(id: ClientId): void {
         delete this.sockets[id];
     }
+
+    public getClientIds(): ClientId[] {
+        return Object.keys(this.sockets);
+    }
 }
