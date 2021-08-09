@@ -6,10 +6,13 @@ import OutgoingSystem from "./network/OutgoingSystem";
 import ConnectionSystem from "./network/ConnectionSystem";
 import RoomSystem from "./network/RoomSystem";
 import Ticks from "./network/Ticks";
-import SimulationLoop from "./loops/SimulationLoop";
 import IncomingSystem from "./network/IncomingSystem";
-import UpdateRateSystem from "./network/UpdateRateSystem";
-import {PREPARE_SNAPSHOT, SEND_SNAPSHOT} from "./constants/events";
+import SimulationSystem from "./loops/SimulationSystem";
+import SnapshotSystem from "./loops/SnapshotSystem";
+import Loop from "@leela/common/dist/loops/Loop";
+import {performance} from "perf_hooks";
+
+Loop.setContext({performance, clearInterval});
 
 const network = new NetworkSystem();
 network.bootstrap();
@@ -23,27 +26,21 @@ const messages = new MessageSystem();
 const incoming = new IncomingSystem(
     ticks, packets.incoming, messages
 );
-const connections = new ConnectionSystem(
-    network.io, sockets, packets
-);
-connections.init();
 
 const outgoing = new OutgoingSystem(
     ticks, sockets, packets.outgoing
 );
-const updateRate = new UpdateRateSystem(sockets);
-const simulations = new SimulationLoop(
+const snapshots = new SnapshotSystem(outgoing);
+const connections = new ConnectionSystem(
+    network.io, sockets, packets, snapshots
+);
+connections.init();
+
+const simulations = new SimulationSystem(
     ticks, incoming
 );
-simulations.events.on(PREPARE_SNAPSHOT, (delta) => {
-    updateRate.tick(delta);
-});
-simulations.events.on(SEND_SNAPSHOT, () => {
-    outgoing.send();
-    updateRate.flush();
-});
-simulations.start();
+simulations.loop.start();
 
 messages.on(Opcode.UpdateRate, (data, id) => {
-    updateRate.set(id, data.shift() as number);
+    snapshots.set(id, data.shift() as number);
 });

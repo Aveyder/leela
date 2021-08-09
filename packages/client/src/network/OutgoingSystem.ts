@@ -1,12 +1,14 @@
 import {ClientPacket, createMessage, Data, Message, Opcode, Tick} from "@leela/common";
 import {Socket} from "socket.io-client";
+import Ticks from "./Ticks";
 
 export default class OutgoingSystem {
 
     private readonly messages: Message[];
 
     constructor(
-        private readonly socket: Socket
+        private readonly socket: Socket,
+        private readonly ticks: Ticks
     ) {
         this.messages = [];
     }
@@ -17,9 +19,9 @@ export default class OutgoingSystem {
         this.messages.push(message);
     }
 
-    public send(tick: Tick): void {
+    public send(): void {
         if (this.socket.connected && this.messages.length > 0) {
-            const clientPacket = [Date.now(), tick, ...this.messages] as ClientPacket;
+            const clientPacket = [Date.now(), this.ticks.client, ...this.messages] as ClientPacket;
 
             this.messages.length = 0;
 

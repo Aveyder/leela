@@ -10,24 +10,22 @@ export default class OutgoingSystem {
         private readonly outgoing: Record<ClientId, Message[]>
     ) {}
 
-    public send(): void {
-        Object.keys(this.outgoing).forEach(id => {
-            const socket = this.sockets.get(id);
+    public send(id: ClientId): void {
+        const socket = this.sockets.get(id);
 
-            if (socket) {
-                const messages = this.outgoing[id];
+        if (socket) {
+            const messages = this.outgoing[id];
 
-                if (messages.length > 0) {
-                    const packet = this.createServerPacket(id, messages);
+            if (messages.length > 0) {
+                const packet = this.createServerPacket(id, messages);
 
-                    const json = JSON.stringify(packet);
+                const json = JSON.stringify(packet);
 
-                    socket.send(json);
+                socket.send(json);
 
-                    this.outgoing[id].length = 0;
-                }
+                this.outgoing[id].length = 0;
             }
-        });
+        }
     }
 
     private createServerPacket(id: ClientId, messages: Message[]) {

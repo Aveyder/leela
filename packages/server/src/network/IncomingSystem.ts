@@ -15,13 +15,13 @@ export default class IncomingSystem {
         this.packetsIncoming.forEach(addressed => {
             const [id, clientPacket] = addressed;
 
-            this.receivePacketIncoming(id, clientPacket);
+            this.receivePacket(id, clientPacket);
         });
 
         this.packetsIncoming.length = 0;
     }
 
-    private receivePacketIncoming(id: ClientId, clientPacket: ClientPacket) {
+    private receivePacket(id: ClientId, clientPacket: ClientPacket) {
         const timestamp = clientPacket.shift() as Timestamp;
         const tick = clientPacket.shift() as Tick;
 
