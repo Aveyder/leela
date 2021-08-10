@@ -1,55 +1,73 @@
-export type SequenceId = string;
-export type State = unknown;
-export type Transaction = unknown;
+import {Tick} from "@leela/common";
+import Ticks from "./Ticks";
 
-export interface TransactionReducer<S extends State, T extends Transaction> {
+type SequenceId = string;
+type State = unknown;
+type Transaction = unknown;
+
+interface TransactionReducer<S extends State, T extends Transaction> {
     (accumulator: S, transaction: T, index?: number, transactions?: T[]): S;
 }
 
 interface Sequence<S extends State, T extends Transaction> {
-    index: number;
+    lastTick: Tick;
     transactions: T[];
     reducer: TransactionReducer<S, T>;
 }
 
-export class ReconcileSystem {
+class ReconcileSystem {
 
     private sequences: Record<SequenceId, Sequence<State, Transaction>>;
 
-    constructor() {
+    constructor(
+        private readonly ticks: Ticks
+    ) {
         this.reset();
     }
 
     public createSequence(id: SequenceId, reducer: TransactionReducer<State, Transaction>): void {
         this.sequences[id] = {
-            index: -1,
+            lastTick: -1,
             transactions: [],
             reducer
         };
     }
 
-    public record(id: SequenceId, transaction: Transaction): void {
+    public add(id: SequenceId, transaction: Transaction): void {
         const sequence = this.sequences[id];
 
         if (sequence) {
             sequence.transactions.push(transaction);
-            sequence.index++;
+            sequence.lastTick = this.ticks.client;
         }
     }
 
-    public acknowledge<S extends State, T extends Transaction>(id: SequenceId, ackIndex: number, ackState: S): S {
+    public reconcile<S extends State, T extends Transaction>(id: SequenceId, ackState: S): S {
         const sequence = this.sequences[id] as Sequence<S, T>;
 
-        const {index, transactions, reducer} = sequence;
+        const {lastTick, transactions, reducer} = sequence;
 
-        const lag = index - ackIndex;
-        const discard = transactions.length - lag;
-        transactions.splice(0, discard);
+        if (transactions.length > 0) {
+            const lag = lastTick - this.ticks.clientAck;
+            const discard = transactions.length - lag;
 
-        return transactions.reduce(reducer, ackState);
+            transactions.splice(0, discard);
+
+            return transactions.reduce(reducer, ackState);
+        }
+
+        return ackState;
     }
 
     public reset(): void {
         this.sequences = {};
     }
 }
+
+export {
+    SequenceId,
+    State,
+    Transaction,
+    TransactionReducer,
+    ReconcileSystem
+};
