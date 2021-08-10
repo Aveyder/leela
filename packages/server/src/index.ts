@@ -1,36 +1,46 @@
-import {IncomingSystem} from "@leela/common";
+import {MessageSystem, Opcode} from "@leela/common";
 import NetworkSystem from "./network/NetworkSystem";
 import SocketSystem from "./network/SocketSystem";
 import PacketSystem from "./network/PacketSystem";
 import OutgoingSystem from "./network/OutgoingSystem";
 import ConnectionSystem from "./network/ConnectionSystem";
-import {UPDATE_TIME} from "./constants/config";
-import {setIntervalAsync} from "./util/interval";
 import RoomSystem from "./network/RoomSystem";
+import Ticks from "./network/Ticks";
+import IncomingSystem from "./network/IncomingSystem";
+import SimulationSystem from "./loops/SimulationSystem";
+import SnapshotSystem from "./loops/SnapshotSystem";
+import Loop from "@leela/common/dist/loops/Loop";
+import {performance} from "perf_hooks";
+
+Loop.setContext({performance, clearInterval});
 
 const network = new NetworkSystem();
 network.bootstrap();
 const sockets = new SocketSystem();
 const packets = new PacketSystem();
 const rooms = new RoomSystem(packets);
-const incoming = new IncomingSystem();
-const outgoing = new OutgoingSystem(
-    sockets, packets.outgoing
+
+const ticks = new Ticks();
+
+const messages = new MessageSystem();
+const incoming = new IncomingSystem(
+    ticks, packets.incoming, messages
 );
+
+const outgoing = new OutgoingSystem(
+    ticks, sockets, packets.outgoing
+);
+const snapshots = new SnapshotSystem(outgoing);
 const connections = new ConnectionSystem(
-    network.io, sockets, packets
+    network.io, sockets, packets, snapshots
 );
 connections.init();
 
-function start() {
-    const interval = 1000 / UPDATE_TIME;
+const simulations = new SimulationSystem(
+    ticks, incoming
+);
+simulations.loop.start();
 
-    setIntervalAsync(async () => {
-        outgoing.send();
-
-        incoming.receivePacket(packets.incoming);
-        packets.incoming.length = 0;
-    }, interval);
-}
-
-start();
+messages.on(Opcode.UpdateRate, (data, id) => {
+    snapshots.set(id, data.shift() as number);
+});

@@ -1,5 +1,8 @@
 enum Opcode {
-    JoinRequest
+    Handshake,
+    UpdateRate,
+    JoinRequest,
+    JoinResponse
 }
 
 export {

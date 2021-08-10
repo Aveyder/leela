@@ -1,13 +1,30 @@
+import "phaser";
 import "../scss/styles.scss";
 import {io} from "socket.io-client";
-import {SERVER_HOST} from "./constants/config";
+import {CLIENT_UPDATE_RATE, SERVER_HOST} from "./constants/config";
 import OutgoingSystem from "./network/OutgoingSystem";
-import {IncomingSystem} from "@leela/common";
+import {Loop, MessageSystem, Opcode} from "@leela/common";
+import ConnectionSystem from "./network/ConnectionSystem";
+import Ticks from "./network/Ticks";
+import IncomingSystem from "./network/IncomingSystem";
+import SimulationSystem from "./loops/SimulationSystem";
+import CommandSystem from "./loops/CommandSystem";
+
+Loop.setContext({performance, clearInterval});
 
 const socket = io(SERVER_HOST);
-const incoming = new IncomingSystem();
-const outgoing = new OutgoingSystem(socket);
 
-socket.on("message", (input: string) => {
-    incoming.receive(input);
-});
+const ticks = new Ticks();
+
+const messages = new MessageSystem();
+const incoming = new IncomingSystem(ticks, messages);
+const connections = new ConnectionSystem(socket, incoming);
+connections.init();
+
+const outgoing = new OutgoingSystem(socket, ticks);
+const simulations = new SimulationSystem(ticks);
+simulations.loop.start();
+const cmd = new CommandSystem(outgoing);
+cmd.loop.start();
+
+outgoing.push(Opcode.UpdateRate, [CLIENT_UPDATE_RATE]);

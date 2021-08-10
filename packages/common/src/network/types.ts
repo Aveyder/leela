@@ -4,11 +4,21 @@ type ClientId = string;
 
 type Data = unknown[];
 type Message = [Opcode, ...Data];
-type Packet = Message[];
+
+type Timestamp = number;
+type Tick = number;
+type AckTick = Tick;
+
+type ClientPacket = [Timestamp, Tick, ...Message[]];
+type ServerPacket = [Timestamp, Tick, AckTick, ...Message[]];
 
 export {
     ClientId,
     Data,
     Message,
-    Packet
-}
+    Timestamp,
+    Tick,
+    AckTick,
+    ClientPacket,
+    ServerPacket
+};
