@@ -13,7 +13,7 @@ export default class SnapshotSystem {
     public set(id: ClientId, tickrate: number): void {
         let loop = this.loops[id];
 
-        tickrate = tickrate == -1 ? SIMULATION_RATE : SNAPSHOT_RATE;
+        tickrate = tickrate == -1 ? SNAPSHOT_RATE == -1 ? SIMULATION_RATE : SNAPSHOT_RATE : tickrate;
 
         if (loop) {
             if (tickrate != loop.tickrate) {
