@@ -2,7 +2,6 @@ import OutgoingSystem from "../network/OutgoingSystem";
 import {Loop, SIMULATION_RATE} from "@leela/common";
 import {CLIENT_CMD_RATE} from "../constants/config";
 
-
 export default class CommandSystem {
 
     public readonly loop: Loop;

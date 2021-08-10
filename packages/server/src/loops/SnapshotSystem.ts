@@ -11,22 +11,34 @@ export default class SnapshotSystem {
     ) {}
 
     public set(id: ClientId, tickrate: number): void {
-        let loop = this.loops[id];
+        const loop = this.loops[id];
 
-        tickrate = tickrate == -1 ? SNAPSHOT_RATE == -1 ? SIMULATION_RATE : SNAPSHOT_RATE : tickrate;
+        tickrate = this.calcTickrate(tickrate);
 
         if (loop) {
-            if (tickrate != loop.tickrate) {
-                loop.tickrate = tickrate;
-                loop.restart();
-            }
+            this.updateLoop(loop, tickrate);
         } else {
-            loop = new Loop(
-                () => this.tick.bind(this, id), tickrate,
-            );
-            loop.start();
-            this.loops[id] = loop;
+            this.createLoop(id, tickrate);
         }
+    }
+
+    private calcTickrate(tickrate: number) {
+        return tickrate == -1 ? SNAPSHOT_RATE == -1 ? SIMULATION_RATE : SNAPSHOT_RATE : tickrate;
+    }
+
+    private updateLoop(loop: Loop, tickrate: number) {
+        if (tickrate != loop.tickrate) {
+            loop.tickrate = tickrate;
+            loop.restart();
+        }
+    }
+
+    private createLoop(id: ClientId, tickrate: number) {
+        const loop = new Loop(
+            () => this.tick.bind(this, id), tickrate,
+        );
+        loop.start();
+        this.loops[id] = loop;
     }
 
     public remove(id: ClientId): void {

@@ -1,4 +1,4 @@
-import {ClientPacket, createMessage, Data, Message, Opcode, Tick} from "@leela/common";
+import {ClientPacket, createMessage, Data, Message, Opcode} from "@leela/common";
 import {Socket} from "socket.io-client";
 import Ticks from "./Ticks";
 

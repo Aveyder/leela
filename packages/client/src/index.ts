@@ -3,11 +3,10 @@ import "../scss/styles.scss";
 import {io} from "socket.io-client";
 import {CLIENT_UPDATE_RATE, SERVER_HOST} from "./constants/config";
 import OutgoingSystem from "./network/OutgoingSystem";
-import {MessageSystem, Opcode} from "@leela/common";
+import {Loop, MessageSystem, Opcode} from "@leela/common";
 import ConnectionSystem from "./network/ConnectionSystem";
 import Ticks from "./network/Ticks";
 import IncomingSystem from "./network/IncomingSystem";
-import {Loop} from "@leela/common";
 import SimulationSystem from "./loops/SimulationSystem";
 import CommandSystem from "./loops/CommandSystem";
 
