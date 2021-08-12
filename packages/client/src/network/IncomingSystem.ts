@@ -23,8 +23,8 @@ export default class IncomingSystem {
         const timestamp = packet.shift() as Timestamp;
 
         const ticks = this.ticks;
-        if (ticks.server.timestamp < timestamp) {
-            ticks.server.timestamp = timestamp;
+        if (ticks.server.time < timestamp) {
+            ticks.server.time = timestamp;
             ticks.server.tick = packet.shift() as Tick;
             ticks.clientAck = packet.shift() as AckTick;
 

@@ -1,8 +1,8 @@
 import {Tick} from "@leela/common";
 import Ticks from "./Ticks";
+import {State} from "./types";
 
 type SequenceId = string;
-type State = unknown;
 type Transaction = unknown;
 
 interface TransactionReducer<S extends State, T extends Transaction> {
@@ -25,7 +25,7 @@ class ReconcileSystem {
         this.reset();
     }
 
-    public createSequence(id: SequenceId, reducer: TransactionReducer<State, Transaction>): void {
+    public register<S extends State, T extends Transaction>(id: SequenceId, reducer: TransactionReducer<S, T>): void {
         this.sequences[id] = {
             lastTick: -1,
             transactions: [],
@@ -36,10 +36,8 @@ class ReconcileSystem {
     public add(id: SequenceId, transaction: Transaction): void {
         const sequence = this.sequences[id];
 
-        if (sequence) {
-            sequence.transactions.push(transaction);
-            sequence.lastTick = this.ticks.client;
-        }
+        sequence.transactions.push(transaction);
+        sequence.lastTick = this.ticks.client;
     }
 
     public reconcile<S extends State, T extends Transaction>(id: SequenceId, ackState: S): S {
