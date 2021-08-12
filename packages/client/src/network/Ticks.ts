@@ -7,7 +7,7 @@ export default class Ticks {
     client: Tick;
 
     constructor() {
-        this.server = {timestamp: -1, tick: -1};
+        this.server = {time: -1, tick: -1};
         this.clientAck = -1;
         this.client = -1;
     }
