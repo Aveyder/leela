@@ -1,14 +1,18 @@
-import {ClientId, SIMULATION_RATE, SNAPSHOT_RATE} from "@leela/common";
+import {ClientId, SIMULATION_RATE, SNAPSHOT_RATE, TICK} from "@leela/common";
 import Loop from "@leela/common/dist/loops/Loop";
-import OutgoingSystem from "../network/OutgoingSystem";
+import OutgoingSystem from "./OutgoingSystem";
+import EventEmitter from "eventemitter3";
 
 export default class SnapshotSystem {
 
     private readonly loops: Record<ClientId, Loop>;
+    public readonly events: EventEmitter;
 
     constructor(
         private readonly outgoing: OutgoingSystem
-    ) {}
+    ) {
+        this.loops = {};
+    }
 
     public set(id: ClientId, tickrate: number): void {
         const loop = this.loops[id];
@@ -50,8 +54,8 @@ export default class SnapshotSystem {
         }
     }
 
-    private tick(id: ClientId) {
-        // snapshots.generate(id)
+    private tick(id: ClientId, delta: number) {
+        this.events.emit(TICK, id, delta); // snapshots.generate(id)
 
         this.outgoing.send(id);
     }

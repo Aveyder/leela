@@ -1,7 +1,7 @@
 import {Server} from "socket.io";
 import PacketSystem from "./PacketSystem";
 import SocketSystem from "./SocketSystem";
-import SnapshotSystem from "../loops/SnapshotSystem";
+import SnapshotSystem from "./SnapshotSystem";
 
 export default class ConnectionSystem {
     constructor(

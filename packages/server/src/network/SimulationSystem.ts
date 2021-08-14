@@ -1,11 +1,13 @@
-import Ticks from "../network/Ticks";
-import {SIMULATION_RATE} from "@leela/common";
-import IncomingSystem from "../network/IncomingSystem";
+import Ticks from "./Ticks";
+import {SIMULATION_RATE, TICK} from "@leela/common";
+import IncomingSystem from "./IncomingSystem";
 import Loop from "@leela/common/dist/loops/Loop";
+import EventEmitter from "eventemitter3";
 
 export default class SimulationSystem {
 
     public readonly loop: Loop;
+    public readonly events: EventEmitter;
 
     constructor(
         private readonly ticks: Ticks,
@@ -14,6 +16,7 @@ export default class SimulationSystem {
         this.loop = new Loop(
             delta => this.tick(delta), SIMULATION_RATE,
         );
+        this.events = new EventEmitter();
     }
 
     private tick(delta: number) {
@@ -21,6 +24,6 @@ export default class SimulationSystem {
 
         this.incoming.receivePackets();
 
-        // world.tick(delta);
+        this.events.emit(TICK, delta); // world.tick(delta);
     }
 }
