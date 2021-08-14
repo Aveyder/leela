@@ -7,7 +7,7 @@ type SequenceId = string;
 interface Operator<S extends State> {
     sum(s1: S, s2: S): S;
     diff(s1: S, s2: S): S;
-    mul(s1: S, scalar: number): S;
+    mul(s: S, scalar: number): S;
     eq(s1: S, s2: S): boolean;
 }
 
