@@ -95,9 +95,7 @@ class ReconcileSystem {
             const predIndex = (states.length - 1) - lag;
             const predState = states[predIndex];
 
-            const operator = sequence.operator;
-
-            sequence.error = operator.diff(predState, ackState);
+            sequence.error = sequence.operator.diff(predState, ackState);
 
             if (CLIENT_SMOOTH && sequence.error) {
                 sequence.smoothTimer = CLIENT_SMOOTH_MS / 1000;
