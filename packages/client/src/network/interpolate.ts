@@ -4,7 +4,8 @@ import {State} from "./types";
 import {
     ENTITY_EXTRAPOLATE,
     ENTITY_EXTRAPOLATE_MAX_MS,
-    ENTITY_EXTRAPOLATE_PAST, INTERPOLATE,
+    ENTITY_EXTRAPOLATE_PAST,
+    INTERPOLATE,
     INTERPOLATE_BUFFER_MS
 } from "../constants/config";
 
@@ -47,18 +48,16 @@ class InterpolateSystem {
     public pushState(id: InterpolationId, entityId: EntityId, state: State): void {
         const interpolation = this.interpolations[id];
 
-        if (interpolation) {
-            const buffer = interpolation.buffer[entityId] || [];
+        const buffer = interpolation.buffer[entityId] || [];
 
-            this.trimBuffer(buffer);
+        this.trimBuffer(buffer);
 
-            buffer.push({
-                state,
-                stamp: this.ticks.server
-            });
+        buffer.push({
+            state,
+            stamp: this.ticks.server
+        });
 
-            interpolation.buffer[entityId] = buffer;
-        }
+        interpolation.buffer[entityId] = buffer;
     }
 
     private trimBuffer(buffer: SnapshotBuffer<State>) {
