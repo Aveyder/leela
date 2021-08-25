@@ -16,7 +16,7 @@ export default class OutgoingSystem {
         if (socket) {
             const messages = this.outgoing[id];
 
-            if (messages.length > 0) {
+            if (messages?.length > 0) {
                 const packet = this.createServerPacket(id, messages);
 
                 const json = JSON.stringify(packet);

@@ -45,7 +45,7 @@ class InterpolateSystem {
         };
     }
 
-    public pushState(id: InterpolationId, entityId: EntityId, state: State): void {
+    public pushState<S extends State>(id: InterpolationId, entityId: EntityId, state: S): void {
         const interpolation = this.interpolations[id];
 
         const buffer = interpolation.buffer[entityId] || [];
@@ -54,7 +54,7 @@ class InterpolateSystem {
 
         buffer.push({
             state,
-            stamp: this.ticks.server
+            stamp: {...this.ticks.server}
         });
 
         interpolation.buffer[entityId] = buffer;
@@ -75,6 +75,8 @@ class InterpolateSystem {
         const interpolation = this.interpolations[id] as Interpolation<S>;
 
         const buffer = interpolation.buffer[entityId];
+
+        console.log(buffer.length);
 
         if (INTERPOLATE && buffer.length > 1) {
             const now = Date.now();

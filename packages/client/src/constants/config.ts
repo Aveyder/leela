@@ -11,8 +11,8 @@ const CLIENT_PREDICT = true;
 const CLIENT_SMOOTH = true;
 const CLIENT_SMOOTH_MS = 100;
 
-const CLIENT_CMD_RATE = -1;
-const CLIENT_UPDATE_RATE = -1;
+const CLIENT_CMD_RATE = 20;
+const CLIENT_UPDATE_RATE = 20;
 
 export {
     SERVER_HOST,
