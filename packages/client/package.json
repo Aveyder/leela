@@ -2,11 +2,15 @@
   "name": "@leela/client",
   "private": true,
   "scripts": {
-    "dev": "webpack serve --open --host 0.0.0.0 --port 9000 --hot",
-    "build": "webpack",
-    "start": "sirv dist --host 0.0.0.0 --port 9000"
+    "dev": "webpack serve --open --host 0.0.0.0 --port 9000 --hot -c webpack/webpack.client.js",
+    "build": "webpack -c webpack/webpack.client.js",
+    "start": "sirv dist --host 0.0.0.0 --port 9000",
+    "demo:dev": "webpack serve --open --host 0.0.0.0 --port 9001 --hot -c webpack/webpack.demo.js"
   },
   "devDependencies": {
+    "@types/react": "^17.0.19",
+    "@types/react-dom": "^17.0.9",
+    "@types/react-redux": "^7.1.18",
     "clean-webpack-plugin": "^4.0.0-alpha.0",
     "css-loader": "^6.2.0",
     "file-loader": "^6.2.0",
@@ -19,11 +23,17 @@
     "typescript": "^4.3.5",
     "webpack": "^5.46.0",
     "webpack-cli": "^4.7.2",
-    "webpack-dev-server": "^3.11.2"
+    "webpack-dev-server": "^3.11.2",
+    "webpack-merge": "^5.8.0"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^1.6.1",
     "eventemitter3": "^4.0.7",
     "phaser": "^3.55.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-redux": "^7.2.4",
+    "redux": "^4.1.1",
     "socket.io-client": "^4.1.3"
   }
 }
