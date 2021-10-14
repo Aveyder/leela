@@ -1,14 +1,14 @@
 import {State} from "../types";
-import {InterpolateOptions, Interpolator} from "./interpolate";
+import {interpolate, InterpolateOptions, Interpolator} from "./interpolate";
 import {
     ENTITY_EXTRAPOLATE,
     ENTITY_EXTRAPOLATE_MAX_MS,
     ENTITY_EXTRAPOLATE_PAST,
-    INTERPOLATE, INTERPOLATE_BUFFER_MS
+    INTERPOLATE,
+    INTERPOLATE_BUFFER_MS
 } from "../../constants/config";
 import {INTERPOLATE_MS} from "@leela/common";
 import Snapshot from "./Snapshot";
-import {interpolate} from "./interpolate";
 
 type EntityId = string | number;
 

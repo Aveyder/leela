@@ -1,5 +1,4 @@
-import {ClientId, SIMULATION_RATE, SNAPSHOT_RATE, TICK} from "@leela/common";
-import Loop from "@leela/common/dist/loops/Loop";
+import {ClientId, Loop, SIMULATION_RATE, SNAPSHOT_RATE, TICK} from "@leela/common";
 import OutgoingSystem from "./OutgoingSystem";
 import EventEmitter from "eventemitter3";
 

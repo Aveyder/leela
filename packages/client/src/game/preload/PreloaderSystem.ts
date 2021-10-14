@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
 import {Scene} from "phaser";
+import {CHAR_MAX_ID} from "@leela/common";
 import LoaderPlugin = Phaser.Loader.LoaderPlugin;
 import AnimationManager = Phaser.Animations.AnimationManager;
-import {CHAR_MAX_ID} from "@leela/common";
 
 export default class PreloaderSystem {
 

@@ -36,7 +36,7 @@ let config = {
     resolve: {
         extensions: ['.ts', '.tsx', '.js'],
         alias: {
-            "@leela/common": path.resolve(__dirname, "../common/src")
+            "@leela/common": path.resolve(__dirname, "../../common/src")
         }
     },
     plugins: [
