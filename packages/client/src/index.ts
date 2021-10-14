@@ -1,7 +1,6 @@
 import "phaser";
 import "../scss/styles.scss";
 import NetworkSystem from "./network/NetworkSystem";
-import {WORLD_HEIGHT, WORLD_WIDTH} from "@leela/common";
 import GameScene from "./game/GameScene";
 import {Game} from "phaser";
 
@@ -11,8 +10,8 @@ network.init();
 const config = {
     backgroundColor: "#83957d",
     scale: {
-        width: WORLD_WIDTH,
-        height: WORLD_HEIGHT
+        width: 800,
+        height: 600
     }
 }
 

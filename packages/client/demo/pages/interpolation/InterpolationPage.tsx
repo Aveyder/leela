@@ -28,7 +28,6 @@ export default function InterpolationPage(): ReactElement {
                 <label htmlFor="extrapolateMaxMs">extrapolate max ms: </label>
                 <input type="number" name="extrapolateMaxMs" id="extrapolateMaxMs" value={interpolation.extrapolateMaxMs}/>
             </div>
-
             <div>
                 <label htmlFor="extrapolatePast">extrapolate past: </label>
                 <input type="checkbox" name="extrapolatePast" id="extrapolatePast" checked={interpolation.extrapolatePast}/>
