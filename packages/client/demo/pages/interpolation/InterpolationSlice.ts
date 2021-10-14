@@ -1,6 +1,5 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {InterpolateOptions} from "../../src/network/interpolation/interpolate";
-import {act} from "react-dom/test-utils";
+import {InterpolateOptions} from "../../../src/network/interpolation/interpolate";
 
 const initialState = {
     interpolate: true,

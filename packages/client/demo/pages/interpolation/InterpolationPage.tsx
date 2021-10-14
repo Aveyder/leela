@@ -1,10 +1,10 @@
 import * as React from "react";
 import {ReactElement, useRef} from "react";
 import {useSelector} from "react-redux";
-import {InterpolateOptions} from "../../src/network/interpolation/interpolate";
-import DemoAppState from "../app/DemoAppState";
+import {InterpolateOptions} from "../../../src/network/interpolation/interpolate";
+import DemoAppState from "../../app/DemoAppState";
 
-export default function Interpolation(): ReactElement {
+export default function InterpolationPage(): ReactElement {
     const interpolation = useSelector<DemoAppState>(state => state.interpolation) as InterpolateOptions;
 
     const phaserRef = useRef();
