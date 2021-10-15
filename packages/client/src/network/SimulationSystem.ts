@@ -10,7 +10,8 @@ export default class SimulationSystem {
     constructor(
         private readonly ticks: Ticks,
     ) {
-        this.loop = new Loop(delta => this.tick(delta), SIMULATION_RATE)
+        this.loop = new Loop(delta => this.tick(delta), SIMULATION_RATE);
+        this.events = new EventEmitter();
     }
 
     private tick(delta: number) {

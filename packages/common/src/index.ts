@@ -1,5 +1,6 @@
 export * from "./constants/config";
 export * from "./constants/events";
+export * from "./constants/world";
 export { default as Loop } from "./loops/Loop";
 export * from "./network/messages";
 export { default as MessageSystem } from "./network/MessageSystem";

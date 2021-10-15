@@ -5,12 +5,6 @@ const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 let config = {
     mode: 'development',
     devtool: 'eval-source-map',
-    entry: {
-        index: './src/index.ts'
-    },
-    devServer: {
-        contentBase: './dist'
-    },
     module: {
         rules: [
             {
@@ -42,14 +36,12 @@ let config = {
     resolve: {
         extensions: ['.ts', '.tsx', '.js'],
         alias: {
-            "@leela/common": path.resolve(__dirname, "../common/src")
+            "@leela/common": path.resolve(__dirname, "../../common/src")
         }
     },
     plugins: [
         new CleanWebpackPlugin(),
-        new HtmlWebpackPlugin({
-            title: 'Leela Client'
-        })
+        new HtmlWebpackPlugin()
     ],
     output: {
         filename: '[name].[contenthash].js',
