@@ -19,11 +19,11 @@ export default class OutgoingSystem {
             if (messages?.length > 0) {
                 const packet = this.createServerPacket(id, messages);
 
+                this.outgoing[id].length = 0;
+
                 const json = JSON.stringify(packet);
 
                 socket.send(json);
-
-                this.outgoing[id].length = 0;
             }
         }
     }

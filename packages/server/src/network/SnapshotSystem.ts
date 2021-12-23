@@ -27,7 +27,11 @@ export default class SnapshotSystem {
     }
 
     private calcTickrate(tickrate: number) {
-        return tickrate == -1 ? SNAPSHOT_RATE == -1 ? SIMULATION_RATE : SNAPSHOT_RATE : tickrate;
+        if (tickrate == -1) {
+            return (SNAPSHOT_RATE < 0 || SNAPSHOT_RATE > SIMULATION_RATE) ? SIMULATION_RATE : SNAPSHOT_RATE
+        } else {
+            return tickrate;
+        }
     }
 
     private updateLoop(loop: Loop, tickrate: number) {
@@ -55,6 +59,8 @@ export default class SnapshotSystem {
 
     private tick(id: ClientId, delta: number) {
         this.events.emit(TICK, id, delta); // snapshots.generate(id)
+
+        console.log(`SNAPSHOT ${id}: ${delta}`);
 
         this.outgoing.send(id);
     }

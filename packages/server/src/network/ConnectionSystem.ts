@@ -19,17 +19,17 @@ export default class ConnectionSystem {
 
     public init(): void {
         this.io.on("connection", socket => {
-            console.log(`a user connected ${socket.id}`);
+            console.log(`user connected: ${socket.id}`);
 
             this.sockets.put(socket.id, socket);
-            this.snapshots.set(socket.id, -1);
+            this.snapshots.set(socket.id, -1); // now?
 
             socket.on("message", (input: string) => {
                 this.packets.accept(socket.id, input);
             });
 
             socket.on("disconnect", () => {
-                console.log("user disconnected");
+                console.log(`user disconnected: ${socket.id}`);
 
                 this.events.emit("disconnect", socket.id);
 

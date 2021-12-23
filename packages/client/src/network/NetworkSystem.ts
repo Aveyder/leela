@@ -46,6 +46,6 @@ export default class NetworkSystem {
         this.simulations.loop.start();
         this.cmd.loop.start();
 
-        this.outgoing.push(Opcode.UpdateRate, [CLIENT_UPDATE_RATE]);
+        this.outgoing.push(Opcode.UpdateRate, [CLIENT_UPDATE_RATE]); // now?
     }
 }
