@@ -1,5 +1,4 @@
-import {ClientId, SIMULATION_RATE, SNAPSHOT_RATE, TICK} from "@leela/common";
-import Loop from "@leela/common/dist/loops/Loop";
+import {ClientId, Loop, SIMULATION_RATE, SNAPSHOT_RATE, TICK} from "@leela/common";
 import OutgoingSystem from "./OutgoingSystem";
 import EventEmitter from "eventemitter3";
 
@@ -12,6 +11,7 @@ export default class SnapshotSystem {
         private readonly outgoing: OutgoingSystem
     ) {
         this.loops = {};
+        this.events = new EventEmitter();
     }
 
     public set(id: ClientId, tickrate: number): void {
@@ -38,9 +38,8 @@ export default class SnapshotSystem {
     }
 
     private createLoop(id: ClientId, tickrate: number) {
-        const loop = new Loop(
-            () => this.tick.bind(this, id), tickrate,
-        );
+        const tick = this.tick.bind(this, id);
+        const loop = new Loop(tick, tickrate);
         loop.start();
         this.loops[id] = loop;
     }

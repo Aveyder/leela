@@ -17,6 +17,7 @@ interface Sequence<S extends State> {
     error: S;
     smoothTimer: number;
     lastAckState: S;
+    lastAckTick: number;
     operator: Operator<S>
 }
 
@@ -37,6 +38,7 @@ class ReconcileSystem {
             error: null,
             smoothTimer: 0,
             lastAckState: null,
+            lastAckTick: -1,
             operator
         };
     }
@@ -62,10 +64,14 @@ class ReconcileSystem {
                 }
             }
 
-            if (this.isStateUpdate(sequence, state)) {
-                sequence.states.push(state);
-                sequence.lastUpdateTick = this.ticks.client;
+            const states = sequence.states;
+
+            if (states.length > 0 && sequence.lastAckTick == this.ticks.client) {
+                states[states.length - 1] = state;
+            } else {
+                states.push(state);
             }
+            sequence.lastUpdateTick = this.ticks.client;
 
             return state;
         }
@@ -87,24 +93,26 @@ class ReconcileSystem {
     public ack<S extends State>(id: SequenceId, ackState: S): void {
         const sequence = this.sequences[id] as Sequence<S>;
 
-        if (CLIENT_PREDICT && sequence.states.length > 0) {
-            const lag = sequence.lastUpdateTick - this.ticks.clientAck;
+        if (CLIENT_PREDICT) {
+            if (sequence.states.length > 0 && sequence.lastAckTick != this.ticks.clientAck) {
+                const lag = sequence.lastUpdateTick - this.ticks.clientAck;
+                const states = sequence.states;
 
-            const states = sequence.states;
+                const predIndex = (states.length - 1) - lag;
+                const predState = states[predIndex];
 
-            const predIndex = (states.length - 1) - lag;
-            const predState = states[predIndex];
+                sequence.error = sequence.operator.diff(predState, ackState);
 
-            sequence.error = sequence.operator.diff(predState, ackState);
+                if (CLIENT_SMOOTH && sequence.error) {
+                    sequence.smoothTimer = CLIENT_SMOOTH_MS / 1000;
+                }
 
-            if (CLIENT_SMOOTH && sequence.error) {
-                sequence.smoothTimer = CLIENT_SMOOTH_MS / 1000;
+                states.splice(0, predIndex + 1);
             }
-
-            states.splice(0, predIndex + 1);
         }
 
         sequence.lastAckState = ackState;
+        sequence.lastAckTick = this.ticks.clientAck;
     }
 
     public reset(): void {

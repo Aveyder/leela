@@ -1,4 +1,4 @@
-import {Loop, MessageSystem, Opcode, Tick} from "@leela/common";
+import {Loop, MessageSystem, Opcode} from "@leela/common";
 import {io, Socket} from "socket.io-client";
 import {CLIENT_UPDATE_RATE, SERVER_HOST} from "../constants/config";
 import Ticks from "./Ticks";
@@ -7,8 +7,8 @@ import ConnectionSystem from "./ConnectionSystem";
 import OutgoingSystem from "./OutgoingSystem";
 import SimulationSystem from "./SimulationSystem";
 import CommandSystem from "./CommandSystem";
-import {InterpolateSystem} from "./interpolate";
 import {ReconcileSystem} from "./reconcile";
+import InterpolateSystem from "./interpolation/InterpolateSystem";
 
 export default class NetworkSystem {
 

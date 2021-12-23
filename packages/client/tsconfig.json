@@ -11,9 +11,10 @@
 
     "paths": {
       "@leela/common": ["../common/src"]
-    }
+    },
+    "jsx": "react"
   },
   "include": [
-    "src", "types"
+    "src", "demo","types"
   ]
 }

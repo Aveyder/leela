@@ -2,7 +2,10 @@ enum Opcode {
     Handshake,
     UpdateRate,
     JoinRequest,
-    JoinResponse
+    JoinResponse,
+    Tick,
+    Move,
+    Snapshot
 }
 
 export {

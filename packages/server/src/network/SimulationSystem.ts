@@ -1,7 +1,6 @@
 import Ticks from "./Ticks";
-import {SIMULATION_RATE, TICK} from "@leela/common";
+import {Loop, SIMULATION_RATE, TICK} from "@leela/common";
 import IncomingSystem from "./IncomingSystem";
-import Loop from "@leela/common/dist/loops/Loop";
 import EventEmitter from "eventemitter3";
 
 export default class SimulationSystem {

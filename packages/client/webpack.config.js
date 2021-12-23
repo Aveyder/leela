@@ -9,7 +9,7 @@ let config = {
         index: './src/index.ts'
     },
     devServer: {
-        contentBase: './dist'
+        static: './dist'
     },
     module: {
         rules: [
