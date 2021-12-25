@@ -6,21 +6,21 @@ type InterpolationId = string;
 
 export default class InterpolateSystem {
 
-    public readonly interpolations: Record<InterpolationId, Interpolation<State>>;
+    public readonly map: Record<InterpolationId, Interpolation<State>>;
 
     constructor(
         private readonly ticks: Ticks
     ) {
-        this.interpolations = {};
+        this.map = {};
     }
 
     public push<S extends State>(id: InterpolationId, entityId: EntityId, state: S): void {
-        this.interpolations[id].push(entityId, {
+        this.map[id].push(entityId, {
             state, timestamp: this.ticks.server.time
         });
     }
 
     public reset(): void {
-        Object.values(this.interpolations).forEach(interpolation => interpolation.reset());
+        Object.values(this.map).forEach(interpolation => interpolation.reset());
     }
 }
