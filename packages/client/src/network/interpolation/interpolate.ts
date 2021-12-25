@@ -2,11 +2,11 @@ import {State} from "../types";
 import Snapshot from "./Snapshot";
 
 type InterpolateOptions = {
-    interpolate: boolean,
-    interpolateMs: number,
-    extrapolate: boolean,
-    extrapolateMaxMs: number,
-    extrapolatePast: boolean
+    interpolate?: boolean,
+    interpolateMs?: number,
+    extrapolate?: boolean,
+    extrapolateMaxMs?: number,
+    extrapolatePast?: boolean
 };
 
 interface Interpolator<S extends State> {
