@@ -26,7 +26,7 @@ export default class IncomingSystem {
         if (ticks.server.time < timestamp) {
             ticks.server.time = timestamp;
             ticks.server.tick = packet.shift() as Tick;
-            ticks.clientAck = packet.shift() as AckTick;
+            ticks.server.ack = packet.shift() as AckTick;
 
             this.messages.receiveMessages(packet as Message[]);
         }

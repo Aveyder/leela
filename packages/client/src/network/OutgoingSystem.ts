@@ -21,7 +21,7 @@ export default class OutgoingSystem {
 
     public send(): void {
         if (this.socket.connected && this.messages.length > 0) {
-            const clientPacket = [Date.now(), this.ticks.client, ...this.messages] as ClientPacket;
+            const clientPacket = [Date.now(), this.ticks.client, this.ticks.server.tick, ...this.messages] as ClientPacket;
 
             this.messages.length = 0;
 

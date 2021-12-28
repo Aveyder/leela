@@ -93,9 +93,10 @@ class ReconcileSystem {
     public ack<S extends State>(id: SequenceId, ackState: S): void {
         const sequence = this.sequences[id] as Sequence<S>;
 
+        const clientAck = this.ticks.server.ack;
         if (CLIENT_PREDICT) {
-            if (sequence.states.length > 0 && sequence.lastAckTick != this.ticks.clientAck) {
-                const lag = sequence.lastUpdateTick - this.ticks.clientAck;
+            if (sequence.states.length > 0 && sequence.lastAckTick != clientAck) {
+                const lag = sequence.lastUpdateTick - clientAck;
                 const states = sequence.states;
 
                 const predIndex = (states.length - 1) - lag;
@@ -112,7 +113,7 @@ class ReconcileSystem {
         }
 
         sequence.lastAckState = ackState;
-        sequence.lastAckTick = this.ticks.clientAck;
+        sequence.lastAckTick = clientAck;
     }
 
     public reset(): void {

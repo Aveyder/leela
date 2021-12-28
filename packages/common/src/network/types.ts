@@ -9,7 +9,7 @@ type Timestamp = number;
 type Tick = number;
 type AckTick = Tick;
 
-type ClientPacket = [Timestamp, Tick, ...Message[]];
+type ClientPacket = [Timestamp, Tick, AckTick, ...Message[]];
 type ServerPacket = [Timestamp, Tick, AckTick, ...Message[]];
 
 export {
