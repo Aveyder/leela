@@ -60,8 +60,6 @@ export default class SnapshotSystem {
     private tick(id: ClientId, delta: number) {
         this.events.emit(TICK, id, delta); // snapshots.generate(id)
 
-        console.log(`SNAPSHOT ${id}: ${delta}`);
-
         this.outgoing.send(id);
     }
 }

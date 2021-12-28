@@ -20,6 +20,10 @@ export default class InterpolateSystem {
         });
     }
 
+    public reconcile<S extends State>(id: InterpolationId, entityId: EntityId): S {
+        return (this.map[id] as Interpolation<S>).interpolate(entityId, Date.now());
+    }
+
     public reset(): void {
         Object.values(this.map).forEach(interpolation => interpolation.reset());
     }

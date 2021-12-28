@@ -7,8 +7,8 @@ import ConnectionSystem from "./ConnectionSystem";
 import OutgoingSystem from "./OutgoingSystem";
 import SimulationSystem from "./SimulationSystem";
 import CommandSystem from "./CommandSystem";
-import {ReconcileSystem} from "./reconcile";
 import InterpolateSystem from "./interpolation/InterpolateSystem";
+import ReconcileSystem from "./reconcile/ReconcileSystem";
 
 export default class NetworkSystem {
 
