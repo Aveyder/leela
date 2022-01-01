@@ -1,5 +1,7 @@
 const MOVEMENT = "movement";
+const ENTITY_ID = "eid";
 
 export {
-    MOVEMENT
+    MOVEMENT,
+    ENTITY_ID
 }

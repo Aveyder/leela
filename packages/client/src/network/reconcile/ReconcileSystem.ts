@@ -14,9 +14,9 @@ export default class ReconcileSystem {
         this.sequences = {};
     }
 
-    public push<C extends State>(id: SequenceId, control: C): void {
+    public push<C extends State>(id: SequenceId, control: C, delta: number): void {
         const tick = this.ticks.client;
-        this.sequences[id].push({control, tick});
+        this.sequences[id].push({control, delta, tick});
     }
 
     public reconcile<S extends State>(id: SequenceId, state: S): S {

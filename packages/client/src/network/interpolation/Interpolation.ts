@@ -4,13 +4,11 @@ import {
     ENTITY_EXTRAPOLATE,
     ENTITY_EXTRAPOLATE_MAX_MS,
     ENTITY_EXTRAPOLATE_PAST,
-    INTERPOLATE,
-    INTERPOLATE_BUFFER_MS
+    INTERPOLATE, INTERPOLATE_BUFFER_MS, INTERPOLATE_DUPLICATES
 } from "../../constants/config";
-import {INTERPOLATE_MS} from "@leela/common";
+import {EntityId, INTERPOLATE_MS} from "@leela/common";
 import Snapshot from "./Snapshot";
-
-type EntityId = string | number;
+import * as buffer from "buffer";
 
 function trim<S>(snapshots: Snapshot<S>[], thresholdMs) {
     if (snapshots.length > 0) {
@@ -23,13 +21,18 @@ function trim<S>(snapshots: Snapshot<S>[], thresholdMs) {
     }
 }
 
+interface Equalizer<S extends State> {
+    (s1: S, s2: S): boolean
+}
+
 export default class Interpolation<S extends State> {
 
     private buffers: Record<EntityId, Snapshot<S>[]>;
     private readonly options: InterpolateOptions;
 
     constructor(
-        private readonly interpolator: Interpolator<S>
+        private readonly interpolator: Interpolator<S>,
+        private readonly equals: Equalizer<S>
     ) {
         this.buffers = {};
         this.options = {
@@ -45,7 +48,18 @@ export default class Interpolation<S extends State> {
         const buffer = this.getBuffer(entityId);
 
         trim(buffer, INTERPOLATE_BUFFER_MS);
-        buffer.push(snapshot);
+
+        if (INTERPOLATE_DUPLICATES || !this.isDuplicateState(buffer, snapshot.state)) {
+            buffer.push(snapshot);
+        }
+    }
+
+    private isDuplicateState(buffer: Snapshot<S>[], state: S): boolean {
+        if (buffer.length > 0) {
+            const last = buffer[buffer.length - 1];
+
+            return this.equals(last.state, state);
+        }
     }
 
     public interpolate(id: EntityId, moment: number): S {
@@ -73,6 +87,6 @@ export default class Interpolation<S extends State> {
 }
 
 export {
-    EntityId,
+    Equalizer,
     Interpolation
 };

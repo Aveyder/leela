@@ -1,6 +1,7 @@
 import OutgoingSystem from "./OutgoingSystem";
-import {Loop, SIMULATION_RATE} from "@leela/common";
+import {SIMULATION_RATE} from "@leela/common";
 import {CLIENT_CMD_RATE} from "../constants/config";
+import Loop from "./Loop";
 
 export default class CommandSystem {
 

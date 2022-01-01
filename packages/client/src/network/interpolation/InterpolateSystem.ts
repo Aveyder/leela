@@ -1,6 +1,7 @@
 import {State} from "../types";
 import Ticks from "../Ticks";
-import Interpolation, {EntityId} from "./Interpolation";
+import Interpolation from "./Interpolation";
+import {EntityId} from "@leela/common";
 
 type InterpolationId = string;
 
@@ -20,7 +21,7 @@ export default class InterpolateSystem {
         });
     }
 
-    public reconcile<S extends State>(id: InterpolationId, entityId: EntityId): S {
+    public interpolate<S extends State>(id: InterpolationId, entityId: EntityId): S {
         return (this.map[id] as Interpolation<S>).interpolate(entityId, Date.now());
     }
 
