@@ -2,7 +2,7 @@ const SERVER_HOST = "http://localhost:3000/";
 
 const INTERPOLATE = true;
 const INTERPOLATE_BUFFER_MS = 1000;
-const INTERPOLATE_DUPLICATES = true;
+const INTERPOLATE_DUPLICATES = false;
 
 const ENTITY_EXTRAPOLATE = true;
 const ENTITY_EXTRAPOLATE_MAX_MS = 250;

@@ -23,6 +23,10 @@ export default class JoinSystem {
         this.packets = this.controller.network.packets;
         this.messages = this.controller.network.messages;
 
+        this.init();
+    }
+
+    private init() {
         this.connections.events.on("disconnect", this.onDisconnect, this);
 
         this.messages.on(Opcode.JoinRequest, this.onJoinRequest, this);

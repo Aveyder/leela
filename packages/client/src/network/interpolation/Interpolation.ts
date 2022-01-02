@@ -1,14 +1,15 @@
 import {State} from "../types";
-import {interpolate, InterpolateOptions, Interpolator} from "./interpolate";
+import {Equals, interpolate, InterpolateOptions, Interpolator} from "./interpolate";
 import {
     ENTITY_EXTRAPOLATE,
     ENTITY_EXTRAPOLATE_MAX_MS,
     ENTITY_EXTRAPOLATE_PAST,
-    INTERPOLATE, INTERPOLATE_BUFFER_MS, INTERPOLATE_DUPLICATES
+    INTERPOLATE,
+    INTERPOLATE_BUFFER_MS,
+    INTERPOLATE_DUPLICATES
 } from "../../constants/config";
 import {EntityId, INTERPOLATE_MS} from "@leela/common";
 import Snapshot from "./Snapshot";
-import * as buffer from "buffer";
 
 function trim<S>(snapshots: Snapshot<S>[], thresholdMs) {
     if (snapshots.length > 0) {
@@ -19,10 +20,6 @@ function trim<S>(snapshots: Snapshot<S>[], thresholdMs) {
 
         snapshots.splice(0, i);
     }
-}
-
-interface Equals<S extends State> {
-    (s1: S, s2: S): boolean
 }
 
 export default class Interpolation<S extends State> {
@@ -38,6 +35,7 @@ export default class Interpolation<S extends State> {
         this.options = {
             interpolate: INTERPOLATE,
             interpolateMs: INTERPOLATE_MS,
+            interpolateDuplicates: INTERPOLATE_DUPLICATES,
             extrapolate: ENTITY_EXTRAPOLATE,
             extrapolateMaxMs: ENTITY_EXTRAPOLATE_MAX_MS,
             extrapolatePast: ENTITY_EXTRAPOLATE_PAST
@@ -49,17 +47,7 @@ export default class Interpolation<S extends State> {
 
         trim(buffer, INTERPOLATE_BUFFER_MS);
 
-        if (INTERPOLATE_DUPLICATES || !this.isDuplicateState(buffer, snapshot.state)) {
-            buffer.push(snapshot);
-        }
-    }
-
-    private isDuplicateState(buffer: Snapshot<S>[], state: S): boolean {
-        if (buffer.length > 0) {
-            const last = buffer[buffer.length - 1];
-
-            return this.equals(last.state, state);
-        }
+        buffer.push(snapshot);
     }
 
     public interpolate(id: EntityId, moment: number): S {
@@ -67,6 +55,7 @@ export default class Interpolation<S extends State> {
             moment,
             this.getBuffer(id),
             this.interpolator,
+            this.equals,
             this.options
         );
     }
@@ -87,6 +76,5 @@ export default class Interpolation<S extends State> {
 }
 
 export {
-    Equals,
     Interpolation
 };

@@ -3,6 +3,6 @@ import {State} from "../types";
 
 export default interface Transaction<C extends State> {
     control: C;
-    delta: number;
+    delta?: number;
     tick: Tick;
 }

@@ -7,7 +7,7 @@ import {
     WORLD_HEIGHT,
     WORLD_WIDTH,
     bound,
-    toFixed
+    toFixed, SkinId
 } from "@leela/common";
 import {Char} from "@leela/common";
 
@@ -27,12 +27,12 @@ export default class World {
         this.tmpVec2 = {x: 0, y: 0};
     }
 
-    public spawnChar(x?: number, y?: number): Char {
+    public spawnChar(skin?: SkinId, x?: number, y?: number): Char {
         const id = this.entityId++ as EntityId;
 
         const char: Char = {
             id,
-            skin: Math.floor(Math.random() * CHAR_SKINS),
+            skin: skin != undefined ? skin : Math.floor(Math.random() * CHAR_SKINS),
             x: toFixed(x != undefined ? x : Math.random() * WORLD_WIDTH, FRACTION_DIGITS),
             y: toFixed(y != undefined ? y : Math.random() * WORLD_HEIGHT, FRACTION_DIGITS)
         }

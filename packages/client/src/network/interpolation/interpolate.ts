@@ -4,6 +4,7 @@ import Snapshot from "./Snapshot";
 type InterpolateOptions = {
     interpolate?: boolean,
     interpolateMs?: number,
+    interpolateDuplicates?: boolean,
     extrapolate?: boolean,
     extrapolateMaxMs?: number,
     extrapolatePast?: boolean
@@ -13,8 +14,12 @@ interface Interpolator<S extends State> {
     (s1: S, s2: S, progress: number): S;
 }
 
-function interpolate<S extends State>(moment: number, buffer: Snapshot<S>[], interpolator: Interpolator<S>, options: InterpolateOptions): S {
-    const {interpolate, interpolateMs, extrapolate, extrapolateMaxMs, extrapolatePast} = options;
+interface Equals<S extends State> {
+    (s1: S, s2: S): boolean
+}
+
+function interpolate<S extends State>(moment: number, buffer: Snapshot<S>[], interpolator: Interpolator<S>, equals: Equals<S>, options: InterpolateOptions): S {
+    const {interpolate, interpolateMs, interpolateDuplicates, extrapolate, extrapolateMaxMs, extrapolatePast} = options;
 
     const interpolationMoment = moment - interpolateMs;
     const last = buffer.length - 1;
@@ -71,5 +76,6 @@ function interpolate<S extends State>(moment: number, buffer: Snapshot<S>[], int
 export {
     InterpolateOptions,
     Interpolator,
+    Equals,
     interpolate
 };
