@@ -20,6 +20,10 @@ export default class SpawnSystem {
 
         this.messages = this.controller.network.messages;
 
+        this.init();
+    }
+
+    private init() {
         this.messages.on(Opcode.Disappear, this.onDisappear, this);
     }
 

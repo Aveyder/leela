@@ -20,6 +20,10 @@ export default class MovementSystem {
         this.messages = this.controller.network.messages;
         this.ticks = this.controller.network.ticks;
 
+        this.init();
+    }
+
+    private init() {
         this.messages.on(Opcode.Move, this.onMove, this);
     }
 

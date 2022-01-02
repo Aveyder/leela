@@ -16,6 +16,10 @@ export default class SnapshotSystem {
         this.spawn = this.controller.spawn;
         this.move = this.controller.move;
 
+        this.init();
+    }
+
+    private init() {
         this.messages.on(Opcode.Snapshot, this.onUpdate, this);
     }
 

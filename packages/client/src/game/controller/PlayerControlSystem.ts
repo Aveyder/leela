@@ -22,6 +22,10 @@ export default class PlayerControlSystem {
 
         this.tmpVec2 = {x: 0, y: 0};
 
+        this.init();
+    }
+
+    private init() {
         this.simulations.events.on(TICK, this.sampleInput, this);
     }
 

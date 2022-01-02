@@ -52,10 +52,14 @@ export default class MovementSystem {
         this.interpolations = controller.network.interpolations;
         this.reconciliation = controller.network.reconciliation;
 
+        this.errorTimer = 0;
+
+        this.init();
+    }
+
+    private init() {
         this.interpolations.map[MOVEMENT] = new Interpolation<Vec2>(posInterpolator, posEquals);
         this.reconciliation.sequences[MOVEMENT] = new Sequence<Vec2, Vec2>(move);
-
-        this.errorTimer = 0;
 
         this.worldScene.events.on(UPDATE, this.update, this);
     }

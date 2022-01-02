@@ -34,6 +34,10 @@ export default class JoinSystem {
         this.spawn = controller.spawn;
         this.move = controller.move;
 
+        this.init();
+    }
+
+    private init() {
         this.socket.on("disconnect", () => this.onDisconnect());
 
         this.messages.on(Opcode.JoinResponse, this.onJoinResponse, this);

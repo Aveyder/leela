@@ -17,6 +17,10 @@ export default class SnapshotSystem {
         this.snapshots = this.controller.network.snapshots;
         this.packets = this.controller.network.packets;
 
+        this.init();
+    }
+
+    private init() {
         this.snapshots.events.on(TICK, this.onTick, this);
     }
 
