@@ -1,11 +1,12 @@
 import Sprite = Phaser.GameObjects.Sprite;
 import {Scene} from "phaser";
 import GameScene from "../GameScene";
+import {Direction} from "../../direction";
 
 export default class Char extends Sprite {
 
     private _skin: number;
-    private dir: string;
+    private dir: Direction;
 
     constructor(scene: Scene, skin = 0, x?: number, y?: number) {
         super(scene, x, y, "char:0");
@@ -23,7 +24,7 @@ export default class Char extends Sprite {
         }
     }
 
-    public walk(dir: string):void {
+    public walk(dir: Direction):void {
         this.dir = dir;
 
         const anim = `char:${this._skin}:walk:${this.dir}`;

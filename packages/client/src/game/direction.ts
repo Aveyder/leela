@@ -1,27 +1,35 @@
 import {Vec2} from "@leela/common";
 
-function getDirection(dirVec: Vec2): string {
+enum Direction {
+    LEFT = "left",
+    RIGHT = "right",
+    DOWN = "down",
+    UP = "up"
+}
+
+function getDirection(dirVec: Vec2): Direction {
     let dir;
 
     if (dirVec.x === -1) {
-        dir = "left";
+        dir = Direction.LEFT;
     }
 
     if (dirVec.x === 1) {
-        dir = "right";
+        dir = Direction.RIGHT;
     }
 
     if (dirVec.y === 1) {
-        dir = "down";
+        dir = Direction.DOWN;
     }
 
     if (dirVec.y === -1) {
-        dir = "up";
+        dir = Direction.UP;
     }
 
     return dir;
 }
 
 export {
+    Direction,
     getDirection
 };

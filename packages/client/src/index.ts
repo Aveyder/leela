@@ -1,10 +1,10 @@
 import "phaser";
 import "../scss/styles.scss";
 import NetworkSystem from "./network/NetworkSystem";
-import GameScene from "./game/GameScene";
+import GameScene from "./game/scene/GameScene";
 import {Game} from "phaser";
 import {WORLD_HEIGHT, WORLD_WIDTH} from "@leela/common";
-import Controller from "./game/Controller";
+import Controller from "./game/controller/Controller";
 import READY = Phaser.Core.Events.READY;
 
 const config = {

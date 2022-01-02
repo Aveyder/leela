@@ -1,21 +1,22 @@
-import NetworkSystem from "../network/NetworkSystem";
-import GameScene from "./GameScene";
+import NetworkSystem from "../../network/NetworkSystem";
+import GameScene from "../scene/GameScene";
 import {Game} from "phaser";
 import {CHAR_SPEED, Data, EntityId, move, Opcode, SkinId, TICK, toFixed, Vec2} from "@leela/common";
-import {toVec2} from "./control";
-import {ENTITY_ID, MOVEMENT} from "../constants/keys";
-import Char from "./view/Char";
-import Interpolation, {Equals} from "../network/interpolation/Interpolation";
-import {Interpolator} from "../network/interpolation/interpolate";
-import Sequence from "../network/reconcile/Sequence";
+import {toVec2} from "../control";
+import {ENTITY_ID, MOVEMENT} from "../../constants/keys";
+import Char from "../scene/view/Char";
+import Interpolation, {Equals} from "../../network/interpolation/Interpolation";
+import {Interpolator} from "../../network/interpolation/interpolate";
+import Sequence from "../../network/reconcile/Sequence";
 import {
     CLIENT_PREDICT,
     CLIENT_SMOOTH,
     CLIENT_SMOOTH_MAX_MS,
     CLIENT_SMOOTH_PRECISION,
     CLIENT_SNAP_RATIO, INTERPOLATE
-} from "../constants/config";
+} from "../../constants/config";
 import UPDATE = Phaser.Scenes.Events.UPDATE;
+import SpawnSystem from "../scene/SpawnSystem";
 
 const posInterpolator: Interpolator<Vec2> = (s1, s2, progress: number) => {
     const x = s1.x + (s2.x - s1.x) * progress;
@@ -59,7 +60,7 @@ export default class Controller {
     private init() {
         this.network.socket.on("disconnect", () => {
             if (this.playerId != undefined) {
-                this.gameScene.destroyChar(this.chars[this.playerId]);
+                this.chars[this.playerId].destroy();
                 this.playerId = null;
                 this.error = null;
                 this.errorTimer = 0;
@@ -95,9 +96,8 @@ export default class Controller {
             const entityId = data[0] as EntityId;
 
             const char = this.chars[entityId];
-            if (char) {
-                this.gameScene.destroyChar(char);
-            }
+
+            if (char) char.destroy();
         });
 
         this.network.interpolations.map[MOVEMENT] = new Interpolation<Vec2>(posInterpolator, posEquals);
@@ -121,7 +121,7 @@ export default class Controller {
                     if (INTERPOLATE) {
                         this.network.interpolations.push(MOVEMENT, entityId, pos);
                     } else {
-                        this.gameScene.moveChar(char, x, y);
+                        this.gameScene.move.char(char, x, y);
                     }
                 } else {
                     const player = this.chars[entityId];
@@ -135,7 +135,7 @@ export default class Controller {
 
                             if (errX > CLIENT_SMOOTH_PRECISION || errY > CLIENT_SMOOTH_PRECISION) {
                                 if (errX > CHAR_SPEED * CLIENT_SNAP_RATIO || errY > CHAR_SPEED * CLIENT_SNAP_RATIO) {
-                                    this.gameScene.moveChar(player, rec.x, rec.y);
+                                    this.gameScene.move.char(player, rec.x, rec.y);
                                     this.error = null;
                                     this.errorTimer = 0;
                                 } else {
@@ -146,10 +146,10 @@ export default class Controller {
                                 }
                             }
                         } else {
-                            this.gameScene.moveChar(player, rec.x, rec.y);
+                            this.gameScene.move.char(player, rec.x, rec.y);
                         }
                     } else {
-                        this.gameScene.moveChar(player, x, y);
+                        this.gameScene.move.char(player, x, y);
                     }
                 }
             }
@@ -194,14 +194,14 @@ export default class Controller {
                 if (INTERPOLATE && charId != this.playerId) {
                     const pos = this.network.interpolations.interpolate<Vec2>(MOVEMENT, charId);
 
-                    if (pos) this.gameScene.moveChar(char, pos.x, pos.y);
+                    if (pos) this.gameScene.move.char(char, pos.x, pos.y);
                 }
             });
         });
     }
 
     private spawnChar(entityId: EntityId, x, y, skin: SkinId) {
-        const char = this.gameScene.spawnChar(skin, x, y);
+        const char = this.gameScene.spawn.char(skin, x, y);
         char.setData(ENTITY_ID, entityId);
 
         this.chars[entityId] = char;
