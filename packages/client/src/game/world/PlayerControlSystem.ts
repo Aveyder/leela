@@ -1,5 +1,5 @@
 import {Keys} from "../types";
-import GameScene from "./GameScene";
+import WorldScene from "./WorldScene";
 import {toVec2} from "../control";
 import {move, Vec2} from "@leela/common";
 import EventEmitter = Phaser.Events.EventEmitter;
@@ -16,12 +16,12 @@ export default class PlayerControlSystem {
 
     private readonly tmpVec2: Vec2;
 
-    constructor(private gameScene: GameScene) {
-        this.events = gameScene.events;
+    constructor(private worldScene: WorldScene) {
+        this.events = worldScene.events;
 
-        this.keys = gameScene.keys;
+        this.keys = worldScene.keys;
 
-        this.move = gameScene.move;
+        this.move = worldScene.move;
 
         this.tmpVec2 = {x: 0, y: 0};
 
@@ -29,7 +29,7 @@ export default class PlayerControlSystem {
     }
 
     private update(time: number, delta: number): void {
-        const player = this.gameScene.player;
+        const player = this.worldScene.player;
         if (player) {
             const dir = toVec2(this.keys, this.tmpVec2);
 

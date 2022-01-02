@@ -1,10 +1,10 @@
 import Controller from "./Controller";
 import {Data, EntityId, MessageSystem, Opcode, SkinId} from "@leela/common";
 import {Socket} from "socket.io-client";
-import GameScene from "../scene/GameScene";
+import WorldScene from "../world/WorldScene";
 import OutgoingSystem from "../../network/OutgoingSystem";
 import SpawnSystem from "./SpawnSystem";
-import Char from "../scene/view/Char";
+import Char from "../world/view/Char";
 import MovementSystem from "./MovementSystem";
 
 export default class JoinSystem {
@@ -16,7 +16,7 @@ export default class JoinSystem {
 
     private readonly chars: Record<EntityId, Char>;
 
-    private readonly gameScene: GameScene;
+    private readonly worldScene: WorldScene;
 
     private readonly move: MovementSystem;
     private readonly spawn: SpawnSystem;
@@ -29,7 +29,7 @@ export default class JoinSystem {
 
         this.chars = controller.chars;
 
-        this.gameScene = controller.gameScene;
+        this.worldScene = controller.worldScene;
 
         this.spawn = controller.spawn;
         this.move = controller.move;
@@ -62,6 +62,6 @@ export default class JoinSystem {
 
         this.controller.playerId = entityId;
 
-        this.gameScene.player = this.spawn.charSpawn(entityId, x, y, skin);
+        this.worldScene.player = this.spawn.charSpawn(entityId, x, y, skin);
     }
 }

@@ -1,11 +1,11 @@
-import SceneMoveSystem  from "../scene/MovementSystem";
+import SceneMoveSystem  from "../world/MovementSystem";
 import InterpolateSystem from "../../network/interpolation/InterpolateSystem";
 import Controller from "./Controller";
 import {ENTITY_ID, MOVEMENT} from "../../constants/keys";
 import Interpolation, {Equals} from "../../network/interpolation/Interpolation";
 import {Char as CharSnapshot, CHAR_SPEED, EntityId, move, toFixed, Vec2} from "@leela/common";
 import {Interpolator} from "../../network/interpolation/interpolate";
-import GameScene from "../scene/GameScene";
+import WorldScene from "../world/WorldScene";
 import Sequence from "../../network/reconcile/Sequence";
 import ReconcileSystem from "../../network/reconcile/ReconcileSystem";
 import {
@@ -16,7 +16,7 @@ import {
     CLIENT_SMOOTH_SNAP_RATIO, INTERPOLATE
 } from "../../constants/config";
 import UPDATE = Phaser.Scenes.Events.UPDATE;
-import Char from "../scene/view/Char";
+import Char from "../world/view/Char";
 import {toVec2} from "../control";
 
 const posInterpolator: Interpolator<Vec2> = (s1, s2, progress: number) => {
@@ -34,7 +34,7 @@ export default class MovementSystem {
 
     private readonly chars: Record<EntityId, Char>;
 
-    private readonly gameScene: GameScene;
+    private readonly worldScene: WorldScene;
     private readonly move: SceneMoveSystem;
 
     private readonly interpolations: InterpolateSystem;
@@ -46,8 +46,8 @@ export default class MovementSystem {
     constructor(private readonly controller: Controller) {
         this.chars = controller.chars;
 
-        this.gameScene = controller.gameScene;
-        this.move = controller.gameScene.move;
+        this.worldScene = controller.worldScene;
+        this.move = this.worldScene.move;
 
         this.interpolations = controller.network.interpolations;
         this.reconciliation = controller.network.reconciliation;
@@ -57,7 +57,7 @@ export default class MovementSystem {
 
         this.errorTimer = 0;
 
-        this.gameScene.events.on(UPDATE, this.update, this);
+        this.worldScene.events.on(UPDATE, this.update, this);
     }
 
     public handleSnapshot(snapshot: CharSnapshot): void {
@@ -118,8 +118,8 @@ export default class MovementSystem {
 
         if (playerId != undefined) {
             if (CLIENT_PREDICT) {
-                if (this.gameScene.keys) {
-                    const dirVec = toVec2(this.gameScene.keys);
+                if (this.worldScene.keys) {
+                    const dirVec = toVec2(this.worldScene.keys);
 
                     this.reconciliation.push(MOVEMENT, dirVec, delta / 1000);
                 }

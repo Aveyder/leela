@@ -1,8 +1,8 @@
 import NetworkSystem from "../../network/NetworkSystem";
-import GameScene from "../scene/GameScene";
+import WorldScene from "../world/WorldScene";
 import {Game} from "phaser";
 import {EntityId} from "@leela/common";
-import Char from "../scene/view/Char";
+import Char from "../world/view/Char";
 import MovementSystem from "./MovementSystem";
 import PlayerControlSystem from "./PlayerControlSystem";
 import SpawnSystem from "./SpawnSystem";
@@ -16,7 +16,7 @@ export default class Controller {
 
     public playerId: EntityId;
 
-    public readonly gameScene: GameScene;
+    public readonly worldScene: WorldScene;
 
     public readonly move: MovementSystem;
     public readonly control: PlayerControlSystem;
@@ -30,7 +30,7 @@ export default class Controller {
     ) {
         this.chars = {};
 
-        this.gameScene = game.scene.getScene("game") as GameScene;
+        this.worldScene = game.scene.getScene("world") as WorldScene;
 
         this.move = new MovementSystem(this);
         this.control = new PlayerControlSystem(this);

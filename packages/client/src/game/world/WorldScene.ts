@@ -7,7 +7,7 @@ import MovementSystem from "./MovementSystem";
 import SpawnSystem from "./SpawnSystem";
 import {CLIENT_PREDICT} from "../../constants/config";
 
-export default class GameScene extends Phaser.Scene {
+export default class WorldScene extends Phaser.Scene {
 
     public keys: Keys;
 
@@ -20,7 +20,7 @@ export default class GameScene extends Phaser.Scene {
     private readonly tmpVec2: Vec2;
 
     constructor() {
-        super("game");
+        super("world");
 
         this.tmpVec2 = {x: 0, y: 0};
     }
@@ -40,4 +40,3 @@ export default class GameScene extends Phaser.Scene {
         }
     }
 }
-

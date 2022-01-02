@@ -1,6 +1,6 @@
 import Sprite = Phaser.GameObjects.Sprite;
 import {Scene} from "phaser";
-import GameScene from "../GameScene";
+import WorldScene from "../WorldScene";
 import {Direction} from "../../direction";
 
 export default class Char extends Sprite {

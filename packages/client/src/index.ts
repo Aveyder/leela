@@ -1,7 +1,7 @@
 import "phaser";
 import "../scss/styles.scss";
 import NetworkSystem from "./network/NetworkSystem";
-import GameScene from "./game/scene/GameScene";
+import WorldScene from "./game/world/WorldScene";
 import {Game} from "phaser";
 import {WORLD_HEIGHT, WORLD_WIDTH} from "@leela/common";
 import Controller from "./game/controller/Controller";
@@ -19,9 +19,9 @@ const config = {
 const game = new Game(config);
 
 game.events.on(GAME_READY, () => {
-    const gameScene = game.scene.getScene("game") as GameScene;
+    const worldScene = game.scene.getScene("world") as WorldScene;
 
-    gameScene.events.on(CREATE, () => {
+    worldScene.events.on(CREATE, () => {
         const network = new NetworkSystem();
         network.init();
 
@@ -29,5 +29,5 @@ game.events.on(GAME_READY, () => {
     });
 });
 
-game.scene.add("game", GameScene, false);
-game.scene.run("game");
+game.scene.add("world", WorldScene, false);
+game.scene.run("world");

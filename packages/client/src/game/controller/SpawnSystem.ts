@@ -1,22 +1,22 @@
 import Controller from "./Controller";
 import {Data, EntityId, MessageSystem, Opcode, SkinId} from "@leela/common";
-import Char from "../scene/view/Char";
+import Char from "../world/view/Char";
 import {Char as CharSnapshot} from "@leela/common";
 import {ENTITY_ID} from "../../constants/keys";
-import GameScene from "../scene/GameScene";
+import WorldScene from "../world/WorldScene";
 
 export default class SpawnSystem {
 
     private readonly chars: Record<EntityId, Char>;
 
-    private readonly gameScene: GameScene;
+    private readonly worldScene: WorldScene;
 
     private readonly messages: MessageSystem;
 
     constructor(private readonly controller: Controller) {
         this.chars = this.controller.chars;
 
-        this.gameScene = this.controller.gameScene;
+        this.worldScene = this.controller.worldScene;
 
         this.messages = this.controller.network.messages;
 
@@ -41,7 +41,7 @@ export default class SpawnSystem {
     }
 
     public charSpawn(entityId: EntityId, x: number, y: number, skin: SkinId): Char {
-        const char = this.gameScene.spawn.char(skin, x, y);
+        const char = this.worldScene.spawn.char(skin, x, y);
 
         char.setData(ENTITY_ID, entityId);
 
