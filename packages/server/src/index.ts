@@ -1,6 +1,6 @@
 import NetworkSystem from "./network/NetworkSystem";
-import World from "./game/World";
-import Controller from "./game/Controller";
+import World from "./game/world/World";
+import Controller from "./game/controller/Controller";
 
 const network = new NetworkSystem();
 network.init();

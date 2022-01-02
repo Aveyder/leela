@@ -25,12 +25,12 @@ export default class WorldScene extends Phaser.Scene {
         this.tmpVec2 = {x: 0, y: 0};
     }
 
-    preload(): void {
+    public preload(): void {
         const preloader = new PreloaderSystem(this);
         preloader.preload();
     }
 
-    create(): void {
+    public create(): void {
         this.keys = this.input.keyboard.addKeys("W,A,S,D,up,left,down,right") as Keys;
 
         this.spawn = new SpawnSystem(this);

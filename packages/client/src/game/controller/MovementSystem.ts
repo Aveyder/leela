@@ -3,7 +3,7 @@ import InterpolateSystem from "../../network/interpolation/InterpolateSystem";
 import Controller from "./Controller";
 import {ENTITY_ID, MOVEMENT} from "../../constants/keys";
 import Interpolation, {Equals} from "../../network/interpolation/Interpolation";
-import {Char as CharSnapshot, CHAR_SPEED, EntityId, move, toFixed, Vec2} from "@leela/common";
+import {Char as CharSnapshot, CHAR_SPEED, EntityId, FRACTION_DIGITS, move, toFixed, Vec2} from "@leela/common";
 import {Interpolator} from "../../network/interpolation/interpolate";
 import WorldScene from "../world/WorldScene";
 import Sequence from "../../network/reconcile/Sequence";
@@ -140,8 +140,8 @@ export default class MovementSystem {
         // const weight = Math.min(1, (progress - 0.5) * (progress - 0.5) * (progress - 0.5) * 4 + 0.5);
 
         player.setPosition(
-            toFixed(player.x * (1 - weight) + this.error.x * weight, 3),
-            toFixed(player.y * (1 - weight) + this.error.y * weight, 3)
+            toFixed(player.x * (1 - weight) + this.error.x * weight, FRACTION_DIGITS),
+            toFixed(player.y * (1 - weight) + this.error.y * weight, FRACTION_DIGITS)
         );
 
         this.errorTimer += delta;

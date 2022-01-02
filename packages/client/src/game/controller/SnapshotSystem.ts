@@ -3,7 +3,7 @@ import {Char, Data, EntityId, MessageSystem, Opcode, SkinId} from "@leela/common
 import MovementSystem from "./MovementSystem";
 import SpawnSystem from "./SpawnSystem";
 
-export default class SnapshotController {
+export default class SnapshotSystem {
 
     private readonly messages: MessageSystem;
 

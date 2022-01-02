@@ -7,7 +7,7 @@ import MovementSystem from "./MovementSystem";
 import PlayerControlSystem from "./PlayerControlSystem";
 import SpawnSystem from "./SpawnSystem";
 import JoinSystem from "./JoinSystem";
-import SnapshotController from "./SnapshotController";
+import SnapshotSystem from "./SnapshotSystem";
 
 
 export default class Controller {
@@ -22,7 +22,7 @@ export default class Controller {
     public readonly control: PlayerControlSystem;
     public readonly spawn: SpawnSystem;
     public readonly join: JoinSystem;
-    public readonly snapshots: SnapshotController;
+    public readonly snapshots: SnapshotSystem;
 
     constructor(
         public readonly network: NetworkSystem,
@@ -36,6 +36,6 @@ export default class Controller {
         this.control = new PlayerControlSystem(this);
         this.spawn = new SpawnSystem(this);
         this.join = new JoinSystem(this);
-        this.snapshots = new SnapshotController(this);
+        this.snapshots = new SnapshotSystem(this);
     }
 }
