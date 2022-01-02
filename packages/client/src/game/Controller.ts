@@ -1,25 +1,30 @@
 import NetworkSystem from "../network/NetworkSystem";
 import GameScene from "./GameScene";
 import {Game} from "phaser";
-import {CHAR_SPEED, Data, EntityId, move, Opcode, SkinId, TICK, Vec2, WORLD_WIDTH} from "@leela/common";
+import {CHAR_SPEED, Data, EntityId, move, Opcode, SkinId, TICK, toFixed, Vec2} from "@leela/common";
 import {toVec2} from "./control";
 import {ENTITY_ID, MOVEMENT} from "../constants/keys";
 import Char from "./view/Char";
-import Interpolation, {Equalizer} from "../network/interpolation/Interpolation";
+import Interpolation, {Equals} from "../network/interpolation/Interpolation";
 import {Interpolator} from "../network/interpolation/interpolate";
 import Sequence from "../network/reconcile/Sequence";
-import {getDirection} from "./direction";
+import {
+    CLIENT_PREDICT,
+    CLIENT_SMOOTH,
+    CLIENT_SMOOTH_MAX_MS,
+    CLIENT_SMOOTH_PRECISION,
+    CLIENT_SNAP_RATIO, INTERPOLATE
+} from "../constants/config";
 import UPDATE = Phaser.Scenes.Events.UPDATE;
-import {CLIENT_SMOOTH, CLIENT_SMOOTH_MAX_MS, CLIENT_SMOOTH_PRECISION, CLIENT_SNAP_RATIO} from "../constants/config";
 
 const posInterpolator: Interpolator<Vec2> = (s1, s2, progress: number) => {
-      const x = s1.x + (s2.x - s1.x) * progress;
-      const y = s1.y + (s2.y - s1.y) * progress;
+    const x = s1.x + (s2.x - s1.x) * progress;
+    const y = s1.y + (s2.y - s1.y) * progress;
 
-      return {x, y};
+    return {x, y};
 };
 
-const posEqualizer: Equalizer<Vec2> = (s1, s2) => {
+const posEquals: Equals<Vec2> = (s1, s2) => {
     return s1.x == s2.x && s1.y == s2.y;
 }
 
@@ -57,6 +62,7 @@ export default class Controller {
                 this.gameScene.destroyChar(this.chars[this.playerId]);
                 this.playerId = null;
                 this.error = null;
+                this.errorTimer = 0;
             }
         });
 
@@ -64,10 +70,10 @@ export default class Controller {
 
         this.network.simulations.events.on(TICK, (delta: number) => {
             if (this.playerId != undefined) {
-                const dirVec = toVec2(this.gameScene.keys);
+                const dir = toVec2(this.gameScene.keys, this.tmpVec2);
 
-                if (dirVec.x != 0 || dirVec.y != 0) {
-                    this.network.outgoing.push(Opcode.Move, [dirVec.x, dirVec.y]);
+                if (dir.x != 0 || dir.y != 0) {
+                    this.network.outgoing.push(Opcode.Move, [dir.x, dir.y]);
                 }
             }
         });
@@ -94,7 +100,7 @@ export default class Controller {
             }
         });
 
-        this.network.interpolations.map[MOVEMENT] = new Interpolation<Vec2>(posInterpolator, posEqualizer);
+        this.network.interpolations.map[MOVEMENT] = new Interpolation<Vec2>(posInterpolator, posEquals);
 
         this.network.messages.on(Opcode.Snapshot, (data: Data) => {
             for (let i = 0; i < data.length; i += 4) {
@@ -107,35 +113,43 @@ export default class Controller {
 
                 if (entityId != this.playerId) {
                     if (!this.chars[entityId]) {
-
                         this.spawnChar(entityId, x, y, skin);
                     }
 
-                    this.network.interpolations.push(MOVEMENT, entityId, pos);
+                    const char = this.chars[entityId];
+
+                    if (INTERPOLATE) {
+                        this.network.interpolations.push(MOVEMENT, entityId, pos);
+                    } else {
+                        this.gameScene.moveChar(char, x, y);
+                    }
                 } else {
                     const player = this.chars[entityId];
 
-                    const rec = this.network.reconciliation.reconcile(MOVEMENT, pos);
+                    if (CLIENT_PREDICT) {
+                        const rec = this.network.reconciliation.reconcile(MOVEMENT, pos);
 
-                    if (CLIENT_SMOOTH) {
-                        const errX = Math.abs(rec.x - player.x);
-                        const errY = Math.abs(rec.y - player.y);
+                        if (CLIENT_SMOOTH) {
+                            const errX = Math.abs(rec.x - player.x);
+                            const errY = Math.abs(rec.y - player.y);
 
-                        if ((errX > CLIENT_SMOOTH_PRECISION || errY > CLIENT_SMOOTH_PRECISION)) {
-                            if (!this.error || (this.error.x != rec.x || this.error.y != rec.y)) {
-                                this.error = rec;
-                                console.log(`ERR ${errX} ${errY}`);
+                            if (errX > CLIENT_SMOOTH_PRECISION || errY > CLIENT_SMOOTH_PRECISION) {
+                                if (errX > CHAR_SPEED * CLIENT_SNAP_RATIO || errY > CHAR_SPEED * CLIENT_SNAP_RATIO) {
+                                    this.gameScene.moveChar(player, rec.x, rec.y);
+                                    this.error = null;
+                                    this.errorTimer = 0;
+                                } else {
+                                    if (this.error?.x != rec.x || this.error?.y != rec.y) {
+                                        this.error = rec;
+                                    }
+                                    this.errorTimer = 0;
+                                }
                             }
-                            this.errorTimer = 0;
-                        }
-
-                        if (errX > CHAR_SPEED * CLIENT_SNAP_RATIO || errY > CHAR_SPEED * CLIENT_SNAP_RATIO) {
-                            player.setPosition(rec.x, rec.y);
-                            this.error = null;
-                            this.errorTimer = 0;
+                        } else {
+                            this.gameScene.moveChar(player, rec.x, rec.y);
                         }
                     } else {
-                        player.setPosition(rec.x, rec.y);
+                        this.gameScene.moveChar(player, x, y);
                     }
                 }
             }
@@ -143,7 +157,7 @@ export default class Controller {
 
         this.gameScene.events.on(UPDATE, (time: number, delta: number) => {
             if (this.playerId != undefined) {
-                if (this.gameScene.keys) {
+                if (CLIENT_PREDICT && this.gameScene.keys) {
                     const dirVec = toVec2(this.gameScene.keys);
 
                     this.network.reconciliation.push(MOVEMENT, dirVec, delta / 1000);
@@ -155,8 +169,10 @@ export default class Controller {
                     const r = this.errorTimer / CLIENT_SMOOTH_MAX_MS;
                     const weight = Math.min(1 - Math.pow(1 - r, 5), 1);
 
-                    player.x = player.x * (1 - weight) + this.error.x * weight;
-                    player.y = player.y * (1 - weight) + this.error.y * weight;
+                    player.setPosition(
+                        toFixed(player.x * (1 - weight) + this.error.x * weight, 3),
+                        toFixed(player.y * (1 - weight) + this.error.y * weight, 3)
+                    );
 
                     this.errorTimer += delta;
 
@@ -165,7 +181,6 @@ export default class Controller {
 
                     if (Math.abs(offsetX) < CLIENT_SMOOTH_PRECISION && Math.abs(offsetY) < CLIENT_SMOOTH_PRECISION) {
                         this.error = null;
-                        console.log(`ERS: ${this.errorTimer}`);
                         this.errorTimer = 0;
                     }
                 }
@@ -176,23 +191,10 @@ export default class Controller {
 
                 const charId = char.getData(ENTITY_ID) as number;
 
-                if (charId != this.playerId) {
+                if (INTERPOLATE && charId != this.playerId) {
                     const pos = this.network.interpolations.interpolate<Vec2>(MOVEMENT, charId);
 
-                    if (pos) {
-                        if (char.x != pos.x || char.y != pos.y) {
-                            this.tmpVec2.x = Math.sign(pos.x - char.x);
-                            this.tmpVec2.y = Math.sign(pos.y - char.y);
-
-                            const dir = getDirection(this.tmpVec2);
-
-                            char.walk(dir);
-
-                            char.setPosition(pos.x, pos.y);
-                        } else {
-                            char.stay();
-                        }
-                    }
+                    if (pos) this.gameScene.moveChar(char, pos.x, pos.y);
                 }
             });
         });

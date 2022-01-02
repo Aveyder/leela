@@ -6,13 +6,16 @@ import {toFixed} from "../utils/math";
 
 const SIMULATION_DELTA = 1 / SIMULATION_RATE;
 
-export default function move(pos: Vec2, dir: Vec2, delta?: number): Vec2 {
+export default function move(pos: Vec2, dir: Vec2, delta?: number, result?: Vec2): Vec2 {
+    if (!result) {
+        result = {x: 0, y: 0};
+    }
     delta = delta ? delta : SIMULATION_DELTA;
 
-    pos.x += toFixed(dir.x * delta * CHAR_SPEED, FRACTION_DIGITS);
-    pos.y += toFixed(dir.y * delta * CHAR_SPEED, FRACTION_DIGITS);
+    result.x = toFixed(pos.x + dir.x * delta * CHAR_SPEED, FRACTION_DIGITS);
+    result.y = toFixed(pos.y + dir.y * delta * CHAR_SPEED, FRACTION_DIGITS);
 
-    pos = bound(pos);
+    bound(result, result);
 
-    return pos;
+    return result;
 }

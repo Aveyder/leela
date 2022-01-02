@@ -21,7 +21,7 @@ function trim<S>(snapshots: Snapshot<S>[], thresholdMs) {
     }
 }
 
-interface Equalizer<S extends State> {
+interface Equals<S extends State> {
     (s1: S, s2: S): boolean
 }
 
@@ -32,7 +32,7 @@ export default class Interpolation<S extends State> {
 
     constructor(
         private readonly interpolator: Interpolator<S>,
-        private readonly equals: Equalizer<S>
+        private readonly equals: Equals<S>
     ) {
         this.buffers = {};
         this.options = {
@@ -87,6 +87,6 @@ export default class Interpolation<S extends State> {
 }
 
 export {
-    Equalizer,
+    Equals,
     Interpolation
 };

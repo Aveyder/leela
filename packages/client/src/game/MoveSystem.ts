@@ -5,6 +5,7 @@ import {move, Vec2} from "@leela/common";
 import EventEmitter = Phaser.Events.EventEmitter;
 import UPDATE = Phaser.Scenes.Events.UPDATE;
 import {getDirection} from "./direction";
+import {CLIENT_PREDICT} from "../constants/config";
 
 export default class MoveSystem {
 
@@ -26,20 +27,18 @@ export default class MoveSystem {
 
     private init() {
         this.events.on(UPDATE, (time: number, delta: number) => {
-            if (this.scene.player) {
-                const player = this.scene.player;
+            const player = this.scene.player;
+            if (player) {
+                const dir = toVec2(this.keys, this.tmpVec2);
 
-                const dirVec = toVec2(this.keys, this.tmpVec2);
-
-                if (dirVec.x === 0 && dirVec.y === 0) {
-                    player.stay();
+                let pos: Vec2;
+                if (dir.x != 0 || dir.y != 0) {
+                    pos = move(player, dir, delta / 1000, this.tmpVec2);
                 } else {
-                    const dir = getDirection(dirVec);
-
-                    player.walk(dir);
-
-                    move(player, dirVec, delta / 1000);
+                    pos = player;
                 }
+
+                this.scene.moveChar(player, pos.x, pos.y);
             }
         });
     }

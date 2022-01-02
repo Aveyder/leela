@@ -1,5 +1,6 @@
 import Sprite = Phaser.GameObjects.Sprite;
 import {Scene} from "phaser";
+import GameScene from "../GameScene";
 
 export default class Char extends Sprite {
 
@@ -26,10 +27,10 @@ export default class Char extends Sprite {
         this.dir = dir;
 
         const anim = `char:${this._skin}:walk:${this.dir}`;
-        if (this.anims.currentAnim?.key != anim) {
-            this.play(anim);
-        } else {
+        if (this.anims.currentAnim?.key == anim) {
             this.anims.resume();
+        } else {
+            this.play(anim);
         }
     }
 

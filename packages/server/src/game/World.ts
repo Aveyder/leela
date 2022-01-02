@@ -49,9 +49,11 @@ export default class World {
     }
 
     public moveChar(id: EntityId, vx: number, vy: number, delta?: number): void {
+        const char = this.chars[id];
+
         this.tmpVec2.x = vx;
         this.tmpVec2.y = vy;
 
-        move(this.chars[id], this.tmpVec2, delta);
+        move(char, this.tmpVec2, delta, char);
     }
 }

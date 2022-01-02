@@ -1,6 +1,6 @@
 const SERVER_HOST = "http://localhost:3000/";
 
-const INTERPOLATE = true;
+const INTERPOLATE = false;
 const INTERPOLATE_BUFFER_MS = 1000;
 const INTERPOLATE_DUPLICATES = true;
 
