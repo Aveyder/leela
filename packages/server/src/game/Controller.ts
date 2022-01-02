@@ -1,7 +1,6 @@
 import World from "./World";
 import NetworkSystem from "../network/NetworkSystem";
-import {ClientId, EntityId, Opcode, TICK} from "@leela/common";
-import {Char} from "./types";
+import {Char, ClientId, EntityId, Opcode, TICK} from "@leela/common";
 
 export default class Controller {
 

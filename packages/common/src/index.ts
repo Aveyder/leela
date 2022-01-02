@@ -2,6 +2,7 @@ export * from "./constants/config";
 export * from "./constants/events";
 export * from "./constants/world";
 export {default as bound} from "./game/bound";
+export * from "./game/entities";
 export {default as move} from "./game/move";
 export * from "./game/types";
 export {default as Loop} from "./loops/Loop";

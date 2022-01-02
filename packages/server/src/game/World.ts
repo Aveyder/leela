@@ -1,4 +1,3 @@
-import {Char} from "./types";
 import {
     CHAR_SKINS,
     EntityId,
@@ -10,6 +9,7 @@ import {
     bound,
     toFixed
 } from "@leela/common";
+import {Char} from "@leela/common";
 
 export default class World {
 

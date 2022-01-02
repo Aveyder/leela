@@ -11,7 +11,7 @@ export default class MessageSystem {
         this.events = new EventEmitter();
     }
 
-    public on(code: Opcode | string, callback: (data: Data, id?: ClientId) => void, context?: never): void {
+    public on(code: Opcode | string, callback: (data: Data, id?: ClientId) => void, context?: unknown): void {
         if (Number.isInteger(code)) {
             code = MessageSystem.opcodeEvent(code as Opcode);
         }

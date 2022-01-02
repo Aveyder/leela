@@ -1,4 +1,4 @@
-import {SkinId} from "@leela/common";
+import {SkinId} from "./types";
 
 interface Entity {
     id: number;

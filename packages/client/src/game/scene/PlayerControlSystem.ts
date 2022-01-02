@@ -28,7 +28,7 @@ export default class PlayerControlSystem {
         this.events.on(UPDATE, this.update, this);
     }
 
-    protected update(time: number, delta: number): void {
+    private update(time: number, delta: number): void {
         const player = this.gameScene.player;
         if (player) {
             const dir = toVec2(this.keys, this.tmpVec2);

@@ -5,6 +5,7 @@ import PlayerControlSystem from "./PlayerControlSystem";
 import {Vec2} from "@leela/common";
 import MovementSystem from "./MovementSystem";
 import SpawnSystem from "./SpawnSystem";
+import {CLIENT_PREDICT} from "../../constants/config";
 
 export default class GameScene extends Phaser.Scene {
 
@@ -34,6 +35,9 @@ export default class GameScene extends Phaser.Scene {
 
         this.spawn = new SpawnSystem(this);
         this.move = new MovementSystem();
-        this.control = new PlayerControlSystem(this);
+        if (CLIENT_PREDICT) {
+            this.control = new PlayerControlSystem(this);
+        }
     }
 }
+
