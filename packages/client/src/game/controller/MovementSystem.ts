@@ -1,4 +1,4 @@
-import MovementSystem from "../scene/MovementSystem";
+import SceneMoveSystem  from "../scene/MovementSystem";
 import InterpolateSystem from "../../network/interpolation/InterpolateSystem";
 import Controller from "./Controller";
 import {ENTITY_ID, MOVEMENT} from "../../constants/keys";
@@ -30,12 +30,12 @@ const posEquals: Equals<Vec2> = (s1, s2) => {
     return s1?.x == s2?.x && s1?.y == s2?.y;
 }
 
-export default class MovementController {
+export default class MovementSystem {
 
     private readonly chars: Record<EntityId, Char>;
 
     private readonly gameScene: GameScene;
-    private readonly move: MovementSystem;
+    private readonly move: SceneMoveSystem;
 
     private readonly interpolations: InterpolateSystem;
     private readonly reconciliation: ReconcileSystem;
@@ -98,7 +98,7 @@ export default class MovementController {
             const errorThreshold  = CHAR_SPEED * CLIENT_SMOOTH_SNAP_RATIO;
             if (errorX > errorThreshold || errorY > errorThreshold) {
                 this.move.char(char, rec.x, rec.y);
-                this.removeError();
+                this.removePredictionError();
             } else {
                 if (!posEquals(this.error, rec)) {
                     this.error = rec;
@@ -150,7 +150,7 @@ export default class MovementController {
         const offsetY = player.y - this.error.y;
 
         if (Math.abs(offsetX) < CLIENT_SMOOTH_PRECISION && Math.abs(offsetY) < CLIENT_SMOOTH_PRECISION) {
-            this.removeError();
+            this.removePredictionError();
         }
     }
 
@@ -174,7 +174,7 @@ export default class MovementController {
         return entityId != playerId || !CLIENT_PREDICT;
     }
 
-    public removeError() {
+    public removePredictionError(): void {
         this.error = null;
         this.errorTimer = 0;
     }

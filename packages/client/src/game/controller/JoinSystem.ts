@@ -3,11 +3,11 @@ import {Data, EntityId, MessageSystem, Opcode, SkinId} from "@leela/common";
 import {Socket} from "socket.io-client";
 import GameScene from "../scene/GameScene";
 import OutgoingSystem from "../../network/OutgoingSystem";
-import SpawnController from "./SpawnController";
+import SpawnSystem from "./SpawnSystem";
 import Char from "../scene/view/Char";
-import MovementController from "./MovementController";
+import MovementSystem from "./MovementSystem";
 
-export default class JoinController {
+export default class JoinSystem {
 
     private readonly socket: Socket;
 
@@ -18,8 +18,8 @@ export default class JoinController {
 
     private readonly gameScene: GameScene;
 
-    private readonly move: MovementController;
-    private readonly spawn: SpawnController;
+    private readonly move: MovementSystem;
+    private readonly spawn: SpawnSystem;
 
     constructor(private readonly controller: Controller) {
         this.socket = controller.network.socket;
@@ -50,7 +50,7 @@ export default class JoinController {
 
             controller.playerId = null;
 
-            this.move.removeError();
+            this.move.removePredictionError();
         }
     }
 

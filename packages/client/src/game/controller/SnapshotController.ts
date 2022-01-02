@@ -1,14 +1,14 @@
 import Controller from "./Controller";
 import {Char, Data, EntityId, MessageSystem, Opcode, SkinId} from "@leela/common";
-import MovementController from "./MovementController";
-import SpawnController from "./SpawnController";
+import MovementSystem from "./MovementSystem";
+import SpawnSystem from "./SpawnSystem";
 
 export default class SnapshotController {
 
     private readonly messages: MessageSystem;
 
-    private readonly spawn: SpawnController;
-    private readonly move: MovementController;
+    private readonly spawn: SpawnSystem;
+    private readonly move: MovementSystem;
 
     constructor(private readonly controller: Controller) {
         this.messages = this.controller.network.messages;

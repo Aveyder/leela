@@ -3,10 +3,10 @@ import GameScene from "../scene/GameScene";
 import {Game} from "phaser";
 import {EntityId} from "@leela/common";
 import Char from "../scene/view/Char";
-import MovementController from "./MovementController";
-import PlayerController from "./PlayerController";
-import SpawnController from "./SpawnController";
-import JoinController from "./JoinController";
+import MovementSystem from "./MovementSystem";
+import PlayerControlSystem from "./PlayerControlSystem";
+import SpawnSystem from "./SpawnSystem";
+import JoinSystem from "./JoinSystem";
 import SnapshotController from "./SnapshotController";
 
 
@@ -18,10 +18,10 @@ export default class Controller {
 
     public readonly gameScene: GameScene;
 
-    public readonly move: MovementController;
-    public readonly control: PlayerController;
-    public readonly spawn: SpawnController;
-    public readonly join: JoinController;
+    public readonly move: MovementSystem;
+    public readonly control: PlayerControlSystem;
+    public readonly spawn: SpawnSystem;
+    public readonly join: JoinSystem;
     public readonly snapshots: SnapshotController;
 
     constructor(
@@ -32,10 +32,10 @@ export default class Controller {
 
         this.gameScene = game.scene.getScene("game") as GameScene;
 
-        this.move = new MovementController(this);
-        this.control = new PlayerController(this);
-        this.spawn = new SpawnController(this);
-        this.join = new JoinController(this);
+        this.move = new MovementSystem(this);
+        this.control = new PlayerControlSystem(this);
+        this.spawn = new SpawnSystem(this);
+        this.join = new JoinSystem(this);
         this.snapshots = new SnapshotController(this);
     }
 }

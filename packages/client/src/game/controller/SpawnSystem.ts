@@ -5,7 +5,7 @@ import {Char as CharSnapshot} from "@leela/common";
 import {ENTITY_ID} from "../../constants/keys";
 import GameScene from "../scene/GameScene";
 
-export default class SpawnController {
+export default class SpawnSystem {
 
     private readonly chars: Record<EntityId, Char>;
 

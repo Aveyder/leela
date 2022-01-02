@@ -5,7 +5,7 @@ import SimulationSystem from "../../network/SimulationSystem";
 import GameScene from "../scene/GameScene";
 import OutgoingSystem from "../../network/OutgoingSystem";
 
-export default class PlayerController {
+export default class PlayerControlSystem {
 
     private readonly simulations: SimulationSystem;
     private readonly outgoing: OutgoingSystem;
