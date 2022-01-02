@@ -10,20 +10,20 @@ enum Direction {
 function getDirection(dirVec: Vec2): Direction {
     let dir;
 
-    if (dirVec.x === -1) {
-        dir = Direction.LEFT;
-    }
-
-    if (dirVec.x === 1) {
-        dir = Direction.RIGHT;
-    }
-
-    if (dirVec.y === 1) {
-        dir = Direction.DOWN;
-    }
-
-    if (dirVec.y === -1) {
-        dir = Direction.UP;
+    if (Math.abs(dirVec.y)/Math.abs(dirVec.x) >= 0.9) {
+        if (dirVec.y > 0) {
+            dir = Direction.DOWN;
+        }
+        if (dirVec.y < 0) {
+            dir = Direction.UP;
+        }
+    } else {
+        if (dirVec.x > 0) {
+            dir = Direction.RIGHT;
+        }
+        if (dirVec.x < 0) {
+            dir = Direction.LEFT;
+        }
     }
 
     return dir;

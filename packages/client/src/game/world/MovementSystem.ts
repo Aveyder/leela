@@ -14,8 +14,8 @@ export default class MovementSystem {
         if (char.x == x && char.y == y) {
             char.stay();
         } else {
-            this.tmpVec2.x = Math.sign(x - char.x);
-            this.tmpVec2.y = Math.sign(y - char.y);
+            this.tmpVec2.x = x - char.x;
+            this.tmpVec2.y = y - char.y;
 
             const dir = getDirection(this.tmpVec2);
 
