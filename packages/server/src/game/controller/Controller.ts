@@ -27,20 +27,24 @@ export default class Controller {
     }
 
     private init() {
-        this.spawnNpc();
+        for(let i = 0; i < 5; i++) {
+            this.spawnNpc(Math.random() * WORLD_WIDTH, Math.random() * WORLD_HEIGHT);
+        }
     }
 
-    private spawnNpc() {
-        const char = this.world.spawnChar(5, WORLD_WIDTH / 2 - WORLD_HEIGHT / 4, WORLD_HEIGHT / 2);
+    private spawnNpc(x: number, y: number) {
+        const char = this.world.spawnChar(5, x, y);
 
         let progress = 0;
 
+        const shift = Math.random();
+        const s = Math.random();
+
         this.network.simulations.events.on(TICK, (delta: number) => {
-            console.log(delta)
             progress += delta;
 
-            const vx = Math.sin(progress);
-            const vy = Math.cos(progress);
+            const vx = Math.sin(progress / s + shift);
+            const vy = Math.cos(progress + shift / s);
 
             this.world.moveChar(char.id, vx, vy, delta);
         });

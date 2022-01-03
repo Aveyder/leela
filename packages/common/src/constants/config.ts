@@ -3,7 +3,7 @@ const INTERPOLATE_MS = 150;
 const SIMULATION_RATE = 20;
 const SNAPSHOT_RATE = -1;
 
-const FRACTION_DIGITS = 3;
+const FRACTION_DIGITS = 1;
 
 export {
     INTERPOLATE_MS,
