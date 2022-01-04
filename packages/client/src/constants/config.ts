@@ -9,12 +9,13 @@ const ENTITY_EXTRAPOLATE_MAX_MS = 250;
 const ENTITY_EXTRAPOLATE_PAST = true;
 
 const CLIENT_PREDICT = true;
-const CLIENT_SHOW_ERROR = false;
 const CLIENT_SMOOTH = true;
 const CLIENT_SMOOTH_PRECISION = 0.1;
 const CLIENT_SMOOTH_SNAP_RATIO = 0.1;
 const CLIENT_SMOOTH_MAX_MS = 10000;
 const CLIENT_SMOOTH_FUNCTION = (x: number): number => 1 - Math.pow(1 - x, 5);
+
+const SHOW_ERROR = true;
 
 const CLIENT_CMD_RATE = -1;
 const CLIENT_UPDATE_RATE = -1;
@@ -33,6 +34,7 @@ export {
     CLIENT_SMOOTH,
     CLIENT_SMOOTH_MAX_MS,
     CLIENT_SMOOTH_FUNCTION,
+    SHOW_ERROR,
     CLIENT_CMD_RATE,
     CLIENT_UPDATE_RATE
 };

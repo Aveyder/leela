@@ -4,10 +4,14 @@ import Char from "../world/view/Char";
 import {Char as CharSnapshot} from "@leela/common";
 import {ENTITY_ID} from "../../constants/keys";
 import WorldScene from "../world/WorldScene";
+import {SHOW_ERROR} from "../../constants/config";
+import MovementSystem from "./MovementSystem";
 
 export default class SpawnSystem {
 
     private readonly chars: Record<EntityId, Char>;
+
+    private readonly move: MovementSystem;
 
     private readonly worldScene: WorldScene;
 
@@ -15,6 +19,8 @@ export default class SpawnSystem {
 
     constructor(private readonly controller: Controller) {
         this.chars = this.controller.chars;
+
+        this.move = controller.move;
 
         this.worldScene = this.controller.worldScene;
 
@@ -51,6 +57,10 @@ export default class SpawnSystem {
 
         this.chars[entityId] = char;
 
+        if (SHOW_ERROR) {
+            this.serverCharSpawn(entityId, x, y, skin);
+        }
+
         return char;
     }
 
@@ -59,7 +69,46 @@ export default class SpawnSystem {
 
         if (char) {
             char.destroy();
+
             delete this.chars[entityId];
+
+            if (SHOW_ERROR) {
+                this.serverCharDestroy(entityId);
+            }
+        }
+    }
+
+    private serverCharSpawn(entityId: EntityId, x: number, y: number, skin: SkinId) {
+        const serverChar = this.worldScene.spawn.char(skin, x, y);
+
+        this.move.serverChars[entityId] = serverChar;
+
+        serverChar.setAlpha(0.35);
+        serverChar.setTint(0x00ff00);
+
+        if (entityId == this.controller.playerId) {
+            const serverPlayer = this.worldScene.spawn.char(skin, x, y);
+
+            this.move.serverPlayer = serverPlayer;
+
+            serverPlayer.setAlpha(0.35);
+            serverPlayer.setTint(0xff0000);
+        }
+    }
+
+    private serverCharDestroy(entityId: EntityId) {
+        const serverChar = this.move.serverChars[entityId];
+
+        if (serverChar) {
+            serverChar.destroy();
+
+            delete this.move.serverChars[entityId];
+        }
+
+        if (entityId == this.controller.playerId) {
+            const serverPlayer = this.move.serverPlayer;
+
+            if (serverPlayer) serverPlayer.destroy();
         }
     }
 }

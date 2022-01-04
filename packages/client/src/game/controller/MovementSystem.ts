@@ -13,7 +13,7 @@ import {
     CLIENT_SMOOTH, CLIENT_SMOOTH_FUNCTION,
     CLIENT_SMOOTH_MAX_MS,
     CLIENT_SMOOTH_PRECISION,
-    CLIENT_SMOOTH_SNAP_RATIO, INTERPOLATE
+    CLIENT_SMOOTH_SNAP_RATIO, INTERPOLATE, SHOW_ERROR
 } from "../../constants/config";
 import UPDATE = Phaser.Scenes.Events.UPDATE;
 import Char from "../world/view/Char";
@@ -33,6 +33,8 @@ const posEquals: Equals<Vec2> = (s1, s2) => {
 export default class MovementSystem {
 
     private readonly chars: Record<EntityId, Char>;
+    public readonly serverChars: Record<EntityId, Char>;
+    public serverPlayer: Char;
 
     private readonly worldScene: WorldScene;
     private readonly move: SceneMoveSystem;
@@ -45,6 +47,7 @@ export default class MovementSystem {
 
     constructor(private readonly controller: Controller) {
         this.chars = controller.chars;
+        this.serverChars = {};
 
         this.worldScene = controller.worldScene;
         this.move = this.worldScene.move;
@@ -65,14 +68,19 @@ export default class MovementSystem {
     }
 
     public handleSnapshot(snapshot: CharSnapshot): void {
-        if (this.isNotPredicted(snapshot.id)) {
-            this.handleNotPredicted(snapshot);
+        if (SHOW_ERROR) {
+            const serverChar = this.serverChars[snapshot.id];
+            this.worldScene.move.char(this.serverChars[snapshot.id], snapshot.x, snapshot.y);
+        }
+
+        if (this.isNotPredictable(snapshot.id)) {
+            this.handleNotPredictable(snapshot);
         } else {
-            this.handlePredicted(snapshot);
+            this.handlePredictable(snapshot);
         }
     }
 
-    private handleNotPredicted(snapshot: CharSnapshot) {
+    private handleNotPredictable(snapshot: CharSnapshot) {
         const char = this.chars[snapshot.id];
 
         if (INTERPOLATE) {
@@ -82,10 +90,14 @@ export default class MovementSystem {
         }
     }
 
-    private handlePredicted(snapshot: CharSnapshot) {
+    private handlePredictable(snapshot: CharSnapshot) {
         const char = this.chars[snapshot.id];
 
         const rec = this.reconciliation.reconcile(MOVEMENT, snapshot);
+
+        if (SHOW_ERROR) {
+            this.move.char(this.serverPlayer, rec.x, rec.y);
+        }
 
         if (CLIENT_SMOOTH) {
             this.handlePredictionError(char, rec);
@@ -164,7 +176,7 @@ export default class MovementSystem {
 
             const charId = char.getData(ENTITY_ID) as number;
 
-            if (INTERPOLATE && this.isNotPredicted(charId)) {
+            if (INTERPOLATE && this.isNotPredictable(charId)) {
                 const pos = this.interpolations.interpolate<Vec2>(MOVEMENT, charId);
 
                 if (pos) this.move.char(char, pos.x, pos.y);
@@ -172,7 +184,7 @@ export default class MovementSystem {
         });
     }
 
-    private isNotPredicted(entityId: EntityId) {
+    private isNotPredictable(entityId: EntityId) {
         const playerId = this.controller.playerId;
 
         return entityId != playerId || !CLIENT_PREDICT;
