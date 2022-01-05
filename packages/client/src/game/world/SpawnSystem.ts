@@ -1,4 +1,4 @@
-import {bound, SkinId, Vec2} from "@leela/common";
+import {bound, SkinId} from "@leela/common";
 import Char from "./view/Char";
 import WorldScene from "./WorldScene";
 import GameObjectFactory = Phaser.GameObjects.GameObjectFactory;

@@ -1,4 +1,4 @@
-const INTERPOLATE_MS = 200;
+const INTERPOLATE_MS = 100;
 
 const SIMULATION_RATE = 20;
 const SNAPSHOT_RATE = -1;

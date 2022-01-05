@@ -9,6 +9,7 @@ import SimulationSystem from "./SimulationSystem";
 import CommandSystem from "./CommandSystem";
 import InterpolateSystem from "./interpolation/InterpolateSystem";
 import ReconcileSystem from "./reconcile/ReconcileSystem";
+import SyncSystem from "./SyncSystem";
 
 export default class NetworkSystem {
 
@@ -17,6 +18,7 @@ export default class NetworkSystem {
     public messages: MessageSystem;
     public incoming: IncomingSystem;
     public connections: ConnectionSystem;
+    public sync: SyncSystem;
     public outgoing: OutgoingSystem;
     public simulations: SimulationSystem;
     public cmd: CommandSystem;
@@ -33,12 +35,13 @@ export default class NetworkSystem {
         this.messages = new MessageSystem();
         this.incoming = new IncomingSystem(this.ticks, this.messages);
         this.connections = new ConnectionSystem(this.socket, this.incoming);
+        this.sync = new SyncSystem(this.socket);
 
         this.outgoing = new OutgoingSystem(this.socket, this.ticks);
         this.simulations = new SimulationSystem(this.ticks);
         this.cmd = new CommandSystem(this.outgoing);
 
-        this.interpolations = new InterpolateSystem(this.ticks);
+        this.interpolations = new InterpolateSystem(this.ticks, this.sync);
         this.reconciliation = new ReconcileSystem(this.ticks);
 
         this.connections.init();

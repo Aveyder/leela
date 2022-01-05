@@ -8,6 +8,7 @@ import PlayerControlSystem from "./PlayerControlSystem";
 import SpawnSystem from "./SpawnSystem";
 import JoinSystem from "./JoinSystem";
 import SnapshotSystem from "./SnapshotSystem";
+import UPDATE = Phaser.Scenes.Events.UPDATE;
 
 
 export default class Controller {
@@ -37,5 +38,12 @@ export default class Controller {
         this.spawn = new SpawnSystem(this);
         this.join = new JoinSystem(this);
         this.snapshots = new SnapshotSystem(this);
+
+        const pingText = this.worldScene.add.text(0, 0, "");
+
+        this.worldScene.events.on(UPDATE, () => {
+            const latency = this.network.sync.latency;
+            pingText.text = `ping: ${latency} ms`;
+        });
     }
 }
