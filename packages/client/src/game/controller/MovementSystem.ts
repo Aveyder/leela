@@ -1,4 +1,4 @@
-import SceneMoveSystem  from "../world/MovementSystem";
+import SceneMoveSystem from "../world/MovementSystem";
 import InterpolateSystem from "../../network/interpolation/InterpolateSystem";
 import Controller from "./Controller";
 import {ENTITY_ID, MOVEMENT} from "../../constants/keys";
@@ -10,14 +10,17 @@ import Sequence from "../../network/reconcile/Sequence";
 import ReconcileSystem from "../../network/reconcile/ReconcileSystem";
 import {
     CLIENT_PREDICT,
-    CLIENT_SMOOTH, CLIENT_SMOOTH_FUNCTION,
+    CLIENT_SMOOTH,
+    CLIENT_SMOOTH_FUNCTION,
     CLIENT_SMOOTH_MAX_MS,
     CLIENT_SMOOTH_PRECISION,
-    CLIENT_SMOOTH_SNAP_RATIO, INTERPOLATE, SHOW_ERROR
+    CLIENT_SMOOTH_SNAP_RATIO,
+    INTERPOLATE,
+    SHOW_ERROR
 } from "../../constants/config";
-import UPDATE = Phaser.Scenes.Events.UPDATE;
 import Char from "../world/view/Char";
 import {toVec2} from "../control";
+import UPDATE = Phaser.Scenes.Events.UPDATE;
 
 const posInterpolator: Interpolator<Vec2> = (s1, s2, progress: number) => {
     const x = s1.x + (s2.x - s1.x) * progress;
@@ -70,7 +73,7 @@ export default class MovementSystem {
     public handleSnapshot(snapshot: CharSnapshot): void {
         if (SHOW_ERROR) {
             const serverChar = this.serverChars[snapshot.id];
-            this.worldScene.move.char(this.serverChars[snapshot.id], snapshot.x, snapshot.y);
+            this.worldScene.move.char(serverChar, snapshot.x, snapshot.y);
         }
 
         if (this.isNotPredictable(snapshot.id)) {

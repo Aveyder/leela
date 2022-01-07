@@ -43,7 +43,6 @@ export default class SyncSystem {
 
             if (this.samples.length == 0) {
                 this.offset = offset;
-                console.log(`Set initial OFFSET ${this.offset}`);
             }
 
             this.samples.push({latency, offset});
@@ -61,7 +60,6 @@ export default class SyncSystem {
                 }
 
                 this.offset = offsetSum / osd;
-                console.log(`Set final OFFSET ${this.offset}`);
             }
         }
     }
