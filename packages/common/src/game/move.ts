@@ -12,8 +12,8 @@ export default function move(pos: Vec2, dir: Vec2, delta?: number, result?: Vec2
     }
     delta = delta ? delta : SIMULATION_DELTA;
 
-    result.x = toFixed(pos.x + dir.x * delta * CHAR_SPEED, FRACTION_DIGITS);
-    result.y = toFixed(pos.y + dir.y * delta * CHAR_SPEED, FRACTION_DIGITS);
+    result.x = pos.x + dir.x * delta * CHAR_SPEED;
+    result.y = pos.y + dir.y * delta * CHAR_SPEED;
 
     bound(result, result);
 

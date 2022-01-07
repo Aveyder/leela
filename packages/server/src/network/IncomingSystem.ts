@@ -31,9 +31,9 @@ export default class IncomingSystem {
         const outdated = stamp && (stamp.time > time || stamp.tick > tick);
 
         if (!outdated) {
-            this.messages.receiveMessages(clientPacket as Message[], id);
-
             this.ticks.clients[id] = {tick, ack, time};
+
+            this.messages.receiveMessages(clientPacket as Message[], id);
         }
     }
 }

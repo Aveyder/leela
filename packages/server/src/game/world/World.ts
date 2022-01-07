@@ -33,8 +33,8 @@ export default class World {
         const char: Char = {
             id,
             skin: skin != undefined ? skin : Math.floor(Math.random() * CHAR_SKINS),
-            x: toFixed(x != undefined ? x : Math.random() * WORLD_WIDTH, FRACTION_DIGITS),
-            y: toFixed(y != undefined ? y : Math.random() * WORLD_HEIGHT, FRACTION_DIGITS)
+            x: x != undefined ? x : Math.random() * WORLD_WIDTH,
+            y: y != undefined ? y : Math.random() * WORLD_HEIGHT
         }
 
         bound(char);

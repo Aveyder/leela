@@ -1,5 +1,5 @@
 import Controller from "./Controller";
-import {Char, ClientId, Opcode, TICK} from "@leela/common";
+import {Char, ClientId, FRACTION_DIGITS, Opcode, TICK, toFixed} from "@leela/common";
 import NetworkSnapshotSystem from "../../network/SnapshotSystem";
 import PacketSystem from "../../network/PacketSystem";
 import World from "../world/World";
@@ -32,7 +32,12 @@ export default class SnapshotSystem {
         Object.keys(chars).forEach(entityId => {
             const char = chars[entityId] as Char;
 
-            data.push(char.id, char.x, char.y, char.skin);
+            data.push(
+                char.id,
+                toFixed(char.x, FRACTION_DIGITS),
+                toFixed(char.y, FRACTION_DIGITS),
+                char.skin
+            );
         });
 
         this.packets.push(id, Opcode.Snapshot, data);
