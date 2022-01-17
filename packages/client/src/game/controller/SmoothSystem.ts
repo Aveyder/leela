@@ -1,103 +1,69 @@
+import Smoothing from "../../network/reconcile/smooth";
+import {
+    CLIENT_SMOOTH_POSITION_MAX_MS,
+    CLIENT_SMOOTH_POSITION_PRECISION,
+    CLIENT_SMOOTH_POSITION_THRESHOLD
+} from "../../constants/config";
+import {posDiff, posEquals, posInterpolator} from "./position";
+import Controller from "./Controller";
+import {Scene} from "phaser";
+import WorldScene from "../world/WorldScene";
+import MovementSystem from "../world/MovementSystem";
 import {Vec2} from "@leela/common";
 import Char from "../world/view/Char";
-import WorldScene from "../world/WorldScene";
-import SceneMoveSystem from "../world/MovementSystem";
-import Controller from "./Controller";
-import {
-    CLIENT_PREDICT, CLIENT_SMOOTH,
-    CLIENT_SMOOTH_POSITION_ERROR_THRESHOLD,
-    CLIENT_SMOOTH_POSITION_MAX_MS,
-    CLIENT_SMOOTH_POSITION_PRECISION
-} from "../../constants/config";
-import {posEquals} from "./MovementSystem";
-import UPDATE = Phaser.Scenes.Events.UPDATE;
 
 export default class SmoothSystem {
 
     private readonly worldScene: WorldScene;
-    private readonly move: SceneMoveSystem;
 
-    private error: Vec2;
-    private errorTimer: number;
+    private readonly move: MovementSystem;
 
-    private prevRec: Vec2;
+    private readonly smooth: Smoothing<Vec2>;
 
-    constructor(private readonly controller: Controller) {
-        this.worldScene = controller.worldScene;
+    constructor(
+        private readonly controller: Controller
+    ) {
+        this.worldScene = this.controller.worldScene;
+
         this.move = this.worldScene.move;
 
-        this.errorTimer = 0;
-
-        this.init();
+        this.smooth = new Smoothing<Vec2>({
+            maxMs: CLIENT_SMOOTH_POSITION_MAX_MS,
+            equals: posEquals,
+            interpolator: posInterpolator,
+            diff: posDiff,
+            withinPrecision: this.withinPrecision,
+            withinSmoothThreshold: this.withinSmoothThreshold
+        });
     }
 
-    private init() {
-        this.worldScene.events.on(UPDATE, this.update, this);
+    public refreshError(char: Char, rec: Vec2): void {
+        const snap = this.smooth.refreshError(char, rec);
+
+        if (snap) this.move.char(char, rec.x, rec.y);
     }
 
-    private update(time: number, delta: number) {
+    public smoothError(delta: number): void {
         const playerId = this.controller.playerId;
 
-        if (playerId != undefined && CLIENT_PREDICT && this.error) {
-            this.smoothPlayerPosError(delta);
-        }
-    }
+        if (playerId != undefined) {
+            const player = this.worldScene.player;
 
-    private smoothPlayerPosError(delta: number) {
-        const player = this.worldScene.player;
+            const pos = this.smooth.smoothError(delta, player);
 
-        const weight = Math.min(this.errorTimer / CLIENT_SMOOTH_POSITION_MAX_MS, 1);
-
-        player.setPosition(
-            player.x * (1 - weight) + this.error.x * weight,
-            player.y * (1 - weight) + this.error.y * weight
-        );
-
-        this.errorTimer += delta;
-
-        const offsetX = player.x - this.error.x;
-        const offsetY = player.y - this.error.y;
-
-        if (this.withinPrecision(offsetX, offsetY)) {
-            this.clearError();
-        }
-    }
-
-    public handlePredictionError(char: Char, rec: Vec2): void {
-        const errorX = rec.x - char.x;
-        const errorY = rec.y - char.y;
-
-        if (!this.withinPrecision(errorX, errorY)) {
-            if (this.withinErrorThreshold(errorX, errorY)) {
-                if (!this.error) {
-                    this.errorTimer = 0;
-                }
-                this.error = rec;
-
-                if (posEquals(this.prevRec, rec)) {
-                    this.clearError();
-                }
-            } else {
-                this.move.char(char, rec.x, rec.y);
-                this.clearError();
+            if (pos) {
+                player.setPosition(pos.x, pos.y);
             }
         }
-
-        this.prevRec = rec;
     }
 
-    private withinErrorThreshold(x: number, y: number) {
-        return Math.abs(x) < CLIENT_SMOOTH_POSITION_ERROR_THRESHOLD &&
-            Math.abs(y) < CLIENT_SMOOTH_POSITION_ERROR_THRESHOLD;
+    private withinPrecision(error: Vec2) {
+        return Math.abs(error.x) < CLIENT_SMOOTH_POSITION_PRECISION &&
+            Math.abs(error.y) < CLIENT_SMOOTH_POSITION_PRECISION;
     }
 
-    private withinPrecision(x: number, y: number) {
-        return Math.abs(x) < CLIENT_SMOOTH_POSITION_PRECISION &&
-            Math.abs(y) < CLIENT_SMOOTH_POSITION_PRECISION;
-    }
-
-    public clearError(): void {
-        this.error = null;
-        this.errorTimer = 0;
+    private withinSmoothThreshold(error: Vec2) {
+        return Math.abs(error.x) < CLIENT_SMOOTH_POSITION_THRESHOLD &&
+            Math.abs(error.y) < CLIENT_SMOOTH_POSITION_THRESHOLD;
     }
 }

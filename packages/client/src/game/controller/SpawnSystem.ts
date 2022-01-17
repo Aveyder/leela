@@ -5,13 +5,13 @@ import {Char as CharSnapshot} from "@leela/common";
 import {ENTITY_ID} from "../../constants/keys";
 import WorldScene from "../world/WorldScene";
 import {SHOW_ERROR} from "../../constants/config";
-import MovementSystem from "./MovementSystem";
+import EntityPositionSystem from "./EntityPositionSystem";
 
 export default class SpawnSystem {
 
     private readonly chars: Record<EntityId, Char>;
 
-    private readonly move: MovementSystem;
+    private readonly position: EntityPositionSystem;
 
     private readonly worldScene: WorldScene;
 
@@ -20,7 +20,7 @@ export default class SpawnSystem {
     constructor(private readonly controller: Controller) {
         this.chars = this.controller.chars;
 
-        this.move = controller.move;
+        this.position = controller.position;
 
         this.worldScene = this.controller.worldScene;
 
@@ -81,32 +81,32 @@ export default class SpawnSystem {
     private serverCharSpawn(entityId: EntityId, x: number, y: number, skin: SkinId) {
         const serverChar = this.worldScene.spawn.char(skin, x, y);
 
-        this.move.serverChars[entityId] = serverChar;
+        this.position.serverChars[entityId] = serverChar;
 
-        serverChar.setAlpha(0.35);
+        serverChar.setAlpha(0.15);
         serverChar.setTint(0x00ff00);
 
         if (entityId == this.controller.playerId) {
             const serverPlayer = this.worldScene.spawn.char(skin, x, y);
 
-            this.move.serverPlayer = serverPlayer;
+            this.position.serverPlayer = serverPlayer;
 
-            serverPlayer.setAlpha(0.35);
+            serverPlayer.setAlpha(0.15);
             serverPlayer.setTint(0xff0000);
         }
     }
 
     private serverCharDestroy(entityId: EntityId) {
-        const serverChar = this.move.serverChars[entityId];
+        const serverChar = this.position.serverChars[entityId];
 
         if (serverChar) {
             serverChar.destroy();
 
-            delete this.move.serverChars[entityId];
+            delete this.position.serverChars[entityId];
         }
 
         if (entityId == this.controller.playerId) {
-            const serverPlayer = this.move.serverPlayer;
+            const serverPlayer = this.position.serverPlayer;
 
             if (serverPlayer) serverPlayer.destroy();
         }

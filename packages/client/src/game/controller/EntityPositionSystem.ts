@@ -1,30 +1,19 @@
 import SceneMoveSystem from "../world/MovementSystem";
 import InterpolateSystem from "../../network/interpolation/InterpolateSystem";
 import Controller from "./Controller";
-import {ENTITY_ID, MOVEMENT} from "../../constants/keys";
+import {ENTITY_ID, POSITION} from "../../constants/keys";
 import Interpolation from "../../network/interpolation/Interpolation";
 import {Char as CharSnapshot, EntityId, move, Vec2} from "@leela/common";
-import {Equals, Interpolator} from "../../network/interpolation/interpolate";
 import WorldScene from "../world/WorldScene";
 import Sequence from "../../network/reconcile/Sequence";
 import ReconcileSystem from "../../network/reconcile/ReconcileSystem";
 import {CLIENT_PREDICT, CLIENT_SMOOTH, INTERPOLATE, SHOW_ERROR} from "../../constants/config";
 import Char from "../world/view/Char";
+import {posEquals, posInterpolator} from "./position";
 import SmoothSystem from "./SmoothSystem";
 import UPDATE = Phaser.Scenes.Events.UPDATE;
 
-const posInterpolator: Interpolator<Vec2> = (s1, s2, progress: number) => {
-    const x = s1.x + (s2.x - s1.x) * progress;
-    const y = s1.y + (s2.y - s1.y) * progress;
-
-    return {x, y};
-};
-
-const posEquals: Equals<Vec2> = (s1, s2) => {
-    return s1?.x == s2?.x && s1?.y == s2?.y;
-}
-
-export default class MovementSystem {
+export default class EntityPositionSystem {
 
     private readonly chars: Record<EntityId, Char>;
 
@@ -56,10 +45,10 @@ export default class MovementSystem {
     }
 
     private init() {
-        this.interpolations.map[MOVEMENT] = new Interpolation<Vec2>(posInterpolator, posEquals);
-        this.reconciliation.sequences[MOVEMENT] = new Sequence<Vec2, Vec2>(move);
+        this.interpolations.map[POSITION] = new Interpolation<Vec2>(posInterpolator, posEquals);
+        this.reconciliation.sequences[POSITION] = new Sequence<Vec2, Vec2>(move);
 
-        this.worldScene.events.on(UPDATE, this.interpolateChars, this);
+        this.worldScene.events.on(UPDATE, this.update, this);
     }
 
     public handleSnapshot(snapshot: CharSnapshot): void {
@@ -79,7 +68,7 @@ export default class MovementSystem {
         const char = this.chars[snapshot.id];
 
         if (INTERPOLATE) {
-            this.interpolations.push(MOVEMENT, snapshot.id, snapshot);
+            this.interpolations.push(POSITION, snapshot.id, snapshot);
         } else {
             this.move.char(char, snapshot.x, snapshot.y);
         }
@@ -88,17 +77,22 @@ export default class MovementSystem {
     private handlePredictable(snapshot: CharSnapshot) {
         const char = this.chars[snapshot.id];
 
-        const rec = this.reconciliation.reconcile(MOVEMENT, snapshot);
+        const rec = this.reconciliation.reconcile(POSITION, snapshot);
 
         if (SHOW_ERROR) {
             this.move.char(this.serverPlayer, rec.x, rec.y);
         }
 
         if (CLIENT_SMOOTH) {
-            this.smooth.handlePredictionError(char, rec);
+            this.smooth.refreshError(char, rec);
         } else {
             this.move.char(char, rec.x, rec.y);
         }
+    }
+
+    private update(_: number, delta: number) {
+        this.smooth.smoothError(delta);
+        this.interpolateChars();
     }
 
     private interpolateChars() {
@@ -108,7 +102,7 @@ export default class MovementSystem {
             const charId = char.getData(ENTITY_ID) as number;
 
             if (INTERPOLATE && this.isNotPredictable(charId)) {
-                const pos = this.interpolations.interpolate<Vec2>(MOVEMENT, charId);
+                const pos = this.interpolations.interpolate<Vec2>(POSITION, charId);
 
                 if (pos) this.move.char(char, pos.x, pos.y);
             }

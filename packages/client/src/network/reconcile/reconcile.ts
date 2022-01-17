@@ -1,4 +1,4 @@
-import {State} from "../types";
+import {State} from "../State";
 import {Tick} from "@leela/common";
 import Transaction from "./Transaction";
 

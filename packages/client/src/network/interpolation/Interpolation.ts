@@ -1,12 +1,10 @@
-import {State} from "../types";
+import {State} from "../State";
 import {Equals, interpolate, InterpolateOptions, Interpolator} from "./interpolate";
 import {
     ENTITY_EXTRAPOLATE,
     ENTITY_EXTRAPOLATE_MAX_MS,
     ENTITY_EXTRAPOLATE_PAST,
-    INTERPOLATE,
-    INTERPOLATE_BUFFER_MS,
-    INTERPOLATE_DUPLICATES
+    INTERPOLATE_BUFFER_MS
 } from "../../constants/config";
 import {EntityId, INTERPOLATE_MS} from "@leela/common";
 import Snapshot from "./Snapshot";
@@ -25,17 +23,15 @@ function trim<S>(snapshots: Snapshot<S>[], thresholdMs) {
 export default class Interpolation<S extends State> {
 
     private buffers: Record<EntityId, Snapshot<S>[]>;
-    private readonly options: InterpolateOptions;
 
     constructor(
         private readonly interpolator: Interpolator<S>,
-        private readonly equals: Equals<S>
+        private readonly equals: Equals<S>,
+        private readonly options?: InterpolateOptions
     ) {
         this.buffers = {};
-        this.options = {
-            interpolate: INTERPOLATE,
+        this.options = this.options ? this.options : {
             interpolateMs: INTERPOLATE_MS,
-            interpolateDuplicates: INTERPOLATE_DUPLICATES,
             extrapolate: ENTITY_EXTRAPOLATE,
             extrapolateMaxMs: ENTITY_EXTRAPOLATE_MAX_MS,
             extrapolatePast: ENTITY_EXTRAPOLATE_PAST

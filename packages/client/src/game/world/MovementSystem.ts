@@ -11,9 +11,7 @@ export default class MovementSystem {
     }
 
     public char(char: Char, x: number, y: number): void {
-        if (char.x == x && char.y == y) {
-            char.stay();
-        } else {
+        if (char.x != x || char.y != y) {
             this.tmpVec2.x = x - char.x;
             this.tmpVec2.y = y - char.y;
 
@@ -22,6 +20,8 @@ export default class MovementSystem {
             char.walk(dir);
 
             char.setPosition(x, y);
+        } else {
+            char.stay();
         }
     }
 }

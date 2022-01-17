@@ -1,6 +1,6 @@
 import Controller from "./Controller";
 import {Char, Data, EntityId, MessageSystem, Opcode, SkinId} from "@leela/common";
-import MovementSystem from "./MovementSystem";
+import EntityPositionSystem from "./EntityPositionSystem";
 import SpawnSystem from "./SpawnSystem";
 
 export default class SnapshotSystem {
@@ -8,13 +8,13 @@ export default class SnapshotSystem {
     private readonly messages: MessageSystem;
 
     private readonly spawn: SpawnSystem;
-    private readonly move: MovementSystem;
+    private readonly position: EntityPositionSystem;
 
     constructor(private readonly controller: Controller) {
         this.messages = this.controller.network.messages;
 
         this.spawn = this.controller.spawn;
-        this.move = this.controller.move;
+        this.position = this.controller.position;
 
         this.init();
     }
@@ -33,7 +33,7 @@ export default class SnapshotSystem {
             } as Char;
 
             this.spawn.handleSnapshot(char);
-            this.move.handleSnapshot(char);
+            this.position.handleSnapshot(char);
         }
     }
 }

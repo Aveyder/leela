@@ -5,7 +5,6 @@ import WorldScene from "../world/WorldScene";
 import OutgoingSystem from "../../network/OutgoingSystem";
 import SpawnSystem from "./SpawnSystem";
 import Char from "../world/view/Char";
-import SmoothSystem from "./SmoothSystem";
 
 export default class JoinSystem {
 
@@ -18,7 +17,6 @@ export default class JoinSystem {
 
     private readonly worldScene: WorldScene;
 
-    private readonly smooth: SmoothSystem;
     private readonly spawn: SpawnSystem;
 
     constructor(private readonly controller: Controller) {
@@ -32,7 +30,6 @@ export default class JoinSystem {
         this.worldScene = controller.worldScene;
 
         this.spawn = controller.spawn;
-        this.smooth = controller.smooth;
 
         this.init();
     }
@@ -53,8 +50,6 @@ export default class JoinSystem {
             this.spawn.charDestroy(playerId);
             this.worldScene.player = null;
             controller.playerId = null;
-
-            this.smooth.clearError();
         }
     }
 

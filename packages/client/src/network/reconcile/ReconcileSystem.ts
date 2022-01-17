@@ -1,4 +1,4 @@
-import {State} from "../types";
+import {State} from "../State";
 import Ticks from "../Ticks";
 import Sequence from "./Sequence";
 
