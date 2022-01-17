@@ -4,7 +4,7 @@ import Transaction from "./Transaction";
 
 
 interface Applicator<S extends State, C extends State> {
-    (state: S, control: C, delta?: number): S;
+    (state: S, control: C, delta?: number, result?: S): S;
 }
 
 function reconcile<S extends State, C extends State>(
@@ -25,7 +25,7 @@ function reconcile<S extends State, C extends State>(
     transactions.splice(0, ackIndex + 1);
 
     for (let i = 0; i < transactions.length; i++) {
-        state = applicator(state, transactions[i].control, transactions[i].delta);
+        applicator(state, transactions[i].control, transactions[i].delta, state);
     }
     return state;
 }

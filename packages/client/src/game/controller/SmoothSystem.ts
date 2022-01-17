@@ -4,7 +4,7 @@ import WorldScene from "../world/WorldScene";
 import SceneMoveSystem from "../world/MovementSystem";
 import Controller from "./Controller";
 import {
-    CLIENT_PREDICT,
+    CLIENT_PREDICT, CLIENT_SMOOTH,
     CLIENT_SMOOTH_POSITION_ERROR_THRESHOLD,
     CLIENT_SMOOTH_POSITION_MAX_MS,
     CLIENT_SMOOTH_POSITION_PRECISION

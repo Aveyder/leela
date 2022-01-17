@@ -1,11 +1,9 @@
 import PreloaderSystem from "./PreloaderSystem";
 import {Keys} from "../types";
 import Char from "./view/Char";
-import PlayerControlSystem from "./PlayerControlSystem";
 import {Vec2} from "@leela/common";
 import MovementSystem from "./MovementSystem";
 import SpawnSystem from "./SpawnSystem";
-import {CLIENT_PREDICT} from "../../constants/config";
 
 export default class WorldScene extends Phaser.Scene {
 
@@ -15,7 +13,6 @@ export default class WorldScene extends Phaser.Scene {
 
     public spawn: SpawnSystem;
     public move: MovementSystem;
-    public control: PlayerControlSystem;
 
     private readonly tmpVec2: Vec2;
 
@@ -35,8 +32,5 @@ export default class WorldScene extends Phaser.Scene {
 
         this.spawn = new SpawnSystem(this);
         this.move = new MovementSystem();
-        if (CLIENT_PREDICT) {
-            this.control = new PlayerControlSystem(this);
-        }
     }
 }

@@ -51,7 +51,7 @@ export default class JoinSystem {
 
         if (playerId != undefined) {
             this.spawn.charDestroy(playerId);
-
+            this.worldScene.player = null;
             controller.playerId = null;
 
             this.smooth.clearError();

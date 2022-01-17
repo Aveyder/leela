@@ -1,5 +1,5 @@
 import Controller from "./Controller";
-import {Opcode, TICK, Vec2} from "@leela/common";
+import {move, Opcode, TICK, Vec2} from "@leela/common";
 import {toVec2} from "../control";
 import SimulationSystem from "../../network/SimulationSystem";
 import WorldScene from "../world/WorldScene";
@@ -8,6 +8,7 @@ import UPDATE = Phaser.Scenes.Events.UPDATE;
 import {CLIENT_PREDICT} from "../../constants/config";
 import {MOVEMENT} from "../../constants/keys";
 import ReconcileSystem from "../../network/reconcile/ReconcileSystem";
+import MovementSystem from "../world/MovementSystem";
 
 export default class PlayerControlSystem {
 
@@ -17,8 +18,11 @@ export default class PlayerControlSystem {
     private readonly reconciliation: ReconcileSystem;
 
     private readonly worldScene: WorldScene;
+    private readonly move: MovementSystem;
 
     private readonly tmpVec2: Vec2;
+
+    private dir: Vec2;
 
     constructor(private readonly controller: Controller) {
         this.simulations = this.controller.network.simulations;
@@ -27,6 +31,7 @@ export default class PlayerControlSystem {
         this.reconciliation = this.controller.network.reconciliation;
 
         this.worldScene = this.controller.worldScene;
+        this.move = this.worldScene.move;
 
         this.tmpVec2 = {x: 0, y: 0};
 
@@ -42,21 +47,28 @@ export default class PlayerControlSystem {
         const playerId = this.controller.playerId;
 
         if (playerId != undefined) {
-            const dir = toVec2(this.worldScene.keys, this.tmpVec2);
+            this.dir = toVec2(this.worldScene.keys);
 
-            if (dir.x != 0 || dir.y != 0) {
-                this.outgoing.push(Opcode.Move, [dir.x, dir.y]);
+            if (this.dir.x != 0 || this.dir.y != 0) {
+                this.outgoing.push(Opcode.Move, [this.dir.x, this.dir.y]);
             }
         }
     }
 
     private update(time: number, delta: number) {
-        const playerId = this.controller.playerId;
+        const player = this.worldScene.player;
 
-        if (playerId != undefined && CLIENT_PREDICT) {
-            const dirVec = toVec2(this.worldScene.keys);
+        if (player && CLIENT_PREDICT) {
+            let pos: Vec2;
+            if (this.dir && (this.dir.x != 0 || this.dir.y != 0)) {
+                pos = move(player, this.dir, delta / 1000, this.tmpVec2);
+            } else {
+                pos = player;
+            }
 
-            this.reconciliation.push(MOVEMENT, dirVec, delta / 1000);
+            this.move.char(player, pos.x, pos.y);
+
+            this.reconciliation.push(MOVEMENT, this.dir, delta / 1000);
         }
     }
 }
