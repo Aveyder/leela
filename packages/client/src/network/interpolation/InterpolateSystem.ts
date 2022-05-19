@@ -24,7 +24,7 @@ export default class InterpolateSystem {
     }
 
     public interpolate<S extends State>(id: InterpolationId, entityId: EntityId): S {
-        return (this.map[id] as Interpolation<S>).interpolate(entityId, Date.now() + this.sync.offset);
+        return (this.map[id] as Interpolation<S>).interpolate(entityId, this.sync.ts.now());
     }
 
     public reset(): void {
