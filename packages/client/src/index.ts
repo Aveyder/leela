@@ -25,7 +25,7 @@ game.events.on(GAME_READY, () => {
         const network = new NetworkSystem();
         network.init();
 
-        new Controller(network, game);
+        network.socket.on("connect", () => new Controller(network, game));
     });
 });
 

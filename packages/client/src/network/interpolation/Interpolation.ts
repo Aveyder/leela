@@ -4,10 +4,12 @@ import {
     ENTITY_EXTRAPOLATE,
     ENTITY_EXTRAPOLATE_MAX_MS,
     ENTITY_EXTRAPOLATE_PAST,
-    INTERPOLATE_BUFFER_MS
+    INTERPOLATE_BUFFER_MS,
+    INTERPOLATE_DEDUPLICATE
 } from "../../constants/config";
 import {EntityId, INTERPOLATE_MS} from "@leela/common";
 import Snapshot from "./Snapshot";
+import {deduplicate} from "./deduplicate";
 
 function trim<S>(snapshots: Snapshot<S>[], thresholdMs) {
     if (snapshots.length > 0) {
@@ -22,6 +24,13 @@ function trim<S>(snapshots: Snapshot<S>[], thresholdMs) {
 
 export default class Interpolation<S extends State> {
 
+    private static readonly DEFAULT_OPTIONS = {
+        interpolateMs: INTERPOLATE_MS,
+        extrapolate: ENTITY_EXTRAPOLATE,
+        extrapolateMaxMs: ENTITY_EXTRAPOLATE_MAX_MS,
+        extrapolatePast: ENTITY_EXTRAPOLATE_PAST
+    };
+
     private buffers: Record<EntityId, Snapshot<S>[]>;
 
     constructor(
@@ -30,12 +39,11 @@ export default class Interpolation<S extends State> {
         private readonly options?: InterpolateOptions
     ) {
         this.buffers = {};
-        this.options = this.options ? this.options : {
-            interpolateMs: INTERPOLATE_MS,
-            extrapolate: ENTITY_EXTRAPOLATE,
-            extrapolateMaxMs: ENTITY_EXTRAPOLATE_MAX_MS,
-            extrapolatePast: ENTITY_EXTRAPOLATE_PAST
-        };
+
+        this.options = this.options ? {
+            ...Interpolation.DEFAULT_OPTIONS,
+            ...this.options
+        } : Interpolation.DEFAULT_OPTIONS;
     }
 
     public push(entityId: EntityId, snapshot: Snapshot<S>): void {
@@ -47,9 +55,15 @@ export default class Interpolation<S extends State> {
     }
 
     public interpolate(id: EntityId, moment: number): S {
+        let buffer = this.getBuffer(id);
+
+        if (INTERPOLATE_DEDUPLICATE) {
+            buffer = deduplicate(buffer, this.equals);
+        }
+
         return interpolate(
             moment,
-            this.getBuffer(id),
+            buffer,
             this.interpolator,
             this.equals,
             this.options

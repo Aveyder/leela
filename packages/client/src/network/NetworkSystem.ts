@@ -1,6 +1,6 @@
 import {Loop, MessageSystem, Opcode} from "@leela/common";
 import {io, Socket} from "socket.io-client";
-import {CLIENT_UPDATE_RATE, SERVER_HOST} from "../constants/config";
+import {CLIENT_CMD_LOOP, CLIENT_UPDATE_RATE, SERVER_HOST} from "../constants/config";
 import Ticks from "./Ticks";
 import IncomingSystem from "./IncomingSystem";
 import ConnectionSystem from "./ConnectionSystem";
@@ -47,8 +47,8 @@ export default class NetworkSystem {
         this.connections.init();
 
         this.simulations.loop.start();
-        this.cmd.loop.start();
+        if (CLIENT_CMD_LOOP) this.cmd.loop.start();
 
-        this.outgoing.push(Opcode.UpdateRate, [CLIENT_UPDATE_RATE]); // now?
+        this.socket.on("connect", () => this.outgoing.push(Opcode.UpdateRate, [CLIENT_UPDATE_RATE]));
     }
 }

@@ -35,11 +35,11 @@ export default class JoinSystem {
     }
 
     private init() {
-        this.socket.on("disconnect", () => this.onDisconnect());
+        this.outgoing.push(Opcode.JoinRequest);
 
         this.messages.on(Opcode.JoinResponse, this.onJoinResponse, this);
 
-        this.outgoing.push(Opcode.JoinRequest);
+        this.socket.on("disconnect", () => this.onDisconnect());
     }
 
     private onDisconnect() {
