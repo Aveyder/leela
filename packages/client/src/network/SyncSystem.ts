@@ -1,6 +1,6 @@
 import {Socket} from "socket.io-client";
-import {PONG} from "@leela/common";
-import {SERVER_HOST, TIMESYNC_INTERVAL_MS} from "../constants/config";
+import {PING} from "@leela/common";
+import {PING_DELAY_MS, SERVER_HOST, TIMESYNC_INTERVAL_MS} from "../constants/config";
 import * as timesync from "timesync";
 import {TimeSync} from "timesync";
 
@@ -20,14 +20,14 @@ export default class SyncSystem {
 
         this.latency = 0;
 
-        this.init();
+        this.startPing();
     }
 
-    private init() {
-        this.socket.on(PONG, (clientTime: number, serverTime: number) => {
-            const now = Date.now();
+    private startPing() {
+        setInterval(() => {
+            const start = Date.now();
 
-            this.latency = now - clientTime;
-        });
+            this.socket.emit(PING, () => this.latency = Date.now() - start);
+        }, PING_DELAY_MS);
     }
 }

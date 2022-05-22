@@ -3,7 +3,7 @@ import PacketSystem from "./PacketSystem";
 import SocketSystem from "./SocketSystem";
 import SnapshotSystem from "./SnapshotSystem";
 import EventEmitter from "eventemitter3";
-import {PING, PONG} from "@leela/common";
+import {PING} from "@leela/common";
 
 export default class ConnectionSystem {
 
@@ -25,7 +25,7 @@ export default class ConnectionSystem {
             this.sockets.put(socket.id, socket);
             this.snapshots.set(socket.id, -1); // now?
 
-            socket.on(PING, clientTime => socket.emit(PONG, clientTime, Date.now()));
+            socket.on(PING, callback => callback());
 
             socket.on("message", (input: string) => {
                 this.packets.accept(socket.id, input);
