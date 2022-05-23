@@ -9,7 +9,7 @@ import OutgoingSystem from "./OutgoingSystem";
 import SnapshotSystem from "./SnapshotSystem";
 import ConnectionSystem from "./ConnectionSystem";
 import SimulationSystem from "./SimulationSystem";
-import {Loop, MessageSystem, Opcode} from "@leela/common";
+import {MessageSystem, Opcode} from "@leela/common";
 
 export default class NetworkSystem {
 
@@ -26,8 +26,6 @@ export default class NetworkSystem {
     public simulations: SimulationSystem;
 
     public init(): void {
-        Loop.setContext({performance, clearInterval});
-
         this.servers = new ServerSystem();
         this.servers.bootstrap();
 
@@ -58,7 +56,7 @@ export default class NetworkSystem {
         this.simulations.loop.start();
 
         this.messages.on(Opcode.UpdateRate, (data, id) => {
-            this.snapshots.set(id, data.shift() as number);
+            this.snapshots.set(id, data[0] as number);
         });
     }
 }

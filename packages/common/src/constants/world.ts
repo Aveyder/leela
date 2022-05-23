@@ -1,5 +1,14 @@
-const CHAR_MAX_ID = 4;
+const WORLD_WIDTH = 1300;
+const WORLD_HEIGHT = 1300;
+
+const CHAR_SKINS = 6;
+const CHAR_SPEED = 120;
+const CHAR_SIZE = 32;
 
 export {
-    CHAR_MAX_ID
+    WORLD_WIDTH,
+    WORLD_HEIGHT,
+    CHAR_SKINS,
+    CHAR_SPEED,
+    CHAR_SIZE
 }

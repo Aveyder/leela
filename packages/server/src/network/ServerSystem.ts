@@ -3,6 +3,7 @@ import * as http from "http";
 import express, {Express} from "express";
 import cors from "cors";
 import {PORT} from "../constants/config";
+import timesyncServer from "timesync/server";
 
 export default class ServerSystem {
 
@@ -14,6 +15,7 @@ export default class ServerSystem {
         this.bootstrapAppServer();
         this.bootstrapHttpServer();
         this.bootstrapSocketServer();
+        this.bootstrapTimesyncServer();
     }
 
     private bootstrapAppServer(): void {
@@ -44,5 +46,9 @@ export default class ServerSystem {
                 origin: "*"
             }
         });
+    }
+
+    private bootstrapTimesyncServer(): void {
+        this.app.use("/timesync", timesyncServer.requestHandler);
     }
 }

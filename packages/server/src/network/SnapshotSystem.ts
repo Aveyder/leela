@@ -1,6 +1,7 @@
-import {ClientId, Loop, SIMULATION_RATE, SNAPSHOT_RATE, TICK} from "@leela/common";
+import {ClientId, SIMULATION_RATE, SNAPSHOT_RATE, TICK} from "@leela/common";
 import OutgoingSystem from "./OutgoingSystem";
 import EventEmitter from "eventemitter3";
+import Loop from "./Loop";
 
 export default class SnapshotSystem {
 
@@ -37,7 +38,6 @@ export default class SnapshotSystem {
     private updateLoop(loop: Loop, tickrate: number) {
         if (tickrate != loop.tickrate) {
             loop.tickrate = tickrate;
-            loop.restart();
         }
     }
 

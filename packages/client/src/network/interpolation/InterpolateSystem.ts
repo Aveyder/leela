@@ -1,6 +1,8 @@
-import {State} from "../types";
+import {State} from "../State";
 import Ticks from "../Ticks";
-import Interpolation, {EntityId} from "./Interpolation";
+import Interpolation from "./Interpolation";
+import {EntityId} from "@leela/common";
+import SyncSystem from "../SyncSystem";
 
 type InterpolationId = string;
 
@@ -9,7 +11,8 @@ export default class InterpolateSystem {
     public readonly map: Record<InterpolationId, Interpolation<State>>;
 
     constructor(
-        private readonly ticks: Ticks
+        private readonly ticks: Ticks,
+        private readonly sync: SyncSystem
     ) {
         this.map = {};
     }
@@ -20,8 +23,8 @@ export default class InterpolateSystem {
         });
     }
 
-    public reconcile<S extends State>(id: InterpolationId, entityId: EntityId): S {
-        return (this.map[id] as Interpolation<S>).interpolate(entityId, Date.now());
+    public interpolate<S extends State>(id: InterpolationId, entityId: EntityId): S {
+        return (this.map[id] as Interpolation<S>).interpolate(entityId, this.sync.ts.now());
     }
 
     public reset(): void {

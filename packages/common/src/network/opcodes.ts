@@ -3,9 +3,9 @@ enum Opcode {
     UpdateRate,
     JoinRequest,
     JoinResponse,
-    Tick,
     Move,
-    Snapshot
+    Snapshot,
+    Disappear
 }
 
 export {

@@ -1,8 +1,7 @@
-import {State} from "../types";
 import Snapshot from "./Snapshot";
+import {State, Equals} from "../State";
 
 type InterpolateOptions = {
-    interpolate?: boolean,
     interpolateMs?: number,
     extrapolate?: boolean,
     extrapolateMaxMs?: number,
@@ -13,12 +12,12 @@ interface Interpolator<S extends State> {
     (s1: S, s2: S, progress: number): S;
 }
 
-function interpolate<S extends State>(moment: number, buffer: Snapshot<S>[], interpolator: Interpolator<S>, options: InterpolateOptions): S {
-    const {interpolate, interpolateMs, extrapolate, extrapolateMaxMs, extrapolatePast} = options;
+function interpolate<S extends State>(moment: number, buffer: Snapshot<S>[], interpolator: Interpolator<S>, equals: Equals<S>, options: InterpolateOptions): S {
+    const {interpolateMs, extrapolate, extrapolateMaxMs, extrapolatePast} = options;
 
     const interpolationMoment = moment - interpolateMs;
     const last = buffer.length - 1;
-    if (interpolate && buffer.length > 1) {
+    if (buffer.length > 1) {
         let before = -1;
         for (let i = last; i >= 0 && before == -1; i--) {
             if (buffer[i].timestamp < interpolationMoment) {
@@ -54,14 +53,10 @@ function interpolate<S extends State>(moment: number, buffer: Snapshot<S>[], int
 
     if (buffer.length > 0) {
         const sl = buffer[last];
-        if (interpolate) {
-            const sf = buffer[0];
+        const sf = buffer[0];
 
-            if (sf.timestamp >= interpolationMoment) {
-                return sf.state;
-            } else {
-                return sl.state;
-            }
+        if (sf.timestamp >= interpolationMoment) {
+            return sf.state;
         } else {
             return sl.state;
         }
@@ -71,5 +66,6 @@ function interpolate<S extends State>(moment: number, buffer: Snapshot<S>[], int
 export {
     InterpolateOptions,
     Interpolator,
+    Equals,
     interpolate
 };

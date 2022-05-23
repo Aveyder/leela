@@ -1,6 +1,7 @@
 import {ClientPacket, createMessage, Data, Message, Opcode} from "@leela/common";
 import {Socket} from "socket.io-client";
 import Ticks from "./Ticks";
+import {CLIENT_CMD_LOOP} from "../constants/config";
 
 export default class OutgoingSystem {
 
@@ -17,6 +18,8 @@ export default class OutgoingSystem {
         const message = createMessage(opcode, data);
 
         this.messages.push(message);
+
+        if (!CLIENT_CMD_LOOP) this.send();
     }
 
     public send(): void {
