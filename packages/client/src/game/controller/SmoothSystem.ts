@@ -1,12 +1,11 @@
 import Smoothing from "../../network/reconcile/smooth";
 import {
-    CLIENT_SMOOTH_POSITION_MAX_MS,
-    CLIENT_SMOOTH_POSITION_PRECISION,
-    CLIENT_SMOOTH_POSITION_THRESHOLD
+  CLIENT_SMOOTH_POSITION_MAX_MS,
+  CLIENT_SMOOTH_POSITION_PRECISION,
+  CLIENT_SMOOTH_POSITION_THRESHOLD
 } from "../../constants/config";
 import {posDiff, posEquals, posInterpolator} from "./position";
 import Controller from "./Controller";
-import {Scene} from "phaser";
 import WorldScene from "../world/WorldScene";
 import MovementSystem from "../world/MovementSystem";
 import {Vec2} from "@leela/common";

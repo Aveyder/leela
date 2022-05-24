@@ -1,5 +1,3 @@
-import P = Phaser.Input.Keyboard.KeyCodes.P;
-
 type State = unknown;
 
 interface Equals<S extends State> {

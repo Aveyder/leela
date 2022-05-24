@@ -1,5 +1,5 @@
 import Snapshot from "./Snapshot";
-import {State, Equals} from "../State";
+import {Equals, State} from "../State";
 
 type InterpolateOptions = {
     interpolateMs?: number,

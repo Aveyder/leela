@@ -1,15 +1,4 @@
-import {
-    CHAR_SKINS,
-    EntityId,
-    FRACTION_DIGITS,
-    move,
-    Vec2,
-    WORLD_HEIGHT,
-    WORLD_WIDTH,
-    bound,
-    toFixed, SkinId
-} from "@leela/common";
-import {Char} from "@leela/common";
+import {bound, Char, CHAR_SKINS, EntityId, move, SkinId, Vec2, WORLD_HEIGHT, WORLD_WIDTH} from "@leela/common";
 
 export default class World {
 

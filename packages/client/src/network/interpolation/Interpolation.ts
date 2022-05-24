@@ -1,11 +1,12 @@
 import {State} from "../State";
 import {Equals, interpolate, InterpolateOptions, Interpolator} from "./interpolate";
 import {
-    ENTITY_EXTRAPOLATE,
-    ENTITY_EXTRAPOLATE_MAX_MS,
-    ENTITY_EXTRAPOLATE_PAST,
-    INTERPOLATE_BUFFER_MS,
-    INTERPOLATE_DEDUPLICATE
+  ENTITY_EXTRAPOLATE,
+  ENTITY_EXTRAPOLATE_MAX_MS,
+  ENTITY_EXTRAPOLATE_PAST,
+  INTERPOLATE_BUFFER_MS,
+  INTERPOLATE_DROP_DUPLICATES,
+  INTERPOLATE_DROP_DUPLICATES_MAX
 } from "../../constants/config";
 import {EntityId, INTERPOLATE_MS} from "@leela/common";
 import Snapshot from "./Snapshot";
@@ -51,19 +52,17 @@ export default class Interpolation<S extends State> {
 
         trim(buffer, INTERPOLATE_BUFFER_MS);
 
+        if (INTERPOLATE_DROP_DUPLICATES) {
+            deduplicate(buffer, snapshot, this.equals, INTERPOLATE_DROP_DUPLICATES_MAX)
+        }
+
         buffer.push(snapshot);
     }
 
     public interpolate(id: EntityId, moment: number): S {
-        let buffer = this.getBuffer(id);
-
-        if (INTERPOLATE_DEDUPLICATE) {
-            buffer = deduplicate(buffer, this.equals);
-        }
-
         return interpolate(
             moment,
-            buffer,
+            this.getBuffer(id),
             this.interpolator,
             this.equals,
             this.options

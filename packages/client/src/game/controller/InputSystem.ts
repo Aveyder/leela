@@ -1,16 +1,15 @@
 import Controller from "./Controller";
-import {move, Opcode, TICK, Vec2} from "@leela/common";
+import {Opcode, TICK, Vec2} from "@leela/common";
 import {toVec2} from "../control";
 import SimulationSystem from "../../network/SimulationSystem";
 import WorldScene from "../world/WorldScene";
 import OutgoingSystem from "../../network/OutgoingSystem";
-import UPDATE = Phaser.Scenes.Events.UPDATE;
 import {CLIENT_PREDICT} from "../../constants/config";
 import {POSITION} from "../../constants/keys";
 import ReconcileSystem from "../../network/reconcile/ReconcileSystem";
-import MovementSystem from "../world/MovementSystem";
 import PlayerControlSystem from "./PlayerControlSystem";
 import {Keys} from "../types";
+import UPDATE = Phaser.Scenes.Events.UPDATE;
 
 export default class InputSystem {
 

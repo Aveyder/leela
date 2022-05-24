@@ -8,9 +8,9 @@ import InputSystem from "./InputSystem";
 import SpawnSystem from "./SpawnSystem";
 import JoinSystem from "./JoinSystem";
 import SnapshotSystem from "./SnapshotSystem";
-import UPDATE = Phaser.Scenes.Events.UPDATE;
 import PlayerControlSystem from "./PlayerControlSystem";
 import SmoothSystem from "./SmoothSystem";
+import UPDATE = Phaser.Scenes.Events.UPDATE;
 
 
 export default class Controller {
