@@ -1,4 +1,3 @@
-import {performance} from "perf_hooks";
 import ServerSystem from "./ServerSystem";
 import SocketSystem from "./SocketSystem";
 import PacketSystem from "./PacketSystem";

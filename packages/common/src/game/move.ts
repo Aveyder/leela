@@ -1,8 +1,7 @@
-import {FRACTION_DIGITS, SIMULATION_RATE} from "../constants/config";
+import {SIMULATION_RATE} from "../constants/config";
 import {CHAR_SPEED} from "../constants/world";
 import {Vec2} from "./types";
 import bound from "./bound";
-import {toFixed} from "../utils/math";
 
 const SIMULATION_DELTA = 1 / SIMULATION_RATE;
 

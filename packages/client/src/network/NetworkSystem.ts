@@ -1,4 +1,4 @@
-import {Loop, MessageSystem, Opcode} from "@leela/common";
+import {MessageSystem, Opcode} from "@leela/common";
 import {io, Socket} from "socket.io-client";
 import {CLIENT_CMD_LOOP, CLIENT_UPDATE_RATE, SERVER_HOST} from "../constants/config";
 import Ticks from "./Ticks";
@@ -26,8 +26,6 @@ export default class NetworkSystem {
     public reconciliation: ReconcileSystem;
 
     public init(): void {
-        Loop.setContext({performance, clearInterval});
-
         this.socket = io(SERVER_HOST);
 
         this.ticks = new Ticks();

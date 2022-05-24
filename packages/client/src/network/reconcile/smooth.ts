@@ -1,4 +1,4 @@
-import {State, Equals, Diff} from "../State";
+import {Diff, Equals, State} from "../State";
 import {Interpolator} from "../interpolation/interpolate";
 
 type SmoothOptions<S extends State> = {

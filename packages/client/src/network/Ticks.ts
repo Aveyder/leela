@@ -1,4 +1,4 @@
-import {AckTick, Stamp, Tick} from "@leela/common";
+import {Stamp, Tick} from "@leela/common";
 
 export default class Ticks {
 

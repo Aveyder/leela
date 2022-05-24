@@ -7,4 +7,4 @@ network.init();
 
 const world = new World();
 
-const controller = new Controller(network, world);
+new Controller(network, world);

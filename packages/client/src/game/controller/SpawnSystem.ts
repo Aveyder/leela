@@ -1,7 +1,6 @@
 import Controller from "./Controller";
-import {Data, EntityId, MessageSystem, Opcode, SkinId} from "@leela/common";
+import {Char as CharSnapshot, Data, EntityId, MessageSystem, Opcode, SkinId} from "@leela/common";
 import Char from "../world/view/Char";
-import {Char as CharSnapshot} from "@leela/common";
 import {ENTITY_ID} from "../../constants/keys";
 import WorldScene from "../world/WorldScene";
 import {SHOW_ERROR} from "../../constants/config";

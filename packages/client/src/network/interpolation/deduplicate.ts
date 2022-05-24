@@ -1,35 +1,30 @@
 import Snapshot from "./Snapshot";
-import {State, Equals} from "../State";
-import {INTERPOLATE_DEDUPLICATE_MAX} from "../../constants/config";
+import {Equals, State} from "../State";
 
 
-function deduplicate<S extends State>(buffer: Snapshot<S>[], equals: Equals<S>): Snapshot<S>[] {
-    if (buffer.length > 3) {
-        const result = [...buffer];
-        let count = 0;
-        let prev;
-        for (let i = 0; i < result.length; i++) {
-            const cur = result[i];
-
-            if (i > 0) {
-                if (equals(prev.state, cur.state)) {
-                    if (count > 0) count++;
-                } else {
-                    if (count > 1 && count <= INTERPOLATE_DEDUPLICATE_MAX) {
-                        const removeAmount = count - 1;
-                        const start = i - removeAmount;
-                        result.splice(start, removeAmount);
-                        i = start;
+function deduplicate<S extends State>(buffer: Snapshot<S>[], snapshot: Snapshot<S>, equals: Equals<S>, max = 2) {
+    if (buffer.length > 2) {
+        const lastIndex = buffer.length - 1;
+        const last = buffer[lastIndex];
+        if (!equals(snapshot.state, last.state)) {
+            let count = 1;
+            for(let i = lastIndex - 1; i >= 0; i--) {
+                const cur = buffer[i];
+                if (equals(cur.state, last.state)) {
+                    if (count < max) {
+                        count++;
+                    } else {
+                        break;
                     }
-                    count = 1;
+                } else {
+                    if (count > 1) {
+                        buffer.splice(i + 2);
+                        console.log(`drop ${count}`);
+                    }
+                    break;
                 }
             }
-
-            prev = cur;
         }
-        return result;
-    } else {
-        return buffer;
     }
 }
 

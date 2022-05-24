@@ -5,7 +5,6 @@ export {default as bound} from "./game/bound";
 export * from "./game/entities";
 export {default as move} from "./game/move";
 export * from "./game/types";
-export {default as Loop} from "./loops/Loop";
 export * from "./network/messages";
 export {default as MessageSystem} from "./network/MessageSystem";
 export * from "./network/opcodes";
