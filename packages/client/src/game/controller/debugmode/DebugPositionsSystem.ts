@@ -52,10 +52,15 @@ export default class DebugPositionsSystem {
     private drawRemotePosition() {
         this.graphics.lineStyle(2, 0xcc00aa);
 
+        const chars = this.controller.chars;
+
         this.snapshot?.forEach(entity => {
             if (entity.type == EntityType.CHAR) {
-                const char = entity as CharSnapshot;
-                this.graphics.strokeRect(char.x - CHAR_SIZE / 2, char.y - CHAR_SIZE, CHAR_SIZE, CHAR_SIZE);
+                const remoteChar = entity as CharSnapshot;
+                this.graphics.strokeRect(remoteChar.x - CHAR_SIZE / 2, remoteChar.y - CHAR_SIZE / 2, CHAR_SIZE, CHAR_SIZE);
+
+                const localChar = chars[entity.id];
+                if (localChar) this.graphics.lineBetween(remoteChar.x, remoteChar.y, localChar.x, localChar.y);
             }
         });
     }
@@ -67,6 +72,7 @@ export default class DebugPositionsSystem {
         Object.keys(chars).forEach(entityId => {
             const char = chars[entityId] as Char;
 
+            this.graphics.strokeCircle(char.x, char.y, 1);
             this.graphics.strokeRectShape(char.getBounds());
         });
     }
@@ -75,7 +81,7 @@ export default class DebugPositionsSystem {
         const error = this.controller.smooth.smooth.error;
         if (error) {
             this.graphics.lineStyle(2, 0xffe861);
-            this.graphics.strokeRect(error.x - CHAR_SIZE / 2, error.y - CHAR_SIZE, CHAR_SIZE, CHAR_SIZE);
+            this.graphics.strokeRect(error.x - CHAR_SIZE / 2, error.y - CHAR_SIZE / 2, CHAR_SIZE, CHAR_SIZE);
         }
     }
 }

@@ -1,7 +1,7 @@
-import {Data} from "./types";
+import {ClientId, Data} from "./types";
 
 interface Serializer<D> {
-    serialize(input: D): Data;
+    serialize(input: D, id?: ClientId): Data;
 }
 
 interface Deserializer<D> {
@@ -9,7 +9,7 @@ interface Deserializer<D> {
 }
 
 class NoopSerializer implements Serializer<unknown>{
-    public serialize(input: unknown) {
+    public serialize(input: unknown, id?: ClientId) {
         return input;
     }
 }

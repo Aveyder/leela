@@ -11,8 +11,6 @@ export default class Char extends Sprite {
         super(scene, x, y, "char:0");
 
         this.skin = skin;
-
-        this.setOrigin(0.5, 1);
     }
 
     public set skin(value: number) {

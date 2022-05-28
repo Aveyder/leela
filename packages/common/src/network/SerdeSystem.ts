@@ -1,6 +1,6 @@
 import {Opcode} from "./opcodes";
 import {Deserializer, NoopDeserializer, NoopSerializer, Serializer} from "./Serializer";
-import {Data} from "./types";
+import {ClientId, Data} from "./types";
 
 
 export default class SerdeSystem {
@@ -19,10 +19,10 @@ export default class SerdeSystem {
         this.deserializers[opcode] = deserializer;
     }
 
-    public serialize<D>(opcode: Opcode, data: D): Data {
+    public serialize<D>(opcode: Opcode, data: D, id?: ClientId): Data {
         const serializer = this.serializers[opcode] as Serializer<D>;
 
-        return (serializer ? serializer : this.noopSerializer).serialize(data);
+        return (serializer ? serializer : this.noopSerializer).serialize(data, id);
     }
 
     public deserialize<D>(opcode: Opcode, data: Data): D {

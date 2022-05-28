@@ -28,7 +28,7 @@ export default class PacketSystem {
     public push(id: ClientId, opcode: Opcode, data?: Data): void {
         const messages = this.outgoing[id] || [] as Message[];
 
-        const serializedData = this.serde.serialize(opcode, data);
+        const serializedData = this.serde.serialize(opcode, data, id);
 
         const message = createMessage(opcode, serializedData);
 
