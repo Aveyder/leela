@@ -1,5 +1,5 @@
 import SocketSystem from "./SocketSystem";
-import {ClientId, Message, ServerPacket} from "@leela/common";
+import {ClientId, Message, Packet} from "@leela/common";
 import Ticks from "./Ticks";
 
 export default class OutgoingSystem {
@@ -36,6 +36,6 @@ export default class OutgoingSystem {
             ticks.server,
             ticks.clients[id]?.tick || -1,
             ...messages
-        ] as ServerPacket;
+        ] as Packet;
     }
 }

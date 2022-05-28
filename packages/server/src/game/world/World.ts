@@ -1,4 +1,15 @@
-import {bound, Char, CHAR_SKINS, EntityId, move, SkinId, Vec2, WORLD_HEIGHT, WORLD_WIDTH} from "@leela/common";
+import {
+    bound,
+    Char,
+    CHAR_SKINS,
+    EntityId,
+    EntityType,
+    move,
+    SkinId,
+    Vec2,
+    WORLD_HEIGHT,
+    WORLD_WIDTH
+} from "@leela/common";
 
 export default class World {
 
@@ -21,6 +32,7 @@ export default class World {
 
         const char: Char = {
             id,
+            type: EntityType.CHAR,
             skin: skin != undefined ? skin : Math.floor(Math.random() * CHAR_SKINS),
             x: x != undefined ? x : Math.random() * WORLD_WIDTH,
             y: y != undefined ? y : Math.random() * WORLD_HEIGHT

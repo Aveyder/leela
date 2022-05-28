@@ -2,12 +2,13 @@ import EventEmitter from "eventemitter3";
 import {ClientId, Data, Message} from "./types";
 import {OPCODE_EVENT_PREFIX} from "../constants/events";
 import {Opcode} from "./opcodes";
+import SerdeSystem from "./SerdeSystem";
 
 export default class MessageSystem {
 
     private readonly events: EventEmitter;
 
-    constructor() {
+    constructor(private readonly serde: SerdeSystem) {
         this.events = new EventEmitter();
     }
 
@@ -29,7 +30,9 @@ export default class MessageSystem {
     private receiveMessage(message: Message, id?: ClientId): void {
         const opcode = message.shift() as Opcode;
 
-        this.events.emit(MessageSystem.opcodeEvent(opcode), message as Data, id);
+        const deserializedData = this.serde.deserialize(opcode, message.shift() as Data);
+
+        this.events.emit(MessageSystem.opcodeEvent(opcode), deserializedData, id);
     }
 
     private static opcodeEvent(opcode: Opcode): string {

@@ -1,4 +1,4 @@
-import {ClientId, ClientPacket, createMessage, Data, Message, Opcode} from "@leela/common";
+import {ClientId, createMessage, Data, Message, Opcode, Packet, SerdeSystem} from "@leela/common";
 import {AddressedPacket} from "./types";
 
 export default class PacketSystem {
@@ -6,13 +6,13 @@ export default class PacketSystem {
     public readonly incoming: AddressedPacket[];
     public readonly outgoing: Record<ClientId, Message[]>;
 
-    constructor() {
+    constructor(private readonly serde: SerdeSystem) {
         this.incoming = [];
         this.outgoing = {};
     }
 
     public accept(id: ClientId, input: string): void {
-        const clientPacket = JSON.parse(input) as ClientPacket;
+        const clientPacket = JSON.parse(input) as Packet;
 
         this.incoming.push([id, clientPacket]);
     }
@@ -28,7 +28,9 @@ export default class PacketSystem {
     public push(id: ClientId, opcode: Opcode, data?: Data): void {
         const messages = this.outgoing[id] || [] as Message[];
 
-        const message = createMessage(opcode, data);
+        const serializedData = this.serde.serialize(opcode, data);
+
+        const message = createMessage(opcode, serializedData);
 
         messages.push(message);
 

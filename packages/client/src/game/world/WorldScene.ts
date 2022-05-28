@@ -1,7 +1,5 @@
 import PreloaderSystem from "./PreloaderSystem";
 import {Keys} from "../types";
-import Char from "./view/Char";
-import {Vec2} from "@leela/common";
 import MovementSystem from "./MovementSystem";
 import SpawnSystem from "./SpawnSystem";
 
@@ -9,17 +7,11 @@ export default class WorldScene extends Phaser.Scene {
 
     public keys: Keys;
 
-    public player: Char;
-
     public spawn: SpawnSystem;
     public move: MovementSystem;
 
-    private readonly tmpVec2: Vec2;
-
     constructor() {
         super("world");
-
-        this.tmpVec2 = {x: 0, y: 0};
     }
 
     public preload(): void {

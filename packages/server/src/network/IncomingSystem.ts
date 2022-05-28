@@ -1,6 +1,6 @@
 import Ticks from "./Ticks";
 import {AddressedPacket} from "./types";
-import {AckTick, ClientId, ClientPacket, Message, MessageSystem, Stamp, Tick, Timestamp} from "@leela/common";
+import {AckTick, ClientId, Message, MessageSystem, Packet, Stamp, Tick, Timestamp} from "@leela/common";
 
 export default class IncomingSystem {
 
@@ -21,7 +21,7 @@ export default class IncomingSystem {
         this.packetsIncoming.length = 0;
     }
 
-    private receivePacket(id: ClientId, clientPacket: ClientPacket) {
+    private receivePacket(id: ClientId, clientPacket: Packet) {
         const time = clientPacket.shift() as Timestamp;
         const tick = clientPacket.shift() as Tick;
         const ack = clientPacket.shift() as AckTick;

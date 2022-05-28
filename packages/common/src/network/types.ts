@@ -2,15 +2,14 @@ import {Opcode} from "./opcodes";
 
 type ClientId = string;
 
-type Data = unknown[];
-type Message = [Opcode, ...Data];
+type Data = unknown | unknown[];
+type Message = [Opcode, Data];
 
 type Timestamp = number;
 type Tick = number;
 type AckTick = Tick;
 
-type ClientPacket = [Timestamp, Tick, AckTick, ...Message[]];
-type ServerPacket = [Timestamp, Tick, AckTick, ...Message[]];
+type Packet = [Timestamp, Tick, AckTick, ...Message[]];
 
 export {
     ClientId,
@@ -19,6 +18,5 @@ export {
     Timestamp,
     Tick,
     AckTick,
-    ClientPacket,
-    ServerPacket
+    Packet
 };

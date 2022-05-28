@@ -53,7 +53,7 @@ export default class InputSystem {
             this.dir = toVec2(this.keys);
 
             if (this.dir.x != 0 || this.dir.y != 0) {
-                this.outgoing.push(Opcode.Move, [this.dir.x, this.dir.y]);
+                this.outgoing.push(Opcode.Move, this.dir);
             }
         }
     }

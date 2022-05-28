@@ -8,6 +8,8 @@ export * from "./game/types";
 export * from "./network/messages";
 export {default as MessageSystem} from "./network/MessageSystem";
 export * from "./network/opcodes";
+export {default as SerdeSystem} from "./network/SerdeSystem";
+export * from "./network/Serializer";
 export {default as Stamp} from "./network/Stamp";
 export * from "./network/types";
 export * from "./utils/math";

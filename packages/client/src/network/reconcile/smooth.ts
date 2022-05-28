@@ -13,7 +13,7 @@ type SmoothOptions<S extends State> = {
 export default class Smoothing<S extends State> {
 
     private pause: boolean;
-    private error: S;
+    public error: S;
     private errorTimer: number;
 
     private prevRec: S;
