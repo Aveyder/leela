@@ -1,4 +1,4 @@
-import {MessageSystem, Opcode} from "@leela/common";
+import {MessageSystem, Opcode, SerdeSystem} from "@leela/common";
 import {io, Socket} from "socket.io-client";
 import {CLIENT_CMD_LOOP, CLIENT_UPDATE_RATE, SERVER_HOST} from "../constants/config";
 import Ticks from "./Ticks";
@@ -25,17 +25,20 @@ export default class NetworkSystem {
     public interpolations: InterpolateSystem;
     public reconciliation: ReconcileSystem;
 
+    constructor(private readonly serde: SerdeSystem) {
+    }
+
     public init(): void {
         this.socket = io(SERVER_HOST);
 
         this.ticks = new Ticks();
 
-        this.messages = new MessageSystem();
+        this.messages = new MessageSystem(this.serde);
         this.incoming = new IncomingSystem(this.ticks, this.messages);
         this.connections = new ConnectionSystem(this.socket, this.incoming);
         this.sync = new SyncSystem(this.socket);
 
-        this.outgoing = new OutgoingSystem(this.socket, this.ticks);
+        this.outgoing = new OutgoingSystem(this.socket, this.ticks, this.serde);
         this.simulations = new SimulationSystem(this.ticks);
         this.cmd = new CommandSystem(this.outgoing);
 
@@ -47,6 +50,6 @@ export default class NetworkSystem {
         this.simulations.loop.start();
         if (CLIENT_CMD_LOOP) this.cmd.loop.start();
 
-        this.socket.on("connect", () => this.outgoing.push(Opcode.UpdateRate, [CLIENT_UPDATE_RATE]));
+        this.socket.on("connect", () => this.outgoing.push(Opcode.UpdateRate, CLIENT_UPDATE_RATE));
     }
 }

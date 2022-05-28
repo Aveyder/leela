@@ -1,5 +1,5 @@
 import Controller from "./Controller";
-import {ClientId, Data, EntityId, MessageSystem, Opcode} from "@leela/common";
+import {ClientId, EntityId, MessageSystem, Opcode, Vec2} from "@leela/common";
 import World from "../world/World";
 import Ticks from "../../network/Ticks";
 
@@ -27,14 +27,11 @@ export default class MovementSystem {
         this.messages.on(Opcode.Move, this.onMove, this);
     }
 
-    private onMove(data: Data, id: ClientId) {
+    private onMove(dir: Vec2, id: ClientId) {
         const playerId = this.players[id];
 
         if (playerId != undefined) {
-            const vx = data[0] as number;
-            const vy = data[1] as number;
-
-            this.world.moveChar(playerId, vx, vy, this.ticks.delta);
+            this.world.moveChar(playerId, dir.x, dir.y, this.ticks.delta);
         }
     }
 }

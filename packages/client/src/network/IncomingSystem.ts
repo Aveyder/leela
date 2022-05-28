@@ -1,4 +1,4 @@
-import {AckTick, Message, MessageSystem, ServerPacket, Tick, Timestamp} from "@leela/common";
+import {AckTick, Message, MessageSystem, Packet, Tick, Timestamp} from "@leela/common";
 import Ticks from "./Ticks";
 
 export default class IncomingSystem {
@@ -18,7 +18,7 @@ export default class IncomingSystem {
     }
 
     private receivePacket(input: string) {
-        const packet = JSON.parse(input) as ServerPacket;
+        const packet = JSON.parse(input) as Packet;
 
         const timestamp = packet.shift() as Timestamp;
 

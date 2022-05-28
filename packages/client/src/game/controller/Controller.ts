@@ -10,6 +10,8 @@ import JoinSystem from "./JoinSystem";
 import SnapshotSystem from "./SnapshotSystem";
 import PlayerControlSystem from "./PlayerControlSystem";
 import SmoothSystem from "./SmoothSystem";
+import DebugSystem from "./debugmode/DebugSystem";
+import {DEBUG_MODE} from "../../constants/config";
 import UPDATE = Phaser.Scenes.Events.UPDATE;
 
 
@@ -18,6 +20,7 @@ export default class Controller {
     public readonly chars: Record<EntityId, Char>;
 
     public playerId: EntityId;
+    public player: Char;
 
     public readonly worldScene: WorldScene;
 
@@ -28,6 +31,7 @@ export default class Controller {
     public readonly spawn: SpawnSystem;
     public readonly join: JoinSystem;
     public readonly snapshots: SnapshotSystem;
+    public readonly debug: DebugSystem;
 
     constructor(
         public readonly network: NetworkSystem,
@@ -44,6 +48,10 @@ export default class Controller {
         this.spawn = new SpawnSystem(this);
         this.join = new JoinSystem(this);
         this.snapshots = new SnapshotSystem(this);
+
+        if (DEBUG_MODE) {
+            this.debug = new DebugSystem(this);
+        }
 
         this.drawPing();
     }

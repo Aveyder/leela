@@ -1,5 +1,5 @@
 import Controller from "./Controller";
-import {ClientId, Data, EntityId, FRACTION_DIGITS, MessageSystem, Opcode, toFixed} from "@leela/common";
+import {ClientId, Data, EntityId, MessageSystem, Opcode} from "@leela/common";
 import ConnectionSystem from "../../network/ConnectionSystem";
 import World from "../world/World";
 import PacketSystem from "../../network/PacketSystem";
@@ -39,7 +39,7 @@ export default class JoinSystem {
 
         delete this.players[id];
 
-        this.packets.pushBroadcast(Opcode.Disappear, [entityId]);
+        this.packets.pushBroadcast(Opcode.Disappear, entityId);
     }
 
     private onJoinRequest(data: Data, id: ClientId) {
@@ -47,11 +47,6 @@ export default class JoinSystem {
 
         this.players[id] = char.id;
 
-        this.packets.push(id, Opcode.JoinResponse, [
-            char.id,
-            toFixed(char.x, FRACTION_DIGITS),
-            toFixed(char.y, FRACTION_DIGITS),
-            char.skin
-        ]);
+        this.packets.push(id, Opcode.JoinResponse, char);
     }
 }

@@ -1,5 +1,5 @@
 import Controller from "./Controller";
-import {Data, EntityId, MessageSystem, Opcode, SkinId} from "@leela/common";
+import {Char as CharSnapshot, EntityId, MessageSystem, Opcode} from "@leela/common";
 import {Socket} from "socket.io-client";
 import WorldScene from "../world/WorldScene";
 import OutgoingSystem from "../../network/OutgoingSystem";
@@ -48,19 +48,14 @@ export default class JoinSystem {
 
         if (playerId != undefined) {
             this.spawn.charDestroy(playerId);
-            this.worldScene.player = null;
+            controller.player = null;
             controller.playerId = null;
         }
     }
 
-    private onJoinResponse(data: Data) {
-        const entityId = data[0] as EntityId;
-        const x = data[1] as number;
-        const y = data[2] as number;
-        const skin = data[3] as SkinId;
+    private onJoinResponse(char: CharSnapshot) {
+        this.controller.playerId = char.id;
 
-        this.controller.playerId = entityId;
-
-        this.worldScene.player = this.spawn.charSpawn(entityId, x, y, skin);
+        this.controller.player = this.spawn.charSpawn(char.id, char.x, char.y, char.skin);
     }
 }

@@ -1,9 +1,8 @@
 import Controller from "./Controller";
-import {Char as CharSnapshot, Data, EntityId, MessageSystem, Opcode, SkinId} from "@leela/common";
+import {Char as CharSnapshot, EntityId, MessageSystem, Opcode, SkinId} from "@leela/common";
 import Char from "../world/view/Char";
 import {ENTITY_ID} from "../../constants/keys";
 import WorldScene from "../world/WorldScene";
-import {SHOW_ERROR} from "../../constants/config";
 import EntityPositionSystem from "./EntityPositionSystem";
 
 export default class SpawnSystem {
@@ -29,13 +28,7 @@ export default class SpawnSystem {
     }
 
     private init() {
-        this.messages.on(Opcode.Disappear, this.onDisappear, this);
-    }
-
-    private onDisappear(data: Data) {
-        const entityId = data[0] as EntityId;
-
-        this.charDestroy(entityId);
+        this.messages.on(Opcode.Disappear, this.charDestroy, this);
     }
 
     public handleSnapshot(snapshot: CharSnapshot): void {
@@ -56,10 +49,6 @@ export default class SpawnSystem {
 
         this.chars[entityId] = char;
 
-        if (SHOW_ERROR) {
-            this.serverCharSpawn(entityId, x, y, skin);
-        }
-
         return char;
     }
 
@@ -70,44 +59,6 @@ export default class SpawnSystem {
             char.destroy();
 
             delete this.chars[entityId];
-
-            if (SHOW_ERROR) {
-                this.serverCharDestroy(entityId);
-            }
-        }
-    }
-
-    private serverCharSpawn(entityId: EntityId, x: number, y: number, skin: SkinId) {
-        const serverChar = this.worldScene.spawn.char(skin, x, y);
-
-        this.position.serverChars[entityId] = serverChar;
-
-        serverChar.setAlpha(0.15);
-        serverChar.setTint(0x00ff00);
-
-        if (entityId == this.controller.playerId) {
-            const serverPlayer = this.worldScene.spawn.char(skin, x, y);
-
-            this.position.serverPlayer = serverPlayer;
-
-            serverPlayer.setAlpha(0.15);
-            serverPlayer.setTint(0xff0000);
-        }
-    }
-
-    private serverCharDestroy(entityId: EntityId) {
-        const serverChar = this.position.serverChars[entityId];
-
-        if (serverChar) {
-            serverChar.destroy();
-
-            delete this.position.serverChars[entityId];
-        }
-
-        if (entityId == this.controller.playerId) {
-            const serverPlayer = this.position.serverPlayer;
-
-            if (serverPlayer) serverPlayer.destroy();
         }
     }
 }

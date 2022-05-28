@@ -20,7 +20,7 @@ export default class PlayerControlSystem {
     }
 
     public apply(keys: Keys, delta: number): void {
-        const player = this.worldScene.player;
+        const player = this.controller.player;
 
         if (player) {
             const dir = toVec2(keys, this.tmpVec2);

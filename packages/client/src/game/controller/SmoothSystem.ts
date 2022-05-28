@@ -1,8 +1,8 @@
 import Smoothing from "../../network/reconcile/smooth";
 import {
-  CLIENT_SMOOTH_POSITION_MAX_MS,
-  CLIENT_SMOOTH_POSITION_PRECISION,
-  CLIENT_SMOOTH_POSITION_THRESHOLD
+    CLIENT_SMOOTH_POSITION_MAX_MS,
+    CLIENT_SMOOTH_POSITION_PRECISION,
+    CLIENT_SMOOTH_POSITION_THRESHOLD
 } from "../../constants/config";
 import {posDiff, posEquals, posInterpolator} from "./position";
 import Controller from "./Controller";
@@ -17,7 +17,7 @@ export default class SmoothSystem {
 
     private readonly move: MovementSystem;
 
-    private readonly smooth: Smoothing<Vec2>;
+    public readonly smooth: Smoothing<Vec2>;
 
     constructor(
         private readonly controller: Controller
@@ -46,7 +46,7 @@ export default class SmoothSystem {
         const playerId = this.controller.playerId;
 
         if (playerId != undefined) {
-            const player = this.worldScene.player;
+            const player = this.controller.player;
 
             const pos = this.smooth.smoothError(delta, player);
 

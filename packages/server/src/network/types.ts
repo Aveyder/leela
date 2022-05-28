@@ -1,6 +1,6 @@
-import {ClientId, ClientPacket} from "@leela/common";
+import {ClientId, Packet} from "@leela/common";
 
-type AddressedPacket = [ClientId, ClientPacket];
+type AddressedPacket = [ClientId, Packet];
 type RoomId = string;
 
 export {

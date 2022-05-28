@@ -7,7 +7,7 @@ import {Char as CharSnapshot, EntityId, move, Vec2} from "@leela/common";
 import WorldScene from "../world/WorldScene";
 import Sequence from "../../network/reconcile/Sequence";
 import ReconcileSystem from "../../network/reconcile/ReconcileSystem";
-import {CLIENT_PREDICT, CLIENT_SMOOTH, INTERPOLATE, SHOW_ERROR} from "../../constants/config";
+import {CLIENT_PREDICT, CLIENT_SMOOTH, INTERPOLATE} from "../../constants/config";
 import Char from "../world/view/Char";
 import {posEquals, posInterpolator} from "./position";
 import SmoothSystem from "./SmoothSystem";
@@ -16,9 +16,6 @@ import UPDATE = Phaser.Scenes.Events.UPDATE;
 export default class EntityPositionSystem {
 
     private readonly chars: Record<EntityId, Char>;
-
-    public readonly serverChars: Record<EntityId, Char>;
-    public serverPlayer: Char;
 
     private readonly smooth: SmoothSystem;
 
@@ -31,9 +28,7 @@ export default class EntityPositionSystem {
     constructor(private readonly controller: Controller) {
         this.chars = controller.chars;
 
-        this.serverChars = {};
-
-        this.smooth = this.controller.smooth;
+        this.smooth = controller.smooth;
 
         this.worldScene = controller.worldScene;
         this.move = this.worldScene.move;
@@ -52,11 +47,6 @@ export default class EntityPositionSystem {
     }
 
     public handleSnapshot(snapshot: CharSnapshot): void {
-        if (SHOW_ERROR) {
-            const serverChar = this.serverChars[snapshot.id];
-            this.worldScene.move.char(serverChar, snapshot.x, snapshot.y);
-        }
-
         if (this.isNotPredictable(snapshot.id)) {
             this.handleNotPredictable(snapshot);
         } else {
@@ -79,14 +69,10 @@ export default class EntityPositionSystem {
 
         const rec = this.reconciliation.reconcile(POSITION, snapshot);
 
-        if (SHOW_ERROR) {
-            this.move.char(this.serverPlayer, rec.x, rec.y);
-        }
-
         if (CLIENT_SMOOTH) {
             this.smooth.refreshError(char, rec);
         } else {
-            this.move.char(char, rec.x, rec.y);
+            char.setPosition(rec.x, rec.y);
         }
     }
 

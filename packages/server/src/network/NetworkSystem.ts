@@ -8,7 +8,7 @@ import OutgoingSystem from "./OutgoingSystem";
 import SnapshotSystem from "./SnapshotSystem";
 import ConnectionSystem from "./ConnectionSystem";
 import SimulationSystem from "./SimulationSystem";
-import {MessageSystem, Opcode} from "@leela/common";
+import {MessageSystem, Opcode, SerdeSystem} from "@leela/common";
 
 export default class NetworkSystem {
 
@@ -24,17 +24,20 @@ export default class NetworkSystem {
     public connections: ConnectionSystem;
     public simulations: SimulationSystem;
 
+    constructor(private readonly serde: SerdeSystem) {
+    }
+
     public init(): void {
         this.servers = new ServerSystem();
         this.servers.bootstrap();
 
         this.sockets = new SocketSystem();
-        this.packets = new PacketSystem();
+        this.packets = new PacketSystem(this.serde);
         this.rooms = new RoomSystem(this.packets);
 
         this.ticks = new Ticks();
 
-        this.messages = new MessageSystem();
+        this.messages = new MessageSystem(this.serde);
         this.incoming = new IncomingSystem(
             this.ticks, this.packets.incoming, this.messages
         );
@@ -54,8 +57,8 @@ export default class NetworkSystem {
 
         this.simulations.loop.start();
 
-        this.messages.on(Opcode.UpdateRate, (data, id) => {
-            this.snapshots.set(id, data[0] as number);
+        this.messages.on(Opcode.UpdateRate, (rate: number, id) => {
+            this.snapshots.set(id, rate);
         });
     }
 }
