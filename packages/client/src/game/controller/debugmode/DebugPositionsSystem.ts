@@ -1,4 +1,12 @@
-import {Char as CharSnapshot, CHAR_SIZE, EntityType, MessageSystem, Opcode, Snapshot} from "@leela/common";
+import {
+    BODY_HEIGHT,
+    BODY_WIDTH,
+    Char as CharSnapshot,
+    EntityType,
+    MessageSystem,
+    Opcode,
+    Snapshot
+} from "@leela/common";
 import Char from "../../world/view/Char";
 import Controller from "../Controller";
 import WorldScene from "../../world/WorldScene";
@@ -10,7 +18,8 @@ export default class DebugPositionsSystem {
 
     public showLocalPosition = true;
     public showRemotePosition = true;
-    public showReconciledPosition = true;
+    public showReconciledPosition = false;
+    public showLastPredictedPosition = true;
 
     private readonly controller: Controller;
     private readonly worldScene: WorldScene;
@@ -46,6 +55,7 @@ export default class DebugPositionsSystem {
 
         if (this.showRemotePosition) this.drawRemotePosition();
         if (this.showReconciledPosition) this.drawReconciledPosition();
+        if (this.showLastPredictedPosition) this.drawLastPredictedPosition();
         if (this.showLocalPosition) this.drawLocalPosition();
     }
 
@@ -57,12 +67,31 @@ export default class DebugPositionsSystem {
         this.snapshot?.forEach(entity => {
             if (entity.type == EntityType.CHAR) {
                 const remoteChar = entity as CharSnapshot;
-                this.graphics.strokeRect(remoteChar.x - CHAR_SIZE / 2, remoteChar.y - CHAR_SIZE / 2, CHAR_SIZE, CHAR_SIZE);
+                this.graphics.strokeRect(remoteChar.x - BODY_WIDTH / 2, remoteChar.y - BODY_HEIGHT / 2, BODY_WIDTH, BODY_HEIGHT);
 
                 const localChar = chars[entity.id];
                 if (localChar) this.graphics.lineBetween(remoteChar.x, remoteChar.y, localChar.x, localChar.y);
             }
         });
+    }
+
+    private drawReconciledPosition() {
+        const error = this.controller.smooth.smooth.error;
+        if (error) {
+            this.graphics.lineStyle(2, 0xffe861);
+            this.graphics.strokeRect(error.x - BODY_WIDTH / 2, error.y - BODY_HEIGHT / 2, BODY_WIDTH, BODY_HEIGHT);
+        }
+    }
+
+    private drawLastPredictedPosition() {
+        const lastPredictedPos = this.controller.predictPosition.lastPredictedPos;
+        const playerChar = this.controller.playerChar;
+
+        if (playerChar && lastPredictedPos) {
+            this.graphics.lineStyle(2, 0xeed856);
+            this.graphics.strokeRect(lastPredictedPos.x - BODY_WIDTH / 2, lastPredictedPos.y - BODY_HEIGHT / 2, BODY_WIDTH, BODY_HEIGHT);
+            this.graphics.lineBetween(playerChar.x, playerChar.y, lastPredictedPos.x, lastPredictedPos.y);
+        }
     }
 
     private drawLocalPosition() {
@@ -75,13 +104,5 @@ export default class DebugPositionsSystem {
             this.graphics.strokeCircle(char.x, char.y, 1);
             this.graphics.strokeRectShape(char.getBounds());
         });
-    }
-
-    private drawReconciledPosition() {
-        const error = this.controller.smooth.smooth.error;
-        if (error) {
-            this.graphics.lineStyle(2, 0xffe861);
-            this.graphics.strokeRect(error.x - CHAR_SIZE / 2, error.y - CHAR_SIZE / 2, CHAR_SIZE, CHAR_SIZE);
-        }
     }
 }

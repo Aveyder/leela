@@ -1,4 +1,4 @@
-import {bound, SkinId} from "@leela/common";
+import {PhysicsWorld, SkinId} from "@leela/common";
 import Char from "./view/Char";
 import WorldScene from "./WorldScene";
 import GameObjectFactory = Phaser.GameObjects.GameObjectFactory;
@@ -13,8 +13,6 @@ export default class SpawnSystem {
 
     public char(skin: SkinId, x?: number, y?: number): Char {
         const char = new Char(this.worldScene, skin, x, y);
-
-        bound(char);
 
         this.add.existing(char);
 

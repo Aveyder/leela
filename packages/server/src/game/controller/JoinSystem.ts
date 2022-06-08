@@ -1,12 +1,12 @@
 import Controller from "./Controller";
-import {ClientId, Data, EntityId, MessageSystem, Opcode} from "@leela/common";
+import {Char, ClientId, Data, MessageSystem, Opcode} from "@leela/common";
 import ConnectionSystem from "../../network/ConnectionSystem";
 import World from "../world/World";
 import PacketSystem from "../../network/PacketSystem";
 
 export default class JoinSystem {
 
-    private readonly players: Record<ClientId, EntityId>;
+    private readonly playerChars: Record<ClientId, Char>;
 
     private readonly world: World;
 
@@ -15,7 +15,7 @@ export default class JoinSystem {
     private readonly messages: MessageSystem;
 
     constructor(private readonly controller: Controller) {
-        this.players = this.controller.players;
+        this.playerChars = this.controller.playerChars;
 
         this.world = this.controller.world;
 
@@ -33,19 +33,19 @@ export default class JoinSystem {
     }
 
     private onDisconnect(id: ClientId) {
-        const entityId = this.players[id];
+        const char = this.playerChars[id];
 
-        this.world.deleteChar(entityId);
+        this.world.deleteChar(char);
 
-        delete this.players[id];
+        delete this.playerChars[id];
 
-        this.packets.pushBroadcast(Opcode.Disappear, entityId);
+        this.packets.pushBroadcast(Opcode.Disappear, char.id);
     }
 
-    private onJoinRequest(data: Data, id: ClientId) {
+    private onJoinRequest(_: Data, id: ClientId) {
         const char = this.world.spawnChar();
 
-        this.players[id] = char.id;
+        this.playerChars[id] = char;
 
         this.packets.push(id, Opcode.JoinResponse, char);
     }

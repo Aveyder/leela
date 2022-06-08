@@ -1,16 +1,14 @@
-import SceneMoveSystem from "../world/MovementSystem";
 import InterpolateSystem from "../../network/interpolation/InterpolateSystem";
 import Controller from "./Controller";
 import {ENTITY_ID, POSITION} from "../../constants/keys";
 import Interpolation from "../../network/interpolation/Interpolation";
-import {Char as CharSnapshot, EntityId, move, Vec2} from "@leela/common";
-import WorldScene from "../world/WorldScene";
-import Sequence from "../../network/reconcile/Sequence";
-import ReconcileSystem from "../../network/reconcile/ReconcileSystem";
-import {CLIENT_PREDICT, CLIENT_SMOOTH, INTERPOLATE} from "../../constants/config";
+import {Char as CharSnapshot, EntityId, Vec2} from "@leela/common";
+import {CLIENT_PREDICT, INTERPOLATE} from "../../constants/config";
 import Char from "../world/view/Char";
 import {posEquals, posInterpolator} from "./position";
 import SmoothSystem from "./SmoothSystem";
+import PredictPositionSystem from "./PredictPositionSystem";
+import MovementSystem from "./MovementSystem";
 import UPDATE = Phaser.Scenes.Events.UPDATE;
 
 export default class EntityPositionSystem {
@@ -18,39 +16,34 @@ export default class EntityPositionSystem {
     private readonly chars: Record<EntityId, Char>;
 
     private readonly smooth: SmoothSystem;
-
-    private readonly worldScene: WorldScene;
-    private readonly move: SceneMoveSystem;
+    private readonly prediction: PredictPositionSystem;
+    private readonly move: MovementSystem;
 
     private readonly interpolations: InterpolateSystem;
-    private readonly reconciliation: ReconcileSystem;
 
     constructor(private readonly controller: Controller) {
         this.chars = controller.chars;
 
         this.smooth = controller.smooth;
-
-        this.worldScene = controller.worldScene;
-        this.move = this.worldScene.move;
+        this.prediction = controller.predictPosition;
+        this.move = controller.move;
 
         this.interpolations = controller.network.interpolations;
-        this.reconciliation = controller.network.reconciliation;
 
         this.init();
     }
 
     private init() {
         this.interpolations.map[POSITION] = new Interpolation<Vec2>(posInterpolator, posEquals);
-        this.reconciliation.sequences[POSITION] = new Sequence<Vec2, Vec2>(move);
 
-        this.worldScene.events.on(UPDATE, this.update, this);
+        this.controller.worldScene.events.on(UPDATE, this.update, this);
     }
 
-    public handleSnapshot(snapshot: CharSnapshot): void {
-        if (this.isNotPredictable(snapshot.id)) {
-            this.handleNotPredictable(snapshot);
+    public handleSnapshot(charSnapshot: CharSnapshot): void {
+        if (this.isNotPredictable(charSnapshot.id)) {
+            this.handleNotPredictable(charSnapshot);
         } else {
-            this.handlePredictable(snapshot);
+            this.handlePredictable(charSnapshot);
         }
     }
 
@@ -65,15 +58,7 @@ export default class EntityPositionSystem {
     }
 
     private handlePredictable(snapshot: CharSnapshot) {
-        const char = this.chars[snapshot.id];
-
-        const rec = this.reconciliation.reconcile(POSITION, snapshot);
-
-        if (CLIENT_SMOOTH) {
-            this.smooth.refreshError(char, rec);
-        } else {
-            char.setPosition(rec.x, rec.y);
-        }
+        // reconciliation & smooth error
     }
 
     private update(_: number, delta: number) {
@@ -95,10 +80,10 @@ export default class EntityPositionSystem {
         });
     }
 
-    private isNotPredictable(entityId: EntityId) {
-        const playerId = this.controller.playerId;
+    private isNotPredictable(charId: EntityId) {
+        const playerCharId = this.controller.playerCharId;
 
-        return entityId != playerId || !CLIENT_PREDICT;
+        return charId != playerCharId || !CLIENT_PREDICT;
     }
 }
 

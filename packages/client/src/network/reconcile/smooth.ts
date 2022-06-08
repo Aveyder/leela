@@ -16,8 +16,6 @@ export default class Smoothing<S extends State> {
     public error: S;
     private errorTimer: number;
 
-    private prevRec: S;
-
     constructor(private readonly options: SmoothOptions<S>) {
         this.clearError();
     }
@@ -31,11 +29,9 @@ export default class Smoothing<S extends State> {
             this.clearError();
         } else {
             if (options.withinSmoothThreshold(error)) {
+                this.pause = options.equals(this.error, rec);
+
                 this.error = rec;
-
-                this.pause = options.equals(this.prevRec, rec);
-
-                this.prevRec = rec;
             } else {
                 this.clearError();
 

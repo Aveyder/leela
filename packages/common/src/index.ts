@@ -1,10 +1,9 @@
 export * from "./constants/config";
 export * from "./constants/events";
 export * from "./constants/world";
-export {default as bound} from "./game/bound";
 export * from "./game/entities";
+export {default as map} from "./game/map";
 export {default as move} from "./game/move";
-export * from "./game/types";
 export * from "./network/messages";
 export {default as MessageSystem} from "./network/MessageSystem";
 export * from "./network/opcodes";
@@ -12,4 +11,5 @@ export {default as SerdeSystem} from "./network/SerdeSystem";
 export * from "./network/Serializer";
 export {default as Stamp} from "./network/Stamp";
 export * from "./network/types";
+export {default as PhysicsWorld} from "./game/physics/PhysicsWorld";
 export * from "./utils/math";

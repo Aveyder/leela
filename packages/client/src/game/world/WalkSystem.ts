@@ -2,7 +2,7 @@ import {Vec2} from "@leela/common";
 import Char from "./view/Char";
 import {getDirection} from "../direction";
 
-export default class MovementSystem {
+export default class WalkSystem {
 
     private readonly tmpVec2: Vec2;
 
@@ -18,8 +18,6 @@ export default class MovementSystem {
             const dir = getDirection(this.tmpVec2);
 
             char.walk(dir);
-
-            char.setPosition(x, y);
         } else {
             char.stay();
         }

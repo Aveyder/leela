@@ -7,7 +7,7 @@ import {
 import {posDiff, posEquals, posInterpolator} from "./position";
 import Controller from "./Controller";
 import WorldScene from "../world/WorldScene";
-import MovementSystem from "../world/MovementSystem";
+import WalkSystem from "../world/WalkSystem";
 import {Vec2} from "@leela/common";
 import Char from "../world/view/Char";
 
@@ -15,7 +15,7 @@ export default class SmoothSystem {
 
     private readonly worldScene: WorldScene;
 
-    private readonly move: MovementSystem;
+    // private readonly move: MovementSystem;
 
     public readonly smooth: Smoothing<Vec2>;
 
@@ -24,7 +24,7 @@ export default class SmoothSystem {
     ) {
         this.worldScene = this.controller.worldScene;
 
-        this.move = this.worldScene.move;
+        // this.move = this.worldScene.move;
 
         this.smooth = new Smoothing<Vec2>({
             maxMs: CLIENT_SMOOTH_POSITION_MAX_MS,
@@ -39,19 +39,17 @@ export default class SmoothSystem {
     public refreshError(char: Char, rec: Vec2): void {
         const snap = this.smooth.refreshError(char, rec);
 
-        if (snap) this.move.char(char, rec.x, rec.y);
+        // if (snap) this.move.char(char, rec.x, rec.y);
     }
 
     public smoothError(delta: number): void {
-        const playerId = this.controller.playerId;
+        const playerChar = this.controller.playerChar;
 
-        if (playerId != undefined) {
-            const player = this.controller.player;
-
-            const pos = this.smooth.smoothError(delta, player);
+        if (playerChar) {
+            const pos = this.smooth.smoothError(delta, playerChar);
 
             if (pos) {
-                player.setPosition(pos.x, pos.y);
+                playerChar.setPosition(pos.x, pos.y);
             }
         }
     }

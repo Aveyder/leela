@@ -20,6 +20,7 @@ export default class DebugSystem {
         const positionsFolder = this.gui.addFolder("positions");
         positionsFolder.add(this.positions, "showLocalPosition").name("local");
         positionsFolder.add(this.positions, "showRemotePosition").name("remote");
+        positionsFolder.add(this.positions, "showLastPredictedPosition").name("predicted");
         positionsFolder.add(this.positions, "showReconciledPosition").name("reconciled");
     }
 }

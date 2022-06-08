@@ -8,7 +8,6 @@ import Controller from "./game/controller/Controller";
 import {init as initSerde} from "./game/controller/serde";
 import GAME_READY = Phaser.Core.Events.READY;
 import CREATE = Phaser.Scenes.Events.CREATE;
-import SandboxScene from "./game/world/SandboxScene";
 
 const config = {
     backgroundColor: "#83957d",
@@ -35,6 +34,4 @@ game.events.on(GAME_READY, () => {
 });
 
 game.scene.add("world", WorldScene, false);
-// game.scene.run("world");
-
-game.scene.add("sandbox", SandboxScene, true);
+game.scene.run("world");
