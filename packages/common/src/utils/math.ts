@@ -15,9 +15,21 @@ function scaleVec2(vec2: Vec2, scale: number): Vec2 {
     return vec2;
 }
 
+function cloneVec2(vec2: Vec2, result?: Vec2): Vec2 {
+    if (!result) {
+        result = {x: 0, y: 0};
+    }
+
+    result.x = vec2.x;
+    result.y = vec2.y;
+
+    return result;
+}
+
 export {
     clamp,
     toFixed,
     Vec2,
-    scaleVec2
+    scaleVec2,
+    cloneVec2
 }

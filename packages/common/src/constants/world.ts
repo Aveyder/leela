@@ -10,7 +10,7 @@ const BODY_WIDTH = TILE_SIZE;
 const BODY_HEIGHT = TILE_SIZE;
 
 const CHAR_SKINS = 6;
-const CHAR_SPEED = 1500;
+const CHAR_SPEED = 140;
 
 export {
     TILE_SIZE,

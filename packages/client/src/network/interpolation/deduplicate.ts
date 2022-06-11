@@ -19,7 +19,6 @@ function deduplicate<S extends State>(buffer: Snapshot<S>[], snapshot: Snapshot<
                 } else {
                     if (count > 1) {
                         buffer.splice(i + 2);
-                        console.log(`drop ${count}`);
                     }
                     break;
                 }

@@ -1,11 +1,4 @@
-import {
-    BODY_HEIGHT,
-    BODY_WIDTH,
-    TILE_SIZE,
-    TILES_WIDTH,
-    WORLD_HEIGHT,
-    WORLD_WIDTH
-} from "../../constants/world";
+import {BODY_HEIGHT, BODY_WIDTH, TILE_SIZE, TILES_WIDTH, WORLD_HEIGHT, WORLD_WIDTH} from "../../constants/world";
 import Body from "./Body";
 import {Vec2} from "../../utils/math";
 
@@ -35,13 +28,19 @@ export default class PhysicsWorld {
     constructor(private readonly map: number[]) {
     }
 
-    public move(body: Body, vec2: Vec2) {
-        for(let i = 0; i < PhysicsWorld.MOVE_STEPS; i++) {
-            body.x += vec2.x / PhysicsWorld.MOVE_STEPS;
-            body.y += vec2.y / PhysicsWorld.MOVE_STEPS;
-
-            this.update(body);
+    public move(body: Body, vec2: Vec2, result?: Body): Body {
+        if (!result) {
+            result = {x: body.x, y: body.y};
         }
+
+        for(let i = 0; i < PhysicsWorld.MOVE_STEPS; i++) {
+            result.x += vec2.x / PhysicsWorld.MOVE_STEPS;
+            result.y += vec2.y / PhysicsWorld.MOVE_STEPS;
+
+            this.update(result);
+        }
+
+        return result;
     }
 
     public update(body: Body) {

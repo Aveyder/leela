@@ -8,8 +8,8 @@ import OutgoingSystem from "./OutgoingSystem";
 import SimulationSystem from "./SimulationSystem";
 import CommandSystem from "./CommandSystem";
 import InterpolateSystem from "./interpolation/InterpolateSystem";
-import ReconcileSystem from "./reconcile/ReconcileSystem";
 import SyncSystem from "./SyncSystem";
+import PredictSystem from "./prediction/PredictSystem";
 
 export default class NetworkSystem {
 
@@ -23,7 +23,7 @@ export default class NetworkSystem {
     public simulations: SimulationSystem;
     public cmd: CommandSystem;
     public interpolations: InterpolateSystem;
-    public reconciliation: ReconcileSystem;
+    public predictions: PredictSystem;
 
     constructor(private readonly serde: SerdeSystem) {
     }
@@ -43,7 +43,7 @@ export default class NetworkSystem {
         this.cmd = new CommandSystem(this.outgoing);
 
         this.interpolations = new InterpolateSystem(this.ticks, this.sync);
-        this.reconciliation = new ReconcileSystem(this.ticks);
+        this.predictions = new PredictSystem(this.ticks);
 
         this.connections.init();
 

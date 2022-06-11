@@ -3,9 +3,11 @@ import {
     CHAR_SKINS,
     EntityId,
     EntityType,
-    map, move,
+    map,
+    move,
     PhysicsWorld,
-    SkinId, Vec2,
+    SkinId,
+    Vec2,
     WORLD_HEIGHT,
     WORLD_WIDTH
 } from "@leela/common";
@@ -53,7 +55,7 @@ export default class World {
 
     public moveChar(char: Char, vec2: Vec2): void {
         move(vec2, vec2);
-        this.physics.move(char, vec2);
+        this.physics.move(char, vec2, char);
     }
 
     public positionChar(char: Char, x: number, y: number) {

@@ -1,5 +1,5 @@
 import Controller from "./Controller";
-import {Char, ClientId, MessageSystem, move, Opcode, scaleVec2, Vec2} from "@leela/common";
+import {Char, ClientId, MessageSystem, Opcode, scaleVec2, Vec2} from "@leela/common";
 import World from "../world/World";
 import Ticks from "../../network/Ticks";
 
@@ -35,7 +35,9 @@ export default class MovementSystem {
         const char = this.playerChars[id];
 
         if (char) {
-            this.world.moveChar(char, scaleVec2(dir, this.ticks.delta));
+            const r = Math.random() > 0.02 ? 1 : 2;
+
+            this.world.moveChar(char, scaleVec2(dir, this.ticks.delta * r));
         }
     }
 }

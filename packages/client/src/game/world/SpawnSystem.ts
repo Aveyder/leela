@@ -1,4 +1,4 @@
-import {PhysicsWorld, SkinId} from "@leela/common";
+import {SkinId} from "@leela/common";
 import Char from "./view/Char";
 import WorldScene from "./WorldScene";
 import GameObjectFactory = Phaser.GameObjects.GameObjectFactory;
