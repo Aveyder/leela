@@ -32,12 +32,12 @@ export default class SpawnSystem {
     }
 
     public handleSnapshot(snapshot: CharSnapshot): void {
-        const playerId = this.controller.playerId;
-        const entityId = snapshot.id;
+        const playerCharId = this.controller.playerCharId;
+        const charId = snapshot.id;
 
-        if (entityId != playerId) {
-            if (!this.chars[entityId]) {
-                this.charSpawn(entityId, snapshot.x, snapshot.y, snapshot.skin);
+        if (charId != playerCharId) {
+            if (!this.chars[charId]) {
+                this.charSpawn(charId, snapshot.x, snapshot.y, snapshot.skin);
             }
         }
     }

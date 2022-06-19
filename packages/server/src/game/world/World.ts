@@ -1,30 +1,31 @@
 import {
-    bound,
     Char,
     CHAR_SKINS,
     EntityId,
     EntityType,
-    move,
+    map,
+    applySpeed,
+    PhysicsWorld,
     SkinId,
     Vec2,
     WORLD_HEIGHT,
-    WORLD_WIDTH
+    WORLD_WIDTH, normalize
 } from "@leela/common";
 
 export default class World {
 
-    public entityId;
+    private entityId;
 
     public readonly chars: Record<EntityId, Char>;
 
-    private readonly tmpVec2: Vec2;
+    private readonly physics: PhysicsWorld;
 
     constructor() {
         this.entityId = 0;
 
         this.chars = {};
 
-        this.tmpVec2 = {x: 0, y: 0};
+        this.physics = new PhysicsWorld(map);
     }
 
     public spawnChar(skin?: SkinId, x?: number, y?: number): Char {
@@ -34,27 +35,38 @@ export default class World {
             id,
             type: EntityType.CHAR,
             skin: skin != undefined ? skin : Math.floor(Math.random() * CHAR_SKINS),
-            x: x != undefined ? x : Math.random() * WORLD_WIDTH,
-            y: y != undefined ? y : Math.random() * WORLD_HEIGHT
+            x: 0,
+            y: 0,
+            vx: 0,
+            vy: 0
         }
 
-        bound(char);
+        this.positionChar(char,
+            x != undefined ? x : Math.random() * WORLD_WIDTH,
+            y != undefined ? y: Math.random() * WORLD_HEIGHT
+        );
 
         this.chars[id] = char;
 
         return char;
     }
 
-    public deleteChar(id: EntityId): void {
-        delete this.chars[id];
+    public deleteChar(char: Char): void {
+        delete this.chars[char.id];
     }
 
-    public moveChar(id: EntityId, vx: number, vy: number, delta?: number): void {
-        const char = this.chars[id];
+    public moveChar(char: Char, vec2: Vec2): void {
+        applySpeed(vec2, vec2);
+        this.physics.move(char, vec2, char);
 
-        this.tmpVec2.x = vx;
-        this.tmpVec2.y = vy;
+        char.vx = vec2.x;
+        char.vy = vec2.y;
+    }
 
-        move(char, this.tmpVec2, delta, char);
+    public positionChar(char: Char, x: number, y: number) {
+        char.x = x;
+        char.y = y;
+
+        this.physics.update(char);
     }
 }

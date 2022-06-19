@@ -9,7 +9,7 @@ type InterpolateOptions = {
 };
 
 interface Interpolator<S extends State> {
-    (s1: S, s2: S, progress: number): S;
+    (s1: S, s2: S, progress: number, result?: S): S;
 }
 
 function interpolate<S extends State>(moment: number, buffer: Snapshot<S>[], interpolator: Interpolator<S>, equals: Equals<S>, options: InterpolateOptions): S {

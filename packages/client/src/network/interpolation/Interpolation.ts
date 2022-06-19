@@ -1,12 +1,12 @@
 import {State} from "../State";
 import {Equals, interpolate, InterpolateOptions, Interpolator} from "./interpolate";
 import {
-  ENTITY_EXTRAPOLATE,
-  ENTITY_EXTRAPOLATE_MAX_MS,
-  ENTITY_EXTRAPOLATE_PAST,
-  INTERPOLATE_BUFFER_MS,
-  INTERPOLATE_DROP_DUPLICATES,
-  INTERPOLATE_DROP_DUPLICATES_MAX
+    ENTITY_EXTRAPOLATE,
+    ENTITY_EXTRAPOLATE_MAX_MS,
+    ENTITY_EXTRAPOLATE_PAST,
+    INTERPOLATE_BUFFER_MS,
+    INTERPOLATE_DROP_DUPLICATES,
+    INTERPOLATE_DROP_DUPLICATES_MAX
 } from "../../constants/config";
 import {EntityId, INTERPOLATE_MS} from "@leela/common";
 import Snapshot from "./Snapshot";

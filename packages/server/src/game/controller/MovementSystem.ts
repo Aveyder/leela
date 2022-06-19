@@ -1,24 +1,28 @@
 import Controller from "./Controller";
-import {ClientId, EntityId, MessageSystem, Opcode, Vec2} from "@leela/common";
+import {Char, ClientId, MessageSystem, Opcode, scaleVec2, Vec2} from "@leela/common";
 import World from "../world/World";
 import Ticks from "../../network/Ticks";
 
 export default class MovementSystem {
 
-    private readonly players: Record<ClientId, EntityId>;
+    private readonly playerChars: Record<ClientId, Char>;
 
     private readonly world: World;
 
     private readonly messages: MessageSystem;
     private readonly ticks: Ticks;
 
+    private readonly tmpVec2: Vec2;
+
     constructor(private readonly controller: Controller) {
-        this.players = this.controller.players;
+        this.playerChars = this.controller.playerChars;
 
         this.world = this.controller.world;
 
         this.messages = this.controller.network.messages;
         this.ticks = this.controller.network.ticks;
+
+        this.tmpVec2 = {x: 0, y: 0};
 
         this.init();
     }
@@ -28,10 +32,12 @@ export default class MovementSystem {
     }
 
     private onMove(dir: Vec2, id: ClientId) {
-        const playerId = this.players[id];
+        const char = this.playerChars[id];
 
-        if (playerId != undefined) {
-            this.world.moveChar(playerId, dir.x, dir.y, this.ticks.delta);
+        if (char) {
+            const r = Math.random() > 0.02 ? 1 : 2;
+
+            this.world.moveChar(char, scaleVec2(dir, this.ticks.delta * r));
         }
     }
 }

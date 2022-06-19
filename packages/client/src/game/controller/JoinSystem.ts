@@ -44,18 +44,19 @@ export default class JoinSystem {
 
     private onDisconnect() {
         const controller = this.controller;
-        const playerId = controller.playerId;
 
-        if (playerId != undefined) {
-            this.spawn.charDestroy(playerId);
-            controller.player = null;
-            controller.playerId = null;
+        const playerCharId = controller.playerCharId;
+
+        if (playerCharId != undefined) {
+            this.spawn.charDestroy(playerCharId);
+            controller.playerChar = null;
+            controller.playerCharId = null;
         }
     }
 
     private onJoinResponse(char: CharSnapshot) {
-        this.controller.playerId = char.id;
+        this.controller.playerCharId = char.id;
 
-        this.controller.player = this.spawn.charSpawn(char.id, char.x, char.y, char.skin);
+        this.controller.playerChar = this.spawn.charSpawn(char.id, char.x, char.y, char.skin);
     }
 }

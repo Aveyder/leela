@@ -1,83 +1,137 @@
-import SceneMoveSystem from "../world/MovementSystem";
 import InterpolateSystem from "../../network/interpolation/InterpolateSystem";
 import Controller from "./Controller";
-import {ENTITY_ID, POSITION} from "../../constants/keys";
+import {DIRECTION, ENTITY_ID, POSITION} from "../../constants/keys";
 import Interpolation from "../../network/interpolation/Interpolation";
-import {Char as CharSnapshot, EntityId, move, Vec2} from "@leela/common";
-import WorldScene from "../world/WorldScene";
-import Sequence from "../../network/reconcile/Sequence";
-import ReconcileSystem from "../../network/reconcile/ReconcileSystem";
-import {CLIENT_PREDICT, CLIENT_SMOOTH, INTERPOLATE} from "../../constants/config";
+import {
+    applySpeed,
+    Char as CharSnapshot,
+    cloneVec2,
+    EntityId,
+    Moving,
+    PhysicsWorld,
+    scaleVec2,
+    SIMULATION_DELTA_MS,
+    TICK,
+    Vec2
+} from "@leela/common";
+import {CLIENT_PREDICT, INTERPOLATE} from "../../constants/config";
 import Char from "../world/view/Char";
 import {posEquals, posInterpolator} from "./position";
+import PredictSystem from "../../network/prediction/PredictSystem";
+import Prediction from "../../network/prediction/Prediction";
+import {toVec2} from "../control";
+import WorldScene from "../world/WorldScene";
 import SmoothSystem from "./SmoothSystem";
+import WalkSystem from "../world/WalkSystem";
 import UPDATE = Phaser.Scenes.Events.UPDATE;
 
 export default class EntityPositionSystem {
 
     private readonly chars: Record<EntityId, Char>;
 
-    private readonly smooth: SmoothSystem;
-
     private readonly worldScene: WorldScene;
-    private readonly move: SceneMoveSystem;
+    private readonly walk: WalkSystem;
+
+    private readonly physics: PhysicsWorld;
 
     private readonly interpolations: InterpolateSystem;
-    private readonly reconciliation: ReconcileSystem;
+    private readonly predictions: PredictSystem;
+
+    private smooth: SmoothSystem;
+
+    private tmpVec2: Vec2;
 
     constructor(private readonly controller: Controller) {
         this.chars = controller.chars;
 
-        this.smooth = controller.smooth;
-
         this.worldScene = controller.worldScene;
-        this.move = this.worldScene.move;
+        this.walk = controller.worldScene.walk;
+
+        this.physics = controller.physics;
 
         this.interpolations = controller.network.interpolations;
-        this.reconciliation = controller.network.reconciliation;
+        this.predictions = controller.network.predictions;
 
         this.init();
     }
 
     private init() {
         this.interpolations.map[POSITION] = new Interpolation<Vec2>(posInterpolator, posEquals);
-        this.reconciliation.sequences[POSITION] = new Sequence<Vec2, Vec2>(move);
+        this.interpolations.map[DIRECTION] = new Interpolation<Moving>(
+            (s1, s2, progress) => s1,
+            (s1, s2) => false
+        );
 
+        this.tmpVec2 = {x: 0, y: 0};
+
+        const posApplication = (state: Vec2, control: Vec2) => {
+            control = cloneVec2(control, this.tmpVec2);
+            control = scaleVec2(control, SIMULATION_DELTA_MS / 1000);
+
+            applySpeed(control, control);
+            return this.physics.move(state, control, state);
+        }
+
+        const posPrediction = new Prediction<Vec2, Vec2>(
+            posApplication, cloneVec2, posInterpolator
+        );
+
+        this.predictions.map[POSITION] = posPrediction;
+
+        this.smooth = new SmoothSystem(posPrediction);
+
+        this.controller.network.simulations.events.on(TICK, this.tick, this);
         this.worldScene.events.on(UPDATE, this.update, this);
     }
 
-    public handleSnapshot(snapshot: CharSnapshot): void {
-        if (this.isNotPredictable(snapshot.id)) {
-            this.handleNotPredictable(snapshot);
+    public handleSnapshot(charSnapshot: CharSnapshot): void {
+        if (this.isNotPredictable(charSnapshot.id)) {
+            this.handleNotPredictable(charSnapshot);
         } else {
-            this.handlePredictable(snapshot);
+            this.handlePredictable(charSnapshot);
         }
     }
 
-    private handleNotPredictable(snapshot: CharSnapshot) {
-        const char = this.chars[snapshot.id];
+    private handleNotPredictable(charSnapshot: CharSnapshot) {
+        const char = this.chars[charSnapshot.id];
 
         if (INTERPOLATE) {
-            this.interpolations.push(POSITION, snapshot.id, snapshot);
+            this.interpolations.push(POSITION, charSnapshot.id, charSnapshot);
+            this.interpolations.push(DIRECTION, charSnapshot.id, charSnapshot);
         } else {
-            this.move.char(char, snapshot.x, snapshot.y);
+            char.x = charSnapshot.x;
+            char.y = charSnapshot.y;
+
+            this.tmpVec2.x = charSnapshot.vx;
+            this.tmpVec2.y = charSnapshot.vy;
+
+            this.walk.char(char, this.tmpVec2);
         }
     }
 
     private handlePredictable(snapshot: CharSnapshot) {
-        const char = this.chars[snapshot.id];
+        this.predictions.reconcile(POSITION, snapshot);
+        this.smooth.smoothing.refreshError();
+    }
 
-        const rec = this.reconciliation.reconcile(POSITION, snapshot);
+    private tick() {
+        const playerChar = this.controller.playerChar;
 
-        if (CLIENT_SMOOTH) {
-            this.smooth.refreshError(char, rec);
-        } else {
-            char.setPosition(rec.x, rec.y);
+        if (CLIENT_PREDICT && playerChar) {
+            const keys = this.worldScene.keys;
+
+            const dir = toVec2(keys);
+
+            if (dir.x != 0 || dir.y != 0) {
+                this.predictions.predict(POSITION, playerChar, dir);
+            }
+
+            this.walk.char(playerChar, dir);
         }
     }
 
     private update(_: number, delta: number) {
-        this.smooth.smoothError(delta);
+        this.smooth.smoothing.smoothError(delta)
         this.interpolateChars();
     }
 
@@ -87,18 +141,35 @@ export default class EntityPositionSystem {
 
             const charId = char.getData(ENTITY_ID) as number;
 
-            if (INTERPOLATE && this.isNotPredictable(charId)) {
-                const pos = this.interpolations.interpolate<Vec2>(POSITION, charId);
+            let pos;
+            if (this.isNotPredictable(charId)) {
+                if (INTERPOLATE) {
+                    pos = this.interpolations.interpolate<Vec2>(POSITION, charId);
 
-                if (pos) this.move.char(char, pos.x, pos.y);
+                    const dir = this.interpolations.interpolate<Moving>(DIRECTION, charId);
+
+                    if (dir) {
+                        this.tmpVec2.x = dir.vx;
+                        this.tmpVec2.y = dir.vy;
+
+                        this.walk.char(char, this.tmpVec2);
+                    }
+                }
+            } else {
+                pos = this.predictions.getPrediction(POSITION);
+            }
+
+            if (pos) {
+                char.x = pos.x;
+                char.y = pos.y;
             }
         });
     }
 
-    private isNotPredictable(entityId: EntityId) {
-        const playerId = this.controller.playerId;
+    private isNotPredictable(charId: EntityId) {
+        const playerCharId = this.controller.playerCharId;
 
-        return entityId != playerId || !CLIENT_PREDICT;
+        return charId != playerCharId || !CLIENT_PREDICT;
     }
 }
 

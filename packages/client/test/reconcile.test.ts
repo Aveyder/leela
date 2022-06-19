@@ -1,7 +1,7 @@
 import {expect} from "chai";
 import "mocha";
-import {Applicator, reconcile} from "../src/network/reconcile/reconcile";
-import Transaction from "../src/network/reconcile/Transaction";
+import {Applicator, reconcile} from "../src/network/prediction/reconcile";
+import Transaction from "../src/network/prediction/Transaction";
 
 type Vec2 = {x: number, y: number};
 

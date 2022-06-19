@@ -27,7 +27,7 @@ function snapshot(input: unknown[]): Snapshot {
         snapshot.push(entity);
 
         if (entity.type == EntityType.CHAR) {
-            i += 3;
+            i += 5;
         }
     }
 
@@ -46,9 +46,12 @@ function deserializeEntity(index: number, serialized: unknown[]) {
 
     if (entity.type == EntityType.CHAR) {
         const char = entity as Char;
+
         char.x = serialized[index + 2] as number;
         char.y = serialized[index + 3] as number;
         char.skin = serialized[index + 4] as SkinId;
+        char.vx = serialized[index + 5] as number;
+        char.vy = serialized[index + 6] as number;
     }
 
     return entity;
@@ -57,6 +60,7 @@ function deserializeEntity(index: number, serialized: unknown[]) {
 function move(dir: Vec2): Data {
     return (1 + dir.x) * 3 + (1 + dir.y);
 }
+
 
 export {
     init

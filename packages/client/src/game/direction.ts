@@ -1,6 +1,7 @@
 import {Vec2} from "@leela/common";
 
 enum Direction {
+    NONE = "none",
     LEFT = "left",
     RIGHT = "right",
     DOWN = "down",
@@ -9,6 +10,10 @@ enum Direction {
 
 function getDirection(dirVec: Vec2): Direction {
     let dir;
+
+    if (dirVec.x == 0 && dirVec.y == 0) {
+        return Direction.NONE;
+    }
 
     if (Math.abs(dirVec.y)/Math.abs(dirVec.x) >= 0.9) {
         if (dirVec.y > 0) {
