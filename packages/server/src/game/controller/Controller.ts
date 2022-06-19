@@ -1,6 +1,6 @@
 import World from "../world/World";
 import NetworkSystem from "../../network/NetworkSystem";
-import {Char, ClientId, move, scaleVec2, TICK, Vec2, WORLD_HEIGHT, WORLD_WIDTH} from "@leela/common";
+import {Char, ClientId, scaleVec2, TICK, Vec2, WORLD_HEIGHT, WORLD_WIDTH} from "@leela/common";
 import JoinSystem from "./JoinSystem";
 import MovementSystem from "./MovementSystem";
 import SnapshotSystem from "./SnapshotSystem";

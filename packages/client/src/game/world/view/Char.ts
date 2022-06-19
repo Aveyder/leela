@@ -24,17 +24,24 @@ export default class Char extends Sprite {
     public walk(dir: Direction):void {
         this.dir = dir;
 
+        if (this.dir == Direction.NONE) {
+            this._stay();
+        } else {
+            this._walk();
+        }
+    }
+
+    private _stay() {
+        this.anims.pause();
+        this.setFrame(1);
+    }
+
+    private _walk() {
         const anim = `char:${this._skin}:walk:${this.dir}`;
         if (this.anims.currentAnim?.key == anim) {
             this.anims.resume();
         } else {
             this.play(anim);
         }
-    }
-
-    public stay(): void {
-        this.dir = null;
-        this.anims.pause();
-        this.setFrame(1);
     }
 }

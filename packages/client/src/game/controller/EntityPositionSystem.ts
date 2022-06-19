@@ -1,12 +1,13 @@
 import InterpolateSystem from "../../network/interpolation/InterpolateSystem";
 import Controller from "./Controller";
-import {ENTITY_ID, POSITION} from "../../constants/keys";
+import {DIRECTION, ENTITY_ID, POSITION} from "../../constants/keys";
 import Interpolation from "../../network/interpolation/Interpolation";
 import {
+    applySpeed,
     Char as CharSnapshot,
     cloneVec2,
     EntityId,
-    move,
+    Moving,
     PhysicsWorld,
     scaleVec2,
     SIMULATION_DELTA_MS,
@@ -16,12 +17,12 @@ import {
 import {CLIENT_PREDICT, INTERPOLATE} from "../../constants/config";
 import Char from "../world/view/Char";
 import {posEquals, posInterpolator} from "./position";
-import MovementSystem from "./MovementSystem";
 import PredictSystem from "../../network/prediction/PredictSystem";
 import Prediction from "../../network/prediction/Prediction";
 import {toVec2} from "../control";
 import WorldScene from "../world/WorldScene";
 import SmoothSystem from "./SmoothSystem";
+import WalkSystem from "../world/WalkSystem";
 import UPDATE = Phaser.Scenes.Events.UPDATE;
 
 export default class EntityPositionSystem {
@@ -29,8 +30,8 @@ export default class EntityPositionSystem {
     private readonly chars: Record<EntityId, Char>;
 
     private readonly worldScene: WorldScene;
+    private readonly walk: WalkSystem;
 
-    private readonly move: MovementSystem;
     private readonly physics: PhysicsWorld;
 
     private readonly interpolations: InterpolateSystem;
@@ -44,8 +45,8 @@ export default class EntityPositionSystem {
         this.chars = controller.chars;
 
         this.worldScene = controller.worldScene;
+        this.walk = controller.worldScene.walk;
 
-        this.move = controller.move;
         this.physics = controller.physics;
 
         this.interpolations = controller.network.interpolations;
@@ -56,13 +57,18 @@ export default class EntityPositionSystem {
 
     private init() {
         this.interpolations.map[POSITION] = new Interpolation<Vec2>(posInterpolator, posEquals);
+        this.interpolations.map[DIRECTION] = new Interpolation<Moving>(
+            (s1, s2, progress) => s1,
+            (s1, s2) => false
+        );
 
         this.tmpVec2 = {x: 0, y: 0};
 
         const posApplication = (state: Vec2, control: Vec2) => {
             control = cloneVec2(control, this.tmpVec2);
+            control = scaleVec2(control, SIMULATION_DELTA_MS / 1000);
 
-            move(scaleVec2(control, SIMULATION_DELTA_MS / 1000), control);
+            applySpeed(control, control);
             return this.physics.move(state, control, state);
         }
 
@@ -86,13 +92,20 @@ export default class EntityPositionSystem {
         }
     }
 
-    private handleNotPredictable(snapshot: CharSnapshot) {
-        const char = this.chars[snapshot.id];
+    private handleNotPredictable(charSnapshot: CharSnapshot) {
+        const char = this.chars[charSnapshot.id];
 
         if (INTERPOLATE) {
-            this.interpolations.push(POSITION, snapshot.id, snapshot);
+            this.interpolations.push(POSITION, charSnapshot.id, charSnapshot);
+            this.interpolations.push(DIRECTION, charSnapshot.id, charSnapshot);
         } else {
-            this.move.char(char, snapshot.x, snapshot.y);
+            char.x = charSnapshot.x;
+            char.y = charSnapshot.y;
+
+            this.tmpVec2.x = charSnapshot.vx;
+            this.tmpVec2.y = charSnapshot.vy;
+
+            this.walk.char(char, this.tmpVec2);
         }
     }
 
@@ -112,6 +125,8 @@ export default class EntityPositionSystem {
             if (dir.x != 0 || dir.y != 0) {
                 this.predictions.predict(POSITION, playerChar, dir);
             }
+
+            this.walk.char(playerChar, dir);
         }
     }
 
@@ -128,12 +143,26 @@ export default class EntityPositionSystem {
 
             let pos;
             if (this.isNotPredictable(charId)) {
-                if (INTERPOLATE) pos = this.interpolations.interpolate<Vec2>(POSITION, charId);
+                if (INTERPOLATE) {
+                    pos = this.interpolations.interpolate<Vec2>(POSITION, charId);
+
+                    const dir = this.interpolations.interpolate<Moving>(DIRECTION, charId);
+
+                    if (dir) {
+                        this.tmpVec2.x = dir.vx;
+                        this.tmpVec2.y = dir.vy;
+
+                        this.walk.char(char, this.tmpVec2);
+                    }
+                }
             } else {
                 pos = this.predictions.getPrediction(POSITION);
             }
 
-            if (pos) this.move.char(char, pos.x, pos.y);
+            if (pos) {
+                char.x = pos.x;
+                char.y = pos.y;
+            }
         });
     }
 

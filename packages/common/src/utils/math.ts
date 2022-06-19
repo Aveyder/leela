@@ -26,10 +26,22 @@ function cloneVec2(vec2: Vec2, result?: Vec2): Vec2 {
     return result;
 }
 
+function normalize(vec2: Vec2, result?: Vec2): Vec2 {
+    if (!result) {
+        result = {x: 0, y: 0};
+    }
+
+    result.x = Math.sign(vec2.x);
+    result.y = Math.sign(vec2.y);
+
+    return result;
+}
+
 export {
     clamp,
     toFixed,
     Vec2,
     scaleVec2,
-    cloneVec2
+    cloneVec2,
+    normalize
 }

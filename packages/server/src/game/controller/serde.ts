@@ -45,25 +45,34 @@ function serializeEntity(entity: Entity, serialized?: unknown[]) {
 
     if (entity.type == EntityType.CHAR) {
         const char = entity as Char;
+
         serialized.push(
             toFixed(char.x, FRACTION_DIGITS),
             toFixed(char.y, FRACTION_DIGITS),
-            char.skin
+            char.skin,
+            toFixed(char.vx, FRACTION_DIGITS),
+            toFixed(char.vy, FRACTION_DIGITS)
         );
     }
 
     return serialized;
 }
 
-function move(input: number): Vec2 {
-    let x = -1;
+function move(input: number, result?: Vec2): Vec2 {
+    if (!result) {
+        result = {x: 0, y: 0};
+    }
+
+    result.x = -1;
     if (input > 2) {
-        x = 0;
+        result.x = 0;
     }
     if (input > 5) {
-        x = 1;
+        result.x = 1;
     }
-    return {x, y: input - 4 - 3 * x};
+    result.y = input - 4 - 3 * result.x;
+
+    return result;
 }
 
 export {

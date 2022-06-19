@@ -10,7 +10,6 @@ import JoinSystem from "./JoinSystem";
 import SnapshotSystem from "./SnapshotSystem";
 import DebugSystem from "./debugmode/DebugSystem";
 import {DEBUG_MODE} from "../../constants/config";
-import MovementSystem from "./MovementSystem";
 import UPDATE = Phaser.Scenes.Events.UPDATE;
 
 
@@ -23,7 +22,6 @@ export default class Controller {
 
     public readonly worldScene: WorldScene;
 
-    public readonly move: MovementSystem;
     public readonly physics: PhysicsWorld;
     public readonly position: EntityPositionSystem;
     public readonly input: SampleInputSystem;
@@ -40,7 +38,6 @@ export default class Controller {
 
         this.worldScene = game.scene.getScene("world") as WorldScene;
 
-        this.move = new MovementSystem(this);
         this.physics = new PhysicsWorld(map);
         this.position = new EntityPositionSystem(this);
         this.input = new SampleInputSystem(this);

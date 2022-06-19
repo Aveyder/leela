@@ -4,12 +4,12 @@ import {
     EntityId,
     EntityType,
     map,
-    move,
+    applySpeed,
     PhysicsWorld,
     SkinId,
     Vec2,
     WORLD_HEIGHT,
-    WORLD_WIDTH
+    WORLD_WIDTH, normalize
 } from "@leela/common";
 
 export default class World {
@@ -36,7 +36,9 @@ export default class World {
             type: EntityType.CHAR,
             skin: skin != undefined ? skin : Math.floor(Math.random() * CHAR_SKINS),
             x: 0,
-            y: 0
+            y: 0,
+            vx: 0,
+            vy: 0
         }
 
         this.positionChar(char,
@@ -54,8 +56,11 @@ export default class World {
     }
 
     public moveChar(char: Char, vec2: Vec2): void {
-        move(vec2, vec2);
+        applySpeed(vec2, vec2);
         this.physics.move(char, vec2, char);
+
+        char.vx = vec2.x;
+        char.vy = vec2.y;
     }
 
     public positionChar(char: Char, x: number, y: number) {

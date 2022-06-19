@@ -27,9 +27,7 @@ export default class SampleInputSystem {
         if (playerChar) {
             const dir = toVec2(this.worldScene.keys);
 
-            if (dir.x != 0 || dir.y != 0) {
-                this.outgoing.push(Opcode.Move, dir);
-            }
+            this.outgoing.push(Opcode.Move, dir);
         }
     }
 }

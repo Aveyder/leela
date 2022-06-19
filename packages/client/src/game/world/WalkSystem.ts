@@ -4,22 +4,9 @@ import {getDirection} from "../direction";
 
 export default class WalkSystem {
 
-    private readonly tmpVec2: Vec2;
+    public char(char: Char, dir: Vec2): void {
+        const direction = getDirection(dir);
 
-    constructor() {
-        this.tmpVec2 = {x: 0, y: 0};
-    }
-
-    public char(char: Char, x: number, y: number): void {
-        if (char.x != x || char.y != y) {
-            this.tmpVec2.x = x - char.x;
-            this.tmpVec2.y = y - char.y;
-
-            const dir = getDirection(this.tmpVec2);
-
-            char.walk(dir);
-        } else {
-            char.stay();
-        }
+        char.walk(direction);
     }
 }

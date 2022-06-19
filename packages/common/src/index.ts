@@ -3,7 +3,7 @@ export * from "./constants/events";
 export * from "./constants/world";
 export * from "./game/entities";
 export {default as map} from "./game/map";
-export {default as move} from "./game/move";
+export {default as applySpeed} from "./game/move";
 export * from "./network/messages";
 export {default as MessageSystem} from "./network/MessageSystem";
 export * from "./network/opcodes";

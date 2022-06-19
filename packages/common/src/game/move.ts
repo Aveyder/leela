@@ -1,7 +1,7 @@
 import {Vec2} from "../utils/math";
 import {CHAR_SPEED} from "../constants/world";
 
-export default function move(vec2: Vec2, result?: Vec2): Vec2 {
+export default function applySpeed(vec2: Vec2, result?: Vec2): Vec2 {
     if (!result) {
         result = {x: 0, y: 0};
     }

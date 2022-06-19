@@ -14,9 +14,14 @@ interface Positioned {
     y: number;
 }
 
+interface Moving {
+    vx: number;
+    vy: number;
+}
+
 type SkinId = number;
 
-interface Char extends Entity, Positioned {
+interface Char extends Entity, Positioned, Moving {
     skin: SkinId
 }
 
@@ -27,6 +32,7 @@ export {
     EntityId,
     Entity,
     Positioned,
+    Moving,
     SkinId,
     Char,
     Snapshot
