@@ -1,4 +1,4 @@
-import {Opcode} from "./opcodes";
+import {Opcode} from "../protocol/opcodes";
 
 type ClientId = string;
 

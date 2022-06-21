@@ -20,7 +20,7 @@ export default class SnapshotSystem {
     }
 
     private init() {
-        this.messages.on(Opcode.Snapshot, this.onUpdate, this);
+        this.messages.on(Opcode.SMSG_SNAPSHOT, this.onUpdate, this);
     }
 
     private onUpdate(snapshot: Snapshot) {

@@ -50,6 +50,6 @@ export default class NetworkSystem {
         this.simulations.loop.start();
         if (CLIENT_CMD_LOOP) this.cmd.loop.start();
 
-        this.socket.on("connect", () => this.outgoing.push(Opcode.UpdateRate, CLIENT_UPDATE_RATE));
+        this.socket.on("connect", () => this.outgoing.push(Opcode.CMSG_UPDATE_RATE, CLIENT_UPDATE_RATE));
     }
 }

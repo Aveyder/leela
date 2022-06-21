@@ -35,9 +35,9 @@ export default class JoinSystem {
     }
 
     private init() {
-        this.outgoing.push(Opcode.JoinRequest);
+        this.outgoing.push(Opcode.CMSG_AUTH);
 
-        this.messages.on(Opcode.JoinResponse, this.onJoinResponse, this);
+        this.messages.on(Opcode.CMSG_JOIN_RESPONSE, this.onJoinResponse, this);
 
         this.socket.on("disconnect", () => this.onDisconnect());
     }

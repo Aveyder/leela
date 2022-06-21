@@ -1,4 +1,4 @@
-import {Opcode} from "./opcodes";
+import {Opcode} from "../protocol/opcodes";
 import {Deserializer, NoopDeserializer, NoopSerializer, Serializer} from "./Serializer";
 import {ClientId, Data} from "./types";
 

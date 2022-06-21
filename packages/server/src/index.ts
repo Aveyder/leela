@@ -1,15 +1,27 @@
-import NetworkSystem from "./network/NetworkSystem";
-import World from "./game/world/World";
-import Controller from "./game/controller/Controller";
-import {init as initSerde} from "./game/controller/serde";
-import {SerdeSystem} from "@leela/common";
+import World from "./world/World";
+import WorldServer from "./server/WorldServer";
+import Loop from "./Loop";
+import {SIMULATION_RATE} from "@leela/common";
 
-const serde = new SerdeSystem();
-initSerde(serde);
+function boot() {
+    const world = new World();
+    world.init();
 
-const network = new NetworkSystem(serde);
-network.init();
+    const server = new WorldServer(world);
+    server.init();
 
-const world = new World();
+    worldUpdateLoop(world);
+}
 
-new Controller(network, world);
+function worldUpdateLoop(world: World) {
+    const loop = new Loop();
+    return loop.start(delta => {
+        if (!world.stopped) {
+            world.update(delta);
+        } else {
+            loop.stop();
+        }
+    }, SIMULATION_RATE);
+}
+
+boot();

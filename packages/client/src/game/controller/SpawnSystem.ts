@@ -28,7 +28,7 @@ export default class SpawnSystem {
     }
 
     private init() {
-        this.messages.on(Opcode.Disappear, this.charDestroy, this);
+        this.messages.on(Opcode.SMSG_DISAPPEAR, this.charDestroy, this);
     }
 
     public handleSnapshot(snapshot: CharSnapshot): void {

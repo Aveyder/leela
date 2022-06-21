@@ -1,4 +1,4 @@
-import {Opcode} from "./opcodes";
+import {Opcode} from "../protocol/opcodes";
 import {Data, Message} from "./types";
 
 function createMessage(opcode: Opcode, data?: Data): Message {

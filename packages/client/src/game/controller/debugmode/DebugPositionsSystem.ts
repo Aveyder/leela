@@ -37,7 +37,7 @@ export default class DebugPositionsSystem {
         this.graphics = this.worldScene.add.graphics();
         this.graphics.setDepth(1000);
 
-        this.network.messages.on(Opcode.Snapshot, (snapshot: Snapshot) => {
+        this.network.messages.on(Opcode.SMSG_SNAPSHOT, (snapshot: Snapshot) => {
             this.snapshot = snapshot;
 
             this.drawPositions();

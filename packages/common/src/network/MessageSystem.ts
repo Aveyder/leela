@@ -1,7 +1,7 @@
 import EventEmitter from "eventemitter3";
 import {ClientId, Data, Message} from "./types";
 import {OPCODE_EVENT_PREFIX} from "../constants/events";
-import {Opcode} from "./opcodes";
+import {Opcode} from "../protocol/opcodes";
 import SerdeSystem from "./SerdeSystem";
 
 export default class MessageSystem {

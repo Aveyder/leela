@@ -13,9 +13,9 @@ import {
 } from "@leela/common";
 
 function init(serde: SerdeSystem) {
-    serde.registerDeserializer(Opcode.Snapshot, deserializer(snapshot));
-    serde.registerDeserializer(Opcode.JoinResponse, deserializer(entity));
-    serde.registerSerializer(Opcode.Move, serializer(move));
+    serde.registerDeserializer(Opcode.SMSG_SNAPSHOT, deserializer(snapshot));
+    serde.registerDeserializer(Opcode.CMSG_JOIN_RESPONSE, deserializer(entity));
+    serde.registerSerializer(Opcode.CMSG_MOVE, serializer(move));
 }
 
 function snapshot(input: unknown[]): Snapshot {
