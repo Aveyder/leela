@@ -1,4 +1,4 @@
-import {Vec2} from "../../utils/math";
+import {Vec2} from "../utils/math";
 
 type Body = Vec2;
 

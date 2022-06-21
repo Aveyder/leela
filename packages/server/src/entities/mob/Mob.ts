@@ -1,6 +1,6 @@
-import {Type} from "../Type";
 import World from "../../world/World";
 import {Unit} from "../Unit";
+import {Type} from "@leela/common";
 
 export default class Mob implements Unit {
     public guid: number;

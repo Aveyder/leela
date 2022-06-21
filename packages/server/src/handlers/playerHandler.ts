@@ -1,11 +1,12 @@
 import WorldSession from "../server/WorldSession";
 import Player from "../entities/Player";
 import {
-    CHAR_SKINS,
     FRACTION_DIGITS,
     Opcode,
     scaleVec2,
-    toFixed, Vec2,
+    toFixed,
+    UNIT_SKINS,
+    Vec2,
     WORLD_HEIGHT,
     WORLD_WIDTH,
     WorldPacket
@@ -21,7 +22,7 @@ function handlePlayerJoin(worldSession: WorldSession) {
     const player = new Player(worldSession);
 
     player.guid = world.guid;
-    player.skin = Math.floor(Math.random() * CHAR_SKINS);
+    player.skin = Math.floor(Math.random() * UNIT_SKINS);
     player.x = Math.random() * WORLD_WIDTH;
     player.y = Math.random() * WORLD_HEIGHT;
     player.vx = 0;

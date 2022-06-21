@@ -1,8 +1,7 @@
 import World from "../../world/World";
 import Mob from "./Mob";
-import {scaleVec2, WORLD_HEIGHT, WORLD_WIDTH} from "@leela/common";
+import {scaleVec2, Type, WORLD_HEIGHT, WORLD_WIDTH} from "@leela/common";
 import {addUnitToWorld, Unit} from "../Unit";
-import {Type} from "../Type";
 import {moveUnit} from "../../movement/movement";
 
 function spawnMob(world: World) {

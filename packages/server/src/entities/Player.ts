@@ -1,6 +1,6 @@
 import WorldSession from "../server/WorldSession";
-import {Type} from "./Type";
 import {Unit} from "./Unit";
+import {Type} from "@leela/common";
 
 export default class Player implements Unit {
     public guid: number;

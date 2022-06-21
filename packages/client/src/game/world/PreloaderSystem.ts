@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
 import {Scene} from "phaser";
-import {CHAR_SKINS} from "@leela/common";
+import {UNIT_SKINS} from "@leela/common";
 import LoaderPlugin = Phaser.Loader.LoaderPlugin;
 import AnimationManager = Phaser.Animations.AnimationManager;
 
@@ -26,7 +26,7 @@ export default class PreloaderSystem {
     }
 
     private loadChars() {
-        for(let i = 0; i < CHAR_SKINS; i++) {
+        for(let i = 0; i < UNIT_SKINS; i++) {
             const charUri = require(`../../../public/assets/chars/char${i}.png`);
             this.load.spritesheet(`char:${i}`, charUri.default, {frameWidth: 32, frameHeight: 32});
         }
@@ -43,7 +43,7 @@ export default class PreloaderSystem {
             yoyo: true
         };
 
-        for(let i = 0; i < CHAR_SKINS; i++) {
+        for(let i = 0; i < UNIT_SKINS; i++) {
             this.anims.create({
                 key: `char:${i}:walk:down`,
                 frames: this.anims.generateFrameNumbers(`char:${i}`, {start: 0, end: 2}),

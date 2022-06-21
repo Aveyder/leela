@@ -1,6 +1,6 @@
-import {BODY_HEIGHT, BODY_WIDTH, TILE_SIZE, TILES_WIDTH, WORLD_HEIGHT, WORLD_WIDTH} from "../../constants/world";
+import {BODY_HEIGHT, BODY_WIDTH, TILE_SIZE, TILES_WIDTH, WORLD_HEIGHT, WORLD_WIDTH} from "../constants/world";
 import Body from "./Body";
-import {Vec2} from "../../utils/math";
+import {Vec2} from "../utils/math";
 
 export default class PhysicsWorld {
 
