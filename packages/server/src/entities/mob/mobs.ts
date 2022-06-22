@@ -1,7 +1,7 @@
 import World from "../../world/World";
 import Mob from "./Mob";
 import {scaleVec2, Type, WORLD_HEIGHT, WORLD_WIDTH} from "@leela/common";
-import {addUnitToWorld, Unit} from "../Unit";
+import {addUnitToWorld} from "../Unit";
 import {moveUnit} from "../../movement/movement";
 
 function spawnMob(world: World) {
@@ -24,11 +24,8 @@ function spawnMob(world: World) {
 const tmpVec2 = {x: 0, y: 0};
 
 function updateMobs(world: World, delta: number) {
-    const units = world.units;
-
-    Object.keys(units)
-        .map(guid => units[guid] as Unit)
-        .filter(unit => unit.type == Type.MOB)
+    Object.values(world.units)
+        .filter(unit => unit.typeId == Type.MOB)
         .forEach((mob: Mob) => updateMob(mob, delta));
 }
 

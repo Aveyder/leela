@@ -1,9 +1,10 @@
 import World from "../world/World";
+import {Unit as UnitState} from "@leela/common";
 
-interface Unit {
+interface Unit extends UnitState {
     world: World;
     guid: number;
-    type: number;
+    typeId: number;
     skin: number;
     x: number;
     y: number;

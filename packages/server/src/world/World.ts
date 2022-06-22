@@ -7,7 +7,7 @@ export default class World {
 
     private _guid: number;
 
-    public readonly sessions: Record<string, WorldSession>[];
+    public readonly sessions: Record<string, WorldSession>;
 
     private _stopped: boolean;
 
@@ -18,7 +18,7 @@ export default class World {
     constructor() {
         this._guid = -1;
 
-        this.sessions = [];
+        this.sessions = {};
 
         this._stopped = false;
 
@@ -67,6 +67,6 @@ export default class World {
     }
 
     public forEachSession(callback: (session: WorldSession) => void) {
-        Object.keys(this.sessions).forEach(id => callback(this.sessions[id]));
+        Object.values(this.sessions).forEach(session => callback(session));
     }
 }

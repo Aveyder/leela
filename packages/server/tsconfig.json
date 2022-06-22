@@ -13,7 +13,7 @@
     "types": []
   },
   "include": [
-    "src"
+    "src", "types"
   ],
   "references": [
     {

@@ -1,8 +1,9 @@
 import {Socket} from "socket.io";
 import WorldSession from "./WorldSession";
 import World from "../world/World";
-import {Opcode, PING, WorldPacket} from "@leela/common";
+import {Opcode, WorldPacket} from "@leela/common";
 import OpcodeTable from "./protocol/OpcodeTable";
+
 
 export default class WorldSocket {
 
@@ -22,26 +23,48 @@ export default class WorldSocket {
     }
 
     public init() {
-        this.socket.on(PING, callback => callback());
+        this.socket.on("message", (worldPacket: WorldPacket) => {
+            const success = this.handleWorldPacket(worldPacket);
 
-        this.socket.on("message", (worldPacket: WorldPacket) => this.handleWorldPacket(worldPacket));
+            if (!success) {
+                this.socket.disconnect();
+            }
+        });
     }
 
     private handleWorldPacket(worldPacket: WorldPacket) {
         const opcode = worldPacket[0];
 
         switch (opcode) {
+            case Opcode.CMSG_PING:
+                if (this.worldSession) {
+                    this.worldSession.latency = worldPacket[1] as number;
+
+                    this.sendPacket([Opcode.SMSG_PONG], true);
+
+                    return true;
+                }
+                break;
             case Opcode.CMSG_AUTH:
                 if (!this.worldSession) {
                     this.createWorldSession();
+
                     this.sendPacket([Opcode.SMSG_AUTH_SUCCESS]);
+
+                    return true;
                 }
-                return;
+                return false;
         }
 
-        if (!this.worldSession) return;
+        if (!this.worldSession) return false;
+
+        const handler = this.opcodeTable.get(opcode);
+
+        if (!handler) return false;
 
         this.worldSession.queuePacket(worldPacket);
+
+        return true;
     }
 
     private createWorldSession() {
@@ -53,7 +76,7 @@ export default class WorldSocket {
         this.socket.on("disconnect", () => {
             this.world.removeSession(this.worldSession);
 
-            this.worldSession.destroyWorldSession();
+            this.worldSession.destroy();
 
             this.worldSession = null;
         });
@@ -64,7 +87,7 @@ export default class WorldSocket {
         this.bufferQueue.length = 0;
     }
 
-    public sendPacket(worldPacket: WorldPacket, immediate?: boolean) {
+    public sendPacket(worldPacket: WorldPacket, immediate = false) {
         if (immediate) {
             this.socket.send(worldPacket);
         } else {

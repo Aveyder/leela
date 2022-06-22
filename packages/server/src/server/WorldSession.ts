@@ -16,6 +16,8 @@ export default class WorldSession {
 
     public player: Player;
 
+    public latency: number;
+
     constructor(worldSocket: WorldSocket) {
         this.worldSocket = worldSocket;
         this.opcodeTable = worldSocket.opcodeTable;
@@ -45,6 +47,7 @@ export default class WorldSession {
 
     public update(delta: number): void {
         this.recvQueue.forEach(worldPacket => {
+            // validate packet
             const opcode = worldPacket[0] as Opcode;
 
             const handler = this.opcodeTable.get(opcode);
@@ -54,7 +57,7 @@ export default class WorldSession {
         this.recvQueue.length = 0;
     }
 
-    public destroyWorldSession() {
+    public destroy() {
         this.loop?.stop();
 
         handlePlayerLogout(this);
@@ -67,10 +70,14 @@ export default class WorldSession {
     }
 
     public updateLoop(tickrate: number) {
-        this.loop?.stop();
+        tickrate = calcTickrate(tickrate);
 
-        this.loop = new Loop();
-        this.loop.start(() => this.updatePlayer(), calcTickrate(tickrate));
+        if (this.loop?.tickrate != tickrate) {
+            this.loop?.stop();
+
+            this.loop = new Loop();
+            this.loop.start(() => this.updatePlayer(), tickrate);
+        }
     }
 }
 

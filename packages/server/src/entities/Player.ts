@@ -4,7 +4,7 @@ import {Type} from "@leela/common";
 
 export default class Player implements Unit {
     public guid: number;
-    public type: number;
+    public typeId: number;
     public skin: number;
     public x: number;
     public y: number;
@@ -17,7 +17,7 @@ export default class Player implements Unit {
     constructor(worldSession: WorldSession) {
         this._session = worldSession;
 
-        this.type = Type.PLAYER;
+        this.typeId = Type.PLAYER;
     }
 
     public get session() {

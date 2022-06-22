@@ -1,7 +1,7 @@
 import express, {Express} from "express";
 import cors from "cors";
 import http from "http";
-import {PORT} from "../constants/config";
+import {PORT} from "../config";
 import timesyncServer from "timesync/server";
 import * as io from "socket.io";
 import World from "../world/World";
@@ -26,8 +26,8 @@ export default class WorldServer {
         this.initExpressApp();
         this.initTimesyncEndpoint();
         this.initHttpServer();
-        this.initIOServer();
         this.initOpcodeTable();
+        this.initIOServer();
         this.initWorldSocketManagement();
     }
 
@@ -61,6 +61,12 @@ export default class WorldServer {
         return this._http;
     }
 
+    private initOpcodeTable() {
+        this.opcodeTable = new OpcodeTable();
+
+        this.opcodeTable.init();
+    }
+
     private initIOServer(): void {
         this._io = new io.Server(this._http, {
             cors: {
@@ -71,12 +77,6 @@ export default class WorldServer {
 
     public get io() {
         return this._io;
-    }
-
-    private initOpcodeTable() {
-        this.opcodeTable = new OpcodeTable();
-
-        this.opcodeTable.init();
     }
 
     private initWorldSocketManagement() {

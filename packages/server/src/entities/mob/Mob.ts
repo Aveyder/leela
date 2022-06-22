@@ -4,7 +4,7 @@ import {Type} from "@leela/common";
 
 export default class Mob implements Unit {
     public guid: number;
-    public type: number;
+    public typeId: number;
     public skin: number;
     public x: number;
     public y: number;
@@ -19,6 +19,6 @@ export default class Mob implements Unit {
     constructor(world: World) {
         this.world = world;
 
-        this.type = Type.MOB;
+        this.typeId = Type.MOB;
     }
 }

@@ -4,6 +4,7 @@ import {
     FRACTION_DIGITS,
     Opcode,
     scaleVec2,
+    SIMULATION_DELTA_MS,
     toFixed,
     UNIT_SKINS,
     Vec2,
@@ -56,13 +57,11 @@ function handlePlayerUpdateRateChange(worldSession: WorldSession, worldPacket: W
 function handlePlayerUpdate(worldSession: WorldSession) {
     const player = worldSession.player;
 
-    if (!player) return;
-
     const units = worldSession.world.units;
 
-    const packet = [Opcode.SMSG_UPDATE, Date.now(), player.tick] as WorldPacket;
+    const packet = [Opcode.SMSG_UPDATE, Date.now(), player?.tick || -1] as WorldPacket;
 
-    Object.keys(units).map(guid => units[guid] as Unit).forEach(unit => pushSerializedUnit(unit, packet));
+    Object.values(units).forEach(unit => pushSerializedUnit(unit, packet));
 
     worldSession.sendPacket(packet);
 }
@@ -70,7 +69,7 @@ function handlePlayerUpdate(worldSession: WorldSession) {
 function pushSerializedUnit(unit: Unit, worldPacket: WorldPacket) {
     worldPacket.push(
         unit.guid,
-        unit.type,
+        unit.typeId,
         toFixed(unit.x, FRACTION_DIGITS),
         toFixed(unit.y, FRACTION_DIGITS),
         unit.skin,
@@ -89,7 +88,7 @@ function handlePlayerMove(worldSession: WorldSession, worldPacket: WorldPacket, 
 
     const vec2 = deserializeMove(move);
 
-    moveUnit(player, scaleVec2(vec2, delta));
+    moveUnit(player, scaleVec2(vec2, SIMULATION_DELTA_MS / 1000));
 
     player.tick = tick;
 }

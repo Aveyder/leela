@@ -1,6 +1,7 @@
 export default class Loop {
 
     private callback: (delta: number) => void;
+    private _tickrate: number;
     private interval: number;
     private prevTick: number;
     private started: boolean;
@@ -15,13 +16,19 @@ export default class Loop {
 
         this.started = true;
 
-        this.interval = 1000 / tickrate;
+        this._tickrate = tickrate;
+
+        this.interval = 1000 / this._tickrate;
 
         this.prevTick = Date.now();
 
         this.tick();
 
         return this;
+    }
+
+    public get tickrate() {
+        return this._tickrate;
     }
 
     public stop(): void {
