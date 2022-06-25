@@ -6,6 +6,12 @@ import {handleDestroy, handleUpdate} from "../../handlers/updateHandler";
 
 export default class OpcodeTable {
 
+    public static readonly INSTANCE = new OpcodeTable();
+
+    static {
+        OpcodeTable.INSTANCE.init();
+    }
+
     private readonly handlers: WorldPacketHandler[];
 
     constructor() {

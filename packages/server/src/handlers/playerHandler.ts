@@ -1,28 +1,28 @@
 import WorldSession from "../server/WorldSession";
 import Player from "../entities/Player";
 import {
-    FRACTION_DIGITS,
+    moveUnit,
     Opcode,
     scaleVec2,
-    SIMULATION_DELTA_MS,
-    toFixed,
+    SIMULATION_DELTA,
     UNIT_SKINS,
     Vec2,
     WORLD_HEIGHT,
     WORLD_WIDTH,
     WorldPacket
 } from "@leela/common";
-import {addUnitToWorld, Unit} from "../entities/Unit";
-import {moveUnit} from "../movement/movement";
+import {addUnitToWorld} from "../entities/Unit";
+
 
 function handlePlayerJoin(worldSession: WorldSession) {
+    // TODO: Manage this via required session status, drop such packets: STATUS_AUTH, STATUS_LOGON etc
     if (worldSession.player) return;
 
     const world = worldSession.world;
 
     const player = new Player(worldSession);
 
-    player.guid = world.guid;
+    player.guid = world.guid();
     player.skin = Math.floor(Math.random() * UNIT_SKINS);
     player.x = Math.random() * WORLD_WIDTH;
     player.y = Math.random() * WORLD_HEIGHT;
@@ -37,45 +37,10 @@ function handlePlayerJoin(worldSession: WorldSession) {
     worldSession.sendPacket([Opcode.MSG_JOIN, player.guid])
 }
 
-function handlePlayerLogout(worldSession: WorldSession) {
-    if (!worldSession.player) return;
-
-    const world = worldSession.world;
-    const player = worldSession.player;
-
-    delete world.units[player.guid];
-
-    world.forEachSession(session => session.sendPacket([Opcode.SMSG_DESTROY, player.guid]));
-}
-
 function handlePlayerUpdateRateChange(worldSession: WorldSession, worldPacket: WorldPacket) {
     const tickrate = worldPacket[1] as number;
 
-    worldSession.updateLoop(tickrate);
-}
-
-function handlePlayerUpdate(worldSession: WorldSession) {
-    const player = worldSession.player;
-
-    const units = worldSession.world.units;
-
-    const packet = [Opcode.SMSG_UPDATE, Date.now(), player?.tick || -1] as WorldPacket;
-
-    Object.values(units).forEach(unit => pushSerializedUnit(unit, packet));
-
-    worldSession.sendPacket(packet);
-}
-
-function pushSerializedUnit(unit: Unit, worldPacket: WorldPacket) {
-    worldPacket.push(
-        unit.guid,
-        unit.typeId,
-        toFixed(unit.x, FRACTION_DIGITS),
-        toFixed(unit.y, FRACTION_DIGITS),
-        unit.skin,
-        toFixed(unit.vx, FRACTION_DIGITS),
-        toFixed(unit.vy, FRACTION_DIGITS)
-    )
+    worldSession.resetUpdateLoop(tickrate);
 }
 
 function handlePlayerMove(worldSession: WorldSession, worldPacket: WorldPacket, delta: number) {
@@ -88,7 +53,9 @@ function handlePlayerMove(worldSession: WorldSession, worldPacket: WorldPacket, 
 
     const vec2 = deserializeMove(move);
 
-    moveUnit(player, scaleVec2(vec2, SIMULATION_DELTA_MS / 1000));
+    const physics = player.world.physics;
+
+    moveUnit(physics, player, scaleVec2(vec2, SIMULATION_DELTA));
 
     player.tick = tick;
 }
@@ -110,8 +77,6 @@ function deserializeMove(move: number): Vec2 {
 
 export {
     handlePlayerJoin,
-    handlePlayerLogout,
     handlePlayerUpdateRateChange,
-    handlePlayerUpdate,
     handlePlayerMove
 }

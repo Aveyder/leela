@@ -1,30 +1,51 @@
 import WorldSession from "./WorldSession";
 import {Opcode, WorldPacket} from "@leela/common";
-import OpcodeTable from "./protocol/OpcodeTable";
 import WorldScene from "../world/WorldScene";
 import {Socket} from "socket.io-client";
-import {CLIENT_CMD_LOOP} from "../config";
+import WorldClient from "./WorldClient";
+import {TimeSync} from "timesync";
 
 export default class WorldSocket {
 
     public readonly worldScene: WorldScene;
-    public readonly socket: Socket;
-    public readonly opcodeTable: OpcodeTable;
+    private readonly socket: Socket
+    private readonly ts: TimeSync;
+    private readonly bufferQueue: WorldPacket[];
 
     private worldSession: WorldSession;
 
-    private bufferQueue: WorldPacket[];
+    constructor(worldClient: WorldClient) {
+        this.worldScene = worldClient.worldScene;
+        this.socket = worldClient.socket;
+        this.ts = worldClient.ts;
 
-    constructor(worldScene: WorldScene, opcodeTable: OpcodeTable, socket: Socket) {
-        this.worldScene = worldScene;
-        this.socket = socket;
-        this.opcodeTable = opcodeTable;
+        this.bufferQueue = [];
     }
 
     public init() {
-        this.socket.send([Opcode.CMSG_AUTH]);
-
+        this.initTimesync();
         this.socket.on("message", (worldPacket: WorldPacket) => this.handleWorldPacket(worldPacket));
+        this.socket.on("disconnect", () => this.destroy());
+
+        this.sendPacket([Opcode.CMSG_AUTH], true);
+    }
+
+    public sendPacket(worldPacket: WorldPacket, immediate) {
+        if (immediate) {
+            this.socket.send(worldPacket);
+        } else {
+            this.bufferQueue.push(worldPacket);
+        }
+    }
+
+    public update() {
+        if (this.bufferQueue.length == 0) return;
+        this.bufferQueue.forEach(worldPacket => this.socket.send(worldPacket));
+        this.bufferQueue.length = 0;
+    }
+
+    private initTimesync() {
+        this.socket.on("timesync", (data) => this.ts.receive(null, data));
     }
 
     private handleWorldPacket(worldPacket: WorldPacket) {
@@ -36,9 +57,10 @@ export default class WorldSocket {
                     this.createWorldSession();
                     break;
             }
-        } else {
-            this.worldSession.recvPacket(worldPacket);
+            return;
         }
+
+        this.worldSession.recvPacket(worldPacket);
     }
 
     private createWorldSession() {
@@ -46,26 +68,19 @@ export default class WorldSocket {
         this.worldSession.init();
 
         this.worldScene.addSession(this.worldSession);
+    }
 
-        this.socket.on("disconnect", () => {
-            this.worldScene.removeSession(null);
-
+    private destroy() {
+        if (this.worldSession) {
+            this.worldScene.removeSession();
             this.worldSession.destroy();
-
             this.worldSession = null;
-        });
-    }
-
-    public update() {
-        this.bufferQueue.forEach(worldPacket => this.socket.send(worldPacket));
-        this.bufferQueue.length = 0;
-    }
-
-    public sendPacket(worldPacket: WorldPacket, immediate = false) {
-        if (CLIENT_CMD_LOOP && !immediate) {
-            this.bufferQueue.push(worldPacket);
-        } else {
-            this.socket.send(worldPacket);
         }
+
+        this.bufferQueue.length = 0;
+
+        this.socket.removeAllListeners("message");
+        this.socket.removeAllListeners("disconnect");
+        this.socket.removeAllListeners("timesync");
     }
 }

@@ -1,7 +1,7 @@
 import World from "../world/World";
-import {Unit as UnitState} from "@leela/common";
+import {Body, Opcode} from "@leela/common";
 
-interface Unit extends UnitState {
+interface Unit extends Body {
     world: World;
     guid: number;
     typeId: number;
@@ -10,6 +10,9 @@ interface Unit extends UnitState {
     y: number;
     vx: number;
     vy: number;
+    width: number;
+    height: number;
+    bullet: boolean;
 }
 
 function addUnitToWorld(unit: Unit) {
@@ -22,7 +25,16 @@ function addUnitToWorld(unit: Unit) {
     physics.update(unit);
 }
 
+function deleteUnitFromWorld(unit: Unit) {
+    const world = unit.world;
+
+    delete world.units[unit.guid];
+
+    world.forEachSession(session => session.sendPacket([Opcode.SMSG_DESTROY, unit.guid]));
+}
+
 export {
     Unit,
-    addUnitToWorld
+    addUnitToWorld,
+    deleteUnitFromWorld
 }

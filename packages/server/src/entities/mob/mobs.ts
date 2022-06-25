@@ -1,13 +1,12 @@
 import World from "../../world/World";
 import Mob from "./Mob";
-import {scaleVec2, Type, WORLD_HEIGHT, WORLD_WIDTH} from "@leela/common";
+import {moveUnit, scaleVec2, SIMULATION_DELTA, TMP_VEC2, Type, WORLD_HEIGHT, WORLD_WIDTH} from "@leela/common";
 import {addUnitToWorld} from "../Unit";
-import {moveUnit} from "../../movement/movement";
 
 function spawnMob(world: World) {
     const mob = new Mob(world);
 
-    mob.guid = world.guid;
+    mob.guid = world.guid();
     mob.skin = 5;
     mob.x = Math.random() * WORLD_WIDTH;
     mob.y = Math.random() * WORLD_HEIGHT;
@@ -21,25 +20,25 @@ function spawnMob(world: World) {
     addUnitToWorld(mob);
 }
 
-const tmpVec2 = {x: 0, y: 0};
-
-function updateMobs(world: World, delta: number) {
+function updateMobs(world: World) {
     Object.values(world.units)
         .filter(unit => unit.typeId == Type.MOB)
-        .forEach((mob: Mob) => updateMob(mob, delta));
+        .forEach((mob: Mob) => updateMob(mob));
 }
 
-function updateMob(mob: Mob, delta: number) {
-    const progress = mob.moveProgress += delta;
+function updateMob(mob: Mob) {
+    const progress = mob.moveProgress += SIMULATION_DELTA;
     const shift = mob.moveShift;
     const s = mob.moveS;
 
-    const dir = tmpVec2;
+    const dir = TMP_VEC2;
 
     dir.x = Math.sin(progress / s + shift);
     dir.y = Math.cos(progress + shift / s);
 
-    moveUnit(mob, scaleVec2(dir, delta));
+    const physics = mob.world.physics;
+
+    moveUnit(physics, mob, scaleVec2(dir, SIMULATION_DELTA));
 }
 
 export {

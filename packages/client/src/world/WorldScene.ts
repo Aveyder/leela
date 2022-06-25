@@ -14,12 +14,12 @@ import {
 import WorldSession from "../client/WorldSession";
 import WorldClient from "../client/WorldClient";
 import Unit from "../entities/Unit";
-import TimeStepLoop from "../TimeStepLoop";
+import Loop from "../Loop";
 import {playerControl} from "../movement/playerControl";
-import {DEBUG_MODE} from "../config";
-import {lerpPredictedPlayerPosition} from "../movement/playerPositionPrediction";
+import {DEBUG_MODE, TICK_CAP} from "../config";
+import {updatePlayerPosition} from "../movement/playerPrediction";
 import DebugManager from "../debugging/DebugManager";
-import {interpolateUnitPositions} from "../movement/unitPositionInterpolation";
+import {updateUnitPositions} from "../movement/unitPositionInterpolation";
 import Graphics = Phaser.GameObjects.Graphics;
 import UPDATE = Phaser.Scenes.Events.UPDATE;
 import Text = Phaser.GameObjects.Text;
@@ -29,21 +29,21 @@ export default class WorldScene extends Phaser.Scene {
 
     private _keys: Keys;
 
-    private mapGraphics: Graphics;
-    private shade: Graphics;
-    private joinButton: Text;
-    private disconnectedText: Text;
-
     private _worldClient: WorldClient;
     private _worldSession: WorldSession;
 
     public _units: Record<number, Unit>;
 
-    private loop: TimeStepLoop;
+    public _phys: PhysicsWorld;
 
     public _tick: number;
 
-    public _phys: PhysicsWorld;
+    private simulationLoop: Loop;
+
+    private mapGraphics: Graphics;
+    private shadeGraphics: Graphics;
+    private joinButton: Text;
+    private disconnectedText: Text;
 
     constructor() {
         super("world");
@@ -62,26 +62,94 @@ export default class WorldScene extends Phaser.Scene {
             debug.init();
         }
 
-        this.drawMap();
-        this.drawShade();
-        this.drawJoinButton();
-        this.drawDisconnectedText();
-        this.drawPing();
-
         this._worldClient = new WorldClient(this);
         this._worldClient.init();
 
         this._units = {};
 
-        this._tick = -1;
-
         this._phys = new PhysicsWorld(map);
 
+        this._tick = -1;
+
         this.events.on(UPDATE, this.update, this);
+
+        this.drawMap();
+        this.drawShade();
+        this.drawJoinButton();
+        this.drawDisconnectedText();
+    }
+
+    public update(time: number, delta: number): void {
+        updatePlayerPosition(this.worldSession?.player, delta);
+        updateUnitPositions(this);
+    }
+
+    public addSession(worldSession: WorldSession) {
+        this._worldSession = worldSession;
+
+        this.simulationLoop = new Loop();
+        this.simulationLoop.start(delta => this.simulate(delta), SIMULATION_RATE);
+
+        this.showMenu();
+    }
+
+    public removeSession() {
+        this._worldSession = null;
+
+        Object.values(this._units).forEach(unit => unit.destroy());
+
+        this._units = {};
+
+        this.simulationLoop.stop();
+        this.simulationLoop = null;
+
+        this._tick = -1;
+
+        this.shadeGraphics.visible = true;
+        this.joinButton.visible = false;
+        this.disconnectedText.visible = true;
+    }
+
+    public simulate(delta: number) {
+        if (this.worldSession) this._tick = ++this._tick % TICK_CAP;
+
+        playerControl(this);
+    }
+
+    public showGame() {
+        this.shadeGraphics.visible = false;
+        this.joinButton.visible = false;
+        this.disconnectedText.visible = false;
+    }
+
+    public showMenu() {
+        this.shadeGraphics.visible = true;
+        this.joinButton.visible = true;
+        this.disconnectedText.visible = false;
     }
 
     public get keys() {
         return this._keys;
+    }
+
+    public get worldClient() {
+        return this._worldClient;
+    }
+
+    public get worldSession() {
+        return this._worldSession;
+    }
+
+    public get units() {
+        return this._units;
+    }
+
+    public get phys() {
+        return this._phys;
+    }
+
+    public get tick() {
+        return this._tick;
     }
 
     private drawMap() {
@@ -91,8 +159,8 @@ export default class WorldScene extends Phaser.Scene {
             for(let x = 0; x < TILES_WIDTH; x++) {
                 const tile = map[y * TILES_WIDTH + x];
 
-                this.mapGraphics.lineStyle(1, 0xffffff, 0.1);
-                this.mapGraphics.strokeRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                // this.mapGraphics.lineStyle(1, 0xffffff, 0.1);
+                // this.mapGraphics.strokeRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 
                 if (tile == 1) {
                     this.mapGraphics.fillStyle(0x6b2343);
@@ -103,10 +171,10 @@ export default class WorldScene extends Phaser.Scene {
     }
 
     private drawShade() {
-        this.shade = this.add.graphics(this);
-        this.shade.fillStyle(0x000, 0.65);
-        this.shade.fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-        this.shade.setDepth(999);
+        this.shadeGraphics = this.add.graphics(this);
+        this.shadeGraphics.fillStyle(0x000, 0.65);
+        this.shadeGraphics.fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+        this.shadeGraphics.setDepth(999);
     }
 
     private drawJoinButton() {
@@ -139,82 +207,5 @@ export default class WorldScene extends Phaser.Scene {
             });
         this.disconnectedText.visible = false;
         this.disconnectedText.setDepth(999);
-    }
-
-    private drawPing() {
-        const pingText = this.add.text(0, 0, "");
-        pingText.setDepth(999);
-
-        this.events.on(UPDATE, () => {
-            let latency = String(this._worldSession?.latency);
-
-            if (latency == undefined) latency = "?";
-
-            pingText.text = `ping: ${latency} ms`;
-        });
-    }
-
-    public get worldClient() {
-        return this._worldClient;
-    }
-
-    public get worldSession() {
-        return this._worldSession;
-    }
-
-    public get units() {
-        return this._units;
-    }
-
-    public get tick() {
-        return this._tick;
-    }
-
-    public get phys() {
-        return this._phys;
-    }
-
-    public update(time: number, delta: number): void {
-        lerpPredictedPlayerPosition(this.worldSession?.player, delta);
-        interpolateUnitPositions(this);
-    }
-
-    public addSession(worldSession: WorldSession) {
-        this._worldSession = worldSession;
-
-        this.shade.visible = true;
-        this.joinButton.visible = true;
-        this.disconnectedText.visible = false;
-
-        this.loop = new TimeStepLoop();
-        this.loop.start(delta => this.simulate(delta), SIMULATION_RATE);
-    }
-
-    public simulate(delta: number) {
-        if (this.worldSession) this._tick++;
-
-        playerControl(this);
-    }
-
-    public removeSession(worldSession: WorldSession) {
-        this._worldSession = null;
-
-        this.shade.visible = true;
-        this.joinButton.visible = false;
-        this.disconnectedText.visible = true;
-
-        Object.values(this.units).forEach(unit => unit.destroy());
-
-        this._units = {};
-
-        this.loop.stop();
-
-        this._tick = -1;
-    }
-
-    public joinGame() {
-        this.shade.visible = false;
-        this.joinButton.visible = false;
-        this.disconnectedText.visible = false;
     }
 }

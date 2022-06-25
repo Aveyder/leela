@@ -1,18 +1,18 @@
-import {Opcode, SIMULATION_RATE, SNAPSHOT_RATE, WorldPacket} from "@leela/common";
+import {Opcode, SIMULATION_RATE, WorldPacket} from "@leela/common";
 import OpcodeTable from "./protocol/OpcodeTable";
 import WorldSocket from "./WorldSocket";
-import Player from "../entities/Player";
-import {handlePlayerLogout, handlePlayerUpdate} from "../handlers/playerHandler";
+import Player, {sendUpdateToPlayer} from "../entities/Player";
 import Loop from "../Loop";
+import {UPDATE_RATE} from "../config";
+import {deleteUnitFromWorld} from "../entities/Unit";
 
 export default class WorldSession {
 
     private readonly worldSocket: WorldSocket;
-    private readonly opcodeTable: OpcodeTable;
 
     private readonly recvQueue: WorldPacket[];
 
-    private loop: Loop;
+    private updateLoop: Loop;
 
     public player: Player;
 
@@ -20,13 +20,12 @@ export default class WorldSession {
 
     constructor(worldSocket: WorldSocket) {
         this.worldSocket = worldSocket;
-        this.opcodeTable = worldSocket.opcodeTable;
 
         this.recvQueue = [];
     }
 
     public init() {
-        this.updateLoop(SNAPSHOT_RATE);
+        this.resetUpdateLoop(UPDATE_RATE);
     }
 
     public get id() {
@@ -42,48 +41,47 @@ export default class WorldSession {
     }
 
     public sendPacket(worldPacket: WorldPacket): void {
-        this.worldSocket.sendPacket(worldPacket);
+        this.worldSocket.sendPacket(worldPacket, false);
     }
 
     public update(delta: number): void {
         this.recvQueue.forEach(worldPacket => {
-            // validate packet
             const opcode = worldPacket[0] as Opcode;
 
-            const handler = this.opcodeTable.get(opcode);
+            const handler = OpcodeTable.INSTANCE.get(opcode);
 
             handler(this, worldPacket, delta);
         });
         this.recvQueue.length = 0;
     }
 
-    public destroy() {
-        this.loop?.stop();
-
-        handlePlayerLogout(this);
-    }
-
-    public updatePlayer() {
-        handlePlayerUpdate(this);
-
-        this.worldSocket.update();
-    }
-
-    public updateLoop(tickrate: number) {
+    public resetUpdateLoop(tickrate: number) {
         tickrate = calcTickrate(tickrate);
 
-        if (this.loop?.tickrate != tickrate) {
-            this.loop?.stop();
+        if (this.updateLoop?.tickrate != tickrate) {
+            this.updateLoop?.stop();
 
-            this.loop = new Loop();
-            this.loop.start(() => this.updatePlayer(), tickrate);
+            this.updateLoop = new Loop();
+            this.updateLoop.start(delta => this.sendUpdateToPlayer(), tickrate);
         }
+    }
+
+    public destroy() {
+        this.updateLoop?.stop();
+
+        if (this.player) deleteUnitFromWorld(this.player);
+    }
+
+    private sendUpdateToPlayer() {
+        sendUpdateToPlayer(this);
+
+        this.worldSocket.update();
     }
 }
 
 function calcTickrate(tickrate: number) {
     if (tickrate == -1) {
-        return (SNAPSHOT_RATE < 0 || SNAPSHOT_RATE > SIMULATION_RATE) ? SIMULATION_RATE : SNAPSHOT_RATE
+        return (UPDATE_RATE < 0 || UPDATE_RATE > SIMULATION_RATE) ? SIMULATION_RATE : UPDATE_RATE
     } else {
         return tickrate;
     }

@@ -2,15 +2,14 @@ import {Opcode, SIMULATION_RATE, WorldPacket} from "@leela/common";
 import OpcodeTable from "./protocol/OpcodeTable";
 import WorldSocket from "./WorldSocket";
 import {CLIENT_CMD_LOOP, CLIENT_CMD_RATE, CLIENT_UPDATE_RATE, PING_DELAY_MS} from "../config";
-import TimeStepLoop from "../TimeStepLoop";
+import Loop from "../Loop";
 import Unit from "../entities/Unit";
 
 export default class WorldSession {
 
     private readonly worldSocket: WorldSocket;
-    private readonly opcodeTable: OpcodeTable;
 
-    private loop: TimeStepLoop;
+    private cmpLoop: Loop;
 
     private _pingStart: number;
     private pingInterval: number;
@@ -21,48 +20,35 @@ export default class WorldSession {
 
     constructor(worldSocket: WorldSocket) {
         this.worldSocket = worldSocket;
-        this.opcodeTable = worldSocket.opcodeTable;
 
         this.latency = -1;
     }
 
     public init(): void {
         this.sendPacket([Opcode.CMSG_UPDATE_RATE, CLIENT_UPDATE_RATE]);
-        this.cmdLoop();
+        this.initCmdLoop();
         this.startPing();
     }
 
-    public get worldScene() {
-        return this.worldSocket.worldScene;
+    public sendPacket(worldPacket: WorldPacket): void {
+        this.worldSocket.sendPacket(worldPacket, !CLIENT_CMD_LOOP);
     }
 
     public recvPacket(worldPacket: WorldPacket): void {
         const opcode = worldPacket[0] as Opcode;
 
-        const handler = this.opcodeTable.get(opcode);
+        const handler = OpcodeTable.INSTANCE.get(opcode);
 
         handler(this, worldPacket);
     }
 
-    public sendPacket(worldPacket: WorldPacket): void {
-        this.worldSocket.sendPacket(worldPacket);
-    }
+    private initCmdLoop() {
+        this.cmpLoop = new Loop();
 
-    public destroy(): void {
-        this.loop?.stop();
-
-        clearInterval(this.pingInterval);
-    }
-
-    private cmdLoop() {
-        if (CLIENT_CMD_LOOP) {
-            this.loop = new TimeStepLoop();
-
-            this.loop.start(
-                () => this.worldSocket.update(),
-                CLIENT_CMD_RATE < 0 ? SIMULATION_RATE : CLIENT_CMD_RATE
-            );
-        }
+        this.cmpLoop.start(
+            () => this.worldSocket.update(),
+            CLIENT_CMD_RATE < 0 ? SIMULATION_RATE : CLIENT_CMD_RATE
+        );
     }
 
     private startPing() {
@@ -71,6 +57,21 @@ export default class WorldSession {
 
             this.worldSocket.sendPacket([Opcode.CMSG_PING, this.latency], true);
         }, PING_DELAY_MS) as unknown as number;
+    }
+
+    public destroy(): void {
+        this.cmpLoop.stop();
+
+        clearInterval(this.pingInterval);
+        this._pingStart = null;
+        this.latency = -1;
+
+        this.playerGuid = null;
+        this.player = null;
+    }
+
+    public get worldScene() {
+        return this.worldSocket.worldScene;
     }
 
     public get pingStart() {

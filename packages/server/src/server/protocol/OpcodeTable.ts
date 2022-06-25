@@ -4,6 +4,12 @@ import {handlePlayerJoin, handlePlayerMove, handlePlayerUpdateRateChange} from "
 
 export default class OpcodeTable {
 
+    public static readonly INSTANCE = new OpcodeTable();
+
+    static {
+        OpcodeTable.INSTANCE.init();
+    }
+
     private readonly handlers: WorldPacketHandler[];
 
     constructor() {

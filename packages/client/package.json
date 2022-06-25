@@ -33,6 +33,7 @@
     "eventemitter3": "^4.0.7",
     "phaser": "^3.55.2",
     "socket.io-client": "^4.5.1",
+    "socket.io-msgpack-parser": "^3.0.1",
     "timesync": "^1.0.10"
   }
 }

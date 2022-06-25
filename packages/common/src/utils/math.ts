@@ -8,6 +8,8 @@ function toFixed(value: number, fractionDigits: number): number {
 
 type Vec2 = {x: number, y: number};
 
+const TMP_VEC2: Vec2 = {x: 0, y: 0};
+
 function scaleVec2(vec2: Vec2, scale: number): Vec2 {
     vec2.x *= scale;
     vec2.y *= scale;
@@ -41,6 +43,7 @@ export {
     clamp,
     toFixed,
     Vec2,
+    TMP_VEC2,
     scaleVec2,
     cloneVec2,
     normalize

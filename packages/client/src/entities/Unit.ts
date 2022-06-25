@@ -1,40 +1,52 @@
 import Sprite = Phaser.GameObjects.Sprite;
 import {Scene} from "phaser";
-import {Direction, getDirection} from "../movement/direction";
-import {Unit as UnitState, Vec2} from "@leela/common";
+import {UNIT_BODY_HEIGHT, UNIT_BODY_WIDTH, Vec2} from "@leela/common";
+import PhysBody from "../physics/PhysBody";
+import WorldScene from "../world/WorldScene";
 
-interface UnitUpdate {
-    state: UnitState,
-    timestamp: number
+type UnitState = {
+    guid: number,
+    typeId: number,
+    skin: number,
+    x: number,
+    y: number,
+    vx: number,
+    vy: number
 }
 
-export default class Unit extends Sprite implements UnitState {
+type UnitStateBuffer = {
+    state: UnitState,
+    timestamp: number
+}[]
 
-    private _skin = 0;
+export default class Unit extends Sprite {
+
+    private _skin: number;
     public guid: number;
     public typeId: number;
-    private _vx = 0;
-    private _vy = 0;
-    private dir = Direction.NONE;
 
     public remotePos: Vec2;
 
-    public readonly updateBuffer: UnitUpdate[];
+    public readonly stateBuffer: UnitStateBuffer;
 
-    private readonly tmpVec2: Vec2;
+    public readonly physBody: PhysBody;
 
     constructor(scene: Scene, skin = 0, x?: number, y?: number) {
-        super(scene, x, y, "unit:0");
+        super(scene, x, y, `unit:${skin}`);
 
-        this.tmpVec2 = {x: 0, y: 0};
+        this._skin = skin;
 
-        this.dir = Direction.NONE;
+        this.physBody = new PhysBody(this);
+        this.physBody.width = UNIT_BODY_WIDTH;
+        this.physBody.height = UNIT_BODY_HEIGHT;
+
+        this.setDir(0, 0);
 
         this.skin = skin;
 
         this.remotePos = {x: 0, y: 0};
 
-        this.updateBuffer = [];
+        this.stateBuffer = [];
     }
 
     public set skin(value: number) {
@@ -43,28 +55,15 @@ export default class Unit extends Sprite implements UnitState {
         this.updateDir();
     }
 
-    public get vx() {
-        return this._vx;
-    }
-
-    public get vy() {
-        return this._vy;
-    }
-
     public setDir(vx: number, vy: number) {
-        this._vx = vx;
-        this._vy = vy;
+        this.physBody.vx = vx;
+        this.physBody.vy = vy;
 
         this.updateDir();
     }
 
     private updateDir() {
-        this.tmpVec2.x = this._vx;
-        this.tmpVec2.y = this._vy;
-
-        this.dir = getDirection(this.tmpVec2);
-
-        if (this.dir == Direction.NONE) {
+        if (this.physBody.vx == 0 && this.physBody.vy == 0) {
             this.stay();
         } else {
             this.walk();
@@ -77,7 +76,9 @@ export default class Unit extends Sprite implements UnitState {
     }
 
     private walk() {
-        const anim = `unit:${this._skin}:walk:${this.dir}`;
+        const dir = getDirection(this.physBody.vx, this.physBody.vy);
+
+        const anim = `unit:${this._skin}:walk:${dir}`;
         if (this.anims.currentAnim?.key == anim) {
             this.anims.resume(this.anims.currentFrame);
         } else {
@@ -86,6 +87,65 @@ export default class Unit extends Sprite implements UnitState {
     }
 }
 
+enum Direction {
+    LEFT = "left",
+    RIGHT = "right",
+    DOWN = "down",
+    UP = "up"
+}
+
+function getDirection(vx: number, vy: number): Direction {
+    let dir;
+
+    if (Math.abs(vy)/Math.abs(vx) >= 0.9) {
+        if (vy > 0) {
+            dir = Direction.DOWN;
+        }
+        if (vy < 0) {
+            dir = Direction.UP;
+        }
+    } else {
+        if (vx > 0) {
+            dir = Direction.RIGHT;
+        }
+        if (vx < 0) {
+            dir = Direction.LEFT;
+        }
+    }
+
+    return dir;
+}
+
+function addUnitToWorld(unit: Unit) {
+    const worldScene = unit.scene as WorldScene;
+
+    worldScene.add.existing(unit);
+
+    const guid = unit.guid;
+
+    worldScene.units[guid] = unit;
+}
+
+function deleteUnitFromWorld(unit: Unit) {
+    const worldScene = unit.scene as WorldScene;
+
+    unit.destroy();
+
+    const guid = unit.guid;
+
+    delete worldScene.units[guid];
+}
+
+function isPlayer(unit: Unit) {
+    const worldSession = (unit.scene as WorldScene).worldSession;
+
+    return worldSession.playerGuid == unit.guid;
+}
+
 export {
-    UnitUpdate
+    UnitState,
+    UnitStateBuffer,
+    addUnitToWorld,
+    deleteUnitFromWorld,
+    isPlayer
 }

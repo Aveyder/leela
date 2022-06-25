@@ -1,5 +1,8 @@
 const PORT = 3000;
 
+const UPDATE_RATE = -1;
+
 export {
-    PORT
+    PORT,
+    UPDATE_RATE
 }

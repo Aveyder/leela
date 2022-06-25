@@ -1,5 +1,6 @@
 declare module "timesync" {
-  type TimeSync = {
+    import {Socket} from "socket.io-client";
+    type TimeSync = {
     destroy();
     now(): number;
     on(event: "change", callback: (offset: number) => void);
@@ -8,7 +9,7 @@ declare module "timesync" {
     off(event: "change" | "error" | "sync", callback?: () => void);
     sync();
 
-    send(to: string, data: unknown, timeout: number): Promise<void>;
+    send(to: string | Socket, data: unknown, timeout: number): Promise<void>;
     receive(from: string, data: unknown);
   };
 
@@ -18,7 +19,7 @@ declare module "timesync" {
     delay?: number;
     repeat?: number;
     peers?: string | string[];
-    server?: string;
+    server?: string | Socket;
     now?: () => number;
   };
 
