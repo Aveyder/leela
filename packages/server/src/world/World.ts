@@ -33,7 +33,7 @@ export default class World {
         spawnMob(this);
     }
 
-    public get guid() {
+    public guid(): number {
         return this._guid++;
     }
 
@@ -59,7 +59,7 @@ export default class World {
 
     public update(delta: number): void {
         this.updateSessions(delta);
-        updateMobs(this, delta);
+        updateMobs(this);
     }
 
     private updateSessions(delta: number) {

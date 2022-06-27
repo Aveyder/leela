@@ -1,18 +1,15 @@
 import WorldScene from "../world/WorldScene";
 import {ENTITY_EXTRAPOLATE, ENTITY_EXTRAPOLATE_MAX_MS, ENTITY_EXTRAPOLATE_PAST, INTERPOLATE} from "../config";
-import {INTERPOLATE_MS, Unit as UnitState, Vec2} from "@leela/common";
-import Unit, {UnitUpdate} from "../entities/Unit";
-import {posInterpolator} from "./position";
+import {INTERPOLATE_MS, posInterpolator, TMP_VEC2, Vec2} from "@leela/common";
+import Unit, {UnitState, UnitStateBuffer} from "../entities/Unit";
 
-const tmpVec2 = {x: 0, y: 0};
-
-function interpolateUnitPositions(worldScene: WorldScene) {
+function updateUnitPositions(worldScene: WorldScene) {
     if (!INTERPOLATE) return;
 
     const ts = worldScene.worldClient.ts;
 
     Object.values(worldScene.units).forEach(unit => {
-        const updateBuffer = unit.updateBuffer;
+        const updateBuffer = unit.stateBuffer;
 
         const serverNow = ts.now();
 
@@ -21,7 +18,7 @@ function interpolateUnitPositions(worldScene: WorldScene) {
 }
 
 // TODO: refactor this
-function interpolate(updateBuffer: UnitUpdate[], serverNow: number, unit: Unit) {
+function interpolate(updateBuffer: UnitStateBuffer, serverNow: number, unit: Unit) {
     if (updateBuffer.length == 0) return;
 
     let pos: Vec2;
@@ -59,7 +56,7 @@ function interpolate(updateBuffer: UnitUpdate[], serverNow: number, unit: Unit) 
 
             const progress = (interpolationMoment - s1.timestamp) / (s2.timestamp - s1.timestamp);
 
-            pos = posInterpolator(s1.state, s2.state, progress, tmpVec2);
+            pos = posInterpolator(s1.state, s2.state, progress, TMP_VEC2);
             state = s1.state;
         }
     }
@@ -79,5 +76,5 @@ function interpolate(updateBuffer: UnitUpdate[], serverNow: number, unit: Unit) 
 }
 
 export {
-    interpolateUnitPositions
+    updateUnitPositions
 }

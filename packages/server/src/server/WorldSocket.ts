@@ -9,30 +9,52 @@ export default class WorldSocket {
 
     public readonly world: World;
     public readonly socket: Socket;
-    public readonly opcodeTable: OpcodeTable;
+    private readonly bufferQueue: WorldPacket[];
 
     private worldSession: WorldSession;
-    private bufferQueue: WorldPacket[];
 
-    constructor(world: World, opcodeTable: OpcodeTable, socket: Socket) {
+    constructor(world: World, socket: Socket) {
         this.world = world;
         this.socket = socket;
-        this.opcodeTable = opcodeTable;
 
         this.bufferQueue = [];
     }
 
     public init() {
-        this.socket.on("message", (worldPacket: WorldPacket) => {
-            const success = this.handleWorldPacket(worldPacket);
+        this.initTimesync(this.socket);
+        this.socket.on("message", (worldPacket: WorldPacket) => this.handleWorldPacket(worldPacket));
+        this.socket.on("disconnect", () => this.destroy());
+    }
 
-            if (!success) {
-                this.socket.disconnect();
-            }
+    public sendPacket(worldPacket: WorldPacket, immediate) {
+        if (immediate) {
+            this.socket.send(worldPacket);
+        } else {
+            this.bufferQueue.push(worldPacket);
+        }
+    }
+
+    public update() {
+        this.bufferQueue.forEach(worldPacket => this.socket.send(worldPacket));
+        this.bufferQueue.length = 0;
+    }
+
+    private initTimesync(socket: Socket) {
+        socket.on("timesync", (data) => {
+            socket.emit("timesync", {
+                id: data && "id" in data ? data.id : null,
+                result: Date.now()
+            });
         });
     }
 
     private handleWorldPacket(worldPacket: WorldPacket) {
+        const offensive = this.doHandleWorldPacket(worldPacket);
+
+        if (offensive) this.socket.disconnect();
+    }
+
+    private doHandleWorldPacket(worldPacket: WorldPacket) {
         const opcode = worldPacket[0];
 
         switch (opcode) {
@@ -42,29 +64,29 @@ export default class WorldSocket {
 
                     this.sendPacket([Opcode.SMSG_PONG], true);
 
-                    return true;
+                    return false;
                 }
-                break;
+                return true;
             case Opcode.CMSG_AUTH:
                 if (!this.worldSession) {
                     this.createWorldSession();
 
-                    this.sendPacket([Opcode.SMSG_AUTH_SUCCESS]);
+                    this.sendPacket([Opcode.SMSG_AUTH_SUCCESS], true);
 
-                    return true;
+                    return false;
                 }
-                return false;
+                return true;
         }
 
-        if (!this.worldSession) return false;
+        if (!this.worldSession) return true;
 
-        const handler = this.opcodeTable.get(opcode);
+        const handler = OpcodeTable.INSTANCE.get(opcode);
 
-        if (!handler) return false;
+        if (!handler) return true;
 
         this.worldSession.queuePacket(worldPacket);
 
-        return true;
+        return false;
     }
 
     private createWorldSession() {
@@ -72,27 +94,19 @@ export default class WorldSocket {
         this.worldSession.init();
 
         this.world.addSession(this.worldSession);
+    }
 
-        this.socket.on("disconnect", () => {
+    private destroy() {
+        if (this.worldSession) {
             this.world.removeSession(this.worldSession);
-
             this.worldSession.destroy();
-
             this.worldSession = null;
-        });
-    }
-
-    public update() {
-        this.bufferQueue.forEach(worldPacket => this.socket.send(worldPacket));
-        this.bufferQueue.length = 0;
-    }
-
-    public sendPacket(worldPacket: WorldPacket, immediate = false) {
-        if (immediate) {
-            this.socket.send(worldPacket);
-        } else {
-            this.bufferQueue.push(worldPacket);
         }
+
+        this.bufferQueue.length = 0;
+
+        this.socket.removeAllListeners("message");
+        this.socket.removeAllListeners("disconnect");
+        this.socket.removeAllListeners("timesync");
     }
 }
-

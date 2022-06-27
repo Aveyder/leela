@@ -1,14 +1,16 @@
 import Graphics = Phaser.GameObjects.Graphics;
 import UPDATE = Phaser.Scenes.Events.UPDATE;
 import WorldScene from "../world/WorldScene";
-import {BODY_HEIGHT, BODY_WIDTH, Vec2} from "@leela/common";
+import {Body, Vec2} from "@leela/common";
 import {PlayerKey} from "../entities/PlayerKey";
 import {CLIENT_PREDICT} from "../config";
 
 export default class DebugPositionsManager {
 
     public showRemotePosition = true;
+    public showInitialPosition = true;
     public showPredictedPosition = true;
+    public showTargetPosition = true;
     public showReconciledPosition = true;
     public showLocalPosition = true;
 
@@ -31,7 +33,9 @@ export default class DebugPositionsManager {
         this.graphics.clear();
 
         if (this.showRemotePosition) this.drawRemotePosition();
+        if (this.showInitialPosition) this.drawInitialPosition();
         if (this.showPredictedPosition) this.drawPredictedPosition();
+        if (this.showTargetPosition) this.drawTargetPosition();
         if (this.showReconciledPosition) this.drawReconciledPosition();
         if (this.showLocalPosition) this.drawLocalPosition();
     }
@@ -42,49 +46,67 @@ export default class DebugPositionsManager {
         const units = this.worldScene.units;
 
         Object.values(units).forEach(unit => {
-            this.graphics.strokeRect(unit.remotePos.x - BODY_WIDTH / 2, unit.remotePos.y - BODY_HEIGHT / 2, BODY_WIDTH, BODY_HEIGHT);
+            const body = unit.physBody;
+
+            this.graphics.strokeRect(unit.remotePos.x - body.width / 2, unit.remotePos.y - body.height / 2, body.width, body.height);
             this.graphics.lineBetween(unit.remotePos.x, unit.remotePos.y, unit.x, unit.y);
         });
     }
 
-    private drawPredictedPosition() {
-        if (!CLIENT_PREDICT) return;
-
+    private drawInitialPosition() {
         const worldSession = this.worldScene.worldSession;
 
-        if (!worldSession) return;
+        if (!CLIENT_PREDICT || !worldSession?.player) return;
 
         const player = worldSession.player;
 
-        if (!player) return;
+        const initial = player.getData(PlayerKey.PREDICTION_INITIAL_POS) as Vec2;
 
-        const predicted = player.getData(PlayerKey.PREDICTION_PREDICTED_POS) as Vec2;
+        this.graphics.lineStyle(2, 0x808080);
+        this.graphics.strokeRect(initial.x - player.physBody.width / 2, initial.y - player.physBody.height / 2, player.physBody.width, player.physBody.height);
+        this.graphics.lineBetween(player.x, player.y, initial.x, initial.y);
+    }
 
-        if (predicted) {
-            this.graphics.lineStyle(2, 0xeed856);
-            this.graphics.strokeRect(predicted.x - BODY_WIDTH / 2, predicted.y - BODY_HEIGHT / 2, BODY_WIDTH, BODY_HEIGHT);
-            this.graphics.lineBetween(player.x, player.y, predicted.x, predicted.y);
-        }
+    private drawPredictedPosition() {
+        const worldSession = this.worldScene.worldSession;
+
+        if (!CLIENT_PREDICT || !worldSession?.player) return;
+
+        const player = worldSession.player;
+
+        const predicted = player.getData(PlayerKey.PREDICTION_PREDICTED_BODY) as Body;
+
+        this.graphics.lineStyle(2, 0xeed856);
+        this.graphics.strokeRect(predicted.x - predicted.width / 2, predicted.y - predicted.height / 2, predicted.width, predicted.height);
+        this.graphics.lineBetween(player.x, player.y, predicted.x, predicted.y);
+    }
+
+    private drawTargetPosition() {
+        const worldSession = this.worldScene.worldSession;
+
+        if (!CLIENT_PREDICT || !worldSession?.player) return;
+
+        const player = worldSession.player;
+
+        const target = player.getData(PlayerKey.PREDICTION_TARGET_POS) as Vec2;
+
+        this.graphics.lineStyle(2, 0x2b3eb4);
+        this.graphics.strokeRect(target.x - player.physBody.width / 2, target.y - player.physBody.height / 2, player.physBody.width, player.physBody.height);
+        this.graphics.lineBetween(player.x, player.y, target.x, target.y);
     }
 
     private drawReconciledPosition() {
-        if (!CLIENT_PREDICT) return;
-
         const worldSession = this.worldScene.worldSession;
 
-        if (!worldSession) return;
+        if (!CLIENT_PREDICT || !worldSession?.player) return;
 
         const player = worldSession.player;
 
-        if (!player) return;
+        const reconciled = player.getData(PlayerKey.PREDICTION_RECONCILED_BODY) as Body;
 
-        const reconciled = player.getData(PlayerKey.PREDICTION_RECONCILED_POS) as Vec2;
-
-        if (reconciled) {
-            this.graphics.lineStyle(2, 0x71dbff);
-            this.graphics.strokeRect(reconciled.x - BODY_WIDTH / 2, reconciled.y - BODY_HEIGHT / 2, BODY_WIDTH, BODY_HEIGHT);
-            this.graphics.lineBetween(player.x, player.y, reconciled.x, reconciled.y);
-        }
+        this.graphics.lineStyle(2, 0x71dbff);
+        this.graphics.strokeRect(reconciled.x - reconciled.width / 2, reconciled.y - reconciled.height / 2, reconciled.width, reconciled.height);
+        this.graphics.lineBetween(player.x, player.y, reconciled.x, reconciled.y);
     }
 
     private drawLocalPosition() {
@@ -92,8 +114,10 @@ export default class DebugPositionsManager {
 
         this.graphics.lineStyle(2, 0x87e56f);
         Object.values(units).forEach(unit => {
+            const body = unit.physBody;
+
             this.graphics.strokeCircle(unit.x, unit.y, 1);
-            this.graphics.strokeRectShape(unit.getBounds());
+            this.graphics.strokeRect(unit.x - body.width / 2, unit.y - body.height / 2, body.width, body.height);
         });
     }
 }

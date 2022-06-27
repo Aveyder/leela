@@ -1,13 +1,18 @@
 import {Vec2} from "../utils/math";
 import {UNIT_SPEED} from "../constants/world";
+import Body from "../physics/Body";
+import PhysicsWorld from "../physics/PhysicsWorld";
 
-export default function applySpeed(vec2: Vec2, result?: Vec2): Vec2 {
-    if (!result) {
-        result = {x: 0, y: 0};
-    }
+function moveUnit(physics: PhysicsWorld, unit: Body, vec2: Vec2) {
+    applyUnitSpeed(unit, vec2);
+    physics.update(unit);
+}
 
-    result.x = vec2.x * UNIT_SPEED;
-    result.y = vec2.y * UNIT_SPEED;
+function applyUnitSpeed(body: Body, vec2: Vec2) {
+    body.vx = vec2.x * UNIT_SPEED;
+    body.vy = vec2.y * UNIT_SPEED;
+}
 
-    return result;
+export {
+    moveUnit
 }

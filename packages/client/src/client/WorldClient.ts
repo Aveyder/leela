@@ -1,54 +1,61 @@
 import WorldScene from "../world/WorldScene";
 import {io, Socket} from "socket.io-client";
 import {SERVER_HOST, TIMESYNC_INTERVAL_MS} from "../config";
-import OpcodeTable from "./protocol/OpcodeTable";
 import * as timesync from "timesync";
 import {TimeSync} from "timesync";
 import WorldSocket from "./WorldSocket";
-
+import msgpack from "socket.io-msgpack-parser";
 
 export default class WorldClient {
 
-    private readonly worldScene: WorldScene;
+    public readonly worldScene: WorldScene;
 
-    private socket: Socket;
+    private _socket: Socket;
     private _ts: TimeSync;
-
-    private opcodeTable: OpcodeTable;
 
     constructor(worldScene: WorldScene) {
         this.worldScene = worldScene;
     }
 
     public init(): void {
-        this.initTimesyncClient();
-        this.initOpcodeTable();
         this.initIOSocket();
+        this.initTimesyncClient();
+    }
+
+    private initIOSocket() {
+        this._socket = io(SERVER_HOST, {
+            parser: msgpack
+        });
+
+        this._socket.on("connect", () => {
+            const worldSocket = new WorldSocket(this);
+            worldSocket.init();
+        });
     }
 
     private initTimesyncClient() {
         this._ts = timesync.create({
-            server: `${SERVER_HOST}/timesync`,
+            server: this._socket,
             interval: TIMESYNC_INTERVAL_MS
         });
+
+        this._ts.send = (socket: Socket, data, timeout) => {
+            return new Promise((resolve, reject) => {
+                const timeoutFn = setTimeout(reject, timeout);
+
+                socket.emit("timesync", data, function () {
+                    clearTimeout(timeoutFn);
+                    resolve();
+                });
+            });
+        };
+    }
+
+    public get socket() {
+        return this._socket;
     }
 
     public get ts() {
         return this._ts;
-    }
-
-    private initOpcodeTable() {
-        this.opcodeTable = new OpcodeTable();
-        this.opcodeTable.init();
-    }
-
-    private initIOSocket() {
-        this.socket = io(SERVER_HOST);
-
-        this.socket.on("connect", () => {
-            const worldSocket = new WorldSocket(this.worldScene, this.opcodeTable, this.socket);
-
-            worldSocket.init();
-        });
     }
 }

@@ -1,6 +1,6 @@
 import TimeStep = Phaser.Core.TimeStep;
 
-export default class TimeStepLoop {
+export default class Loop {
 
     private timestep: TimeStep;
 
