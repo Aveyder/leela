@@ -1,7 +1,7 @@
 import {Opcode, SIMULATION_RATE, WorldPacket} from "@leela/common";
 import OpcodeTable from "./protocol/OpcodeTable";
 import WorldSocket from "./WorldSocket";
-import {CLIENT_CMD_LOOP, CLIENT_CMD_RATE, CLIENT_UPDATE_RATE, PING_DELAY_MS} from "../config";
+import {CLIENT_CMD_LOOP, CLIENT_CMD_RATE, CLIENT_UPDATE_RATE, PING_INTERVAL_MS} from "../config";
 import Loop from "../Loop";
 import Unit from "../entities/Unit";
 
@@ -56,7 +56,7 @@ export default class WorldSession {
             this._pingStart = Date.now();
 
             this.worldSocket.sendPacket([Opcode.CMSG_PING, this.latency], true);
-        }, PING_DELAY_MS) as unknown as number;
+        }, PING_INTERVAL_MS) as unknown as number;
     }
 
     public destroy(): void {

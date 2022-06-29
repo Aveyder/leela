@@ -1,78 +1,69 @@
 import WorldScene from "../world/WorldScene";
-import {ENTITY_EXTRAPOLATE, ENTITY_EXTRAPOLATE_MAX_MS, ENTITY_EXTRAPOLATE_PAST, INTERPOLATE} from "../config";
+import {ENTITY_EXTRAPOLATE, ENTITY_EXTRAPOLATE_MAX_MS, INTERPOLATE} from "../config";
 import {INTERPOLATE_MS, posInterpolator, TMP_VEC2, Vec2} from "@leela/common";
-import Unit, {Snapshot, SnapshotState} from "../entities/Unit";
+import Unit, {SnapshotState} from "../entities/Unit";
 
 function updateUnitPositions(worldScene: WorldScene) {
     if (!INTERPOLATE) return;
 
     const ts = worldScene.worldClient.ts;
 
-    Object.values(worldScene.units).forEach(unit => {
-        const snapshots = unit.snapshots;
+    const serverNow = ts.now();
 
-        const serverNow = ts.now();
-
-        interpolate(snapshots, serverNow, unit);
-    });
+    Object.values(worldScene.units).forEach(unit => interpolateUnitPosition(unit, serverNow));
 }
 
-// TODO: refactor this
-function interpolate(snapshots: Snapshot[], serverNow: number, unit: Unit) {
+function interpolateUnitPosition(unit: Unit, serverNow: number) {
+    const snapshots = unit.snapshots;
+
     if (snapshots.length == 0) return;
 
-    let pos: Vec2;
-    let state: SnapshotState;
+    const lerpMoment = serverNow - INTERPOLATE_MS;
 
-    const interpolationMoment = serverNow - INTERPOLATE_MS;
-    const last = snapshots.length - 1;
-    if (snapshots.length > 1) {
-        let before = -1;
-        for (let i = last; i >= 0 && before == -1; i--) {
-            if (snapshots[i].timestamp < interpolationMoment) {
-                before = i;
+    let lerpMomentState: SnapshotState;
+    let lerpPos: Vec2;
+
+    const firstSnapshot = snapshots[0];
+
+    if (snapshots.length == 1 || lerpMoment < snapshots[0].timestamp) {
+        lerpPos = lerpMomentState = firstSnapshot.state;
+    } else {
+        const lastIndex = snapshots.length - 1;
+        const lastSnapshot = snapshots[lastIndex];
+
+        let lerpStartSnapshot;
+        let lerpEndSnapshot;
+
+        if (lerpMoment > lastSnapshot.timestamp) {
+            if (ENTITY_EXTRAPOLATE && lerpMoment <= lastSnapshot.timestamp + ENTITY_EXTRAPOLATE_MAX_MS) {
+                lerpStartSnapshot = snapshots[lastIndex - 1];
+                lerpEndSnapshot = lastSnapshot;
+                lerpMomentState = lastSnapshot.state;
+            } else {
+                lerpPos = lerpMomentState = lastSnapshot.state;
             }
-        }
-
-        let start = -1;
-        if (before != -1) {
-            if (before != last) {
-                start = before;
-            } else if (ENTITY_EXTRAPOLATE) {
-                const extrapolate = interpolationMoment - snapshots[last].timestamp <= ENTITY_EXTRAPOLATE_MAX_MS;
-                if (extrapolate) {
-                    start = last - 1;
+        } else {
+            let beforeIndex = -1;
+            for (let i = lastIndex; i >= 0 && beforeIndex == -1; i--) {
+                if (snapshots[i].timestamp < lerpMoment) {
+                    beforeIndex = i;
                 }
             }
-        } else if (ENTITY_EXTRAPOLATE_PAST) {
-            start = 0;
+
+            lerpStartSnapshot = snapshots[beforeIndex];
+            lerpEndSnapshot = snapshots[beforeIndex + 1];
+            lerpMomentState = lerpStartSnapshot.state;
         }
 
-        if (start != -1) {
-            const end = start + 1;
+        if (lerpStartSnapshot && lerpEndSnapshot) {
+            const progress = (lerpMoment - lerpStartSnapshot.timestamp) / (lerpEndSnapshot.timestamp - lerpStartSnapshot.timestamp);
 
-            const s1 = snapshots[start];
-            const s2 = snapshots[end];
-
-            const progress = (interpolationMoment - s1.timestamp) / (s2.timestamp - s1.timestamp);
-
-            pos = posInterpolator(s1.state, s2.state, progress, TMP_VEC2);
-            state = s1.state;
+            lerpPos = posInterpolator(lerpStartSnapshot.state, lerpEndSnapshot.state, progress, TMP_VEC2);
         }
     }
 
-    if (!pos && snapshots.length > 0) {
-        const lastSnapshot = snapshots[last];
-        const firstSnapshot = snapshots[0];
-
-        pos = state = (firstSnapshot.timestamp >= interpolationMoment) ? firstSnapshot.state : lastSnapshot.state;
-    }
-
-    if (pos) {
-        unit.x = pos.x;
-        unit.y = pos.y;
-        unit.setDir(state.vx, state.vy);
-    }
+    unit.setPosition(lerpPos.x, lerpPos.y);
+    unit.setDir(lerpMomentState.vx, lerpMomentState.vy);
 }
 
 export {
