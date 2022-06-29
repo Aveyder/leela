@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "eventemitter3": "^4.0.7",
     "express": "^4.18.1",
     "socket.io": "^4.5.1",
     "socket.io-msgpack-parser": "^3.0.1",

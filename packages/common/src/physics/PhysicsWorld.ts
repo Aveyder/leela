@@ -28,7 +28,7 @@ export default class PhysicsWorld {
     constructor(private readonly map: number[]) {
     }
 
-    public update(body: Body) {
+    public update(body: Body): void {
         const moveSteps = body.bullet ? PhysicsWorld.BULLET_MOVE_STEPS : PhysicsWorld.MOVE_STEPS;
 
         for(let i = 0; i < moveSteps; i++) {
@@ -39,11 +39,11 @@ export default class PhysicsWorld {
         }
     }
 
-    public collideAndRespond(body: Body) {
+    private collideAndRespond(body: Body) {
         if (body.y < PhysicsWorld.BOUND_TOP) body.y = PhysicsWorld.BOUND_TOP + body.height / 2;
-        if (body.x > PhysicsWorld.BOUND_RIGHT) body.x = PhysicsWorld.BOUND_RIGHT - body.height / 2;
+        if (body.x > PhysicsWorld.BOUND_RIGHT) body.x = PhysicsWorld.BOUND_RIGHT - body.width / 2;
         if (body.y > PhysicsWorld.BOUND_BOTTOM) body.y = PhysicsWorld.BOUND_BOTTOM - body.height / 2;
-        if (body.x < PhysicsWorld.BOUND_LEFT) body.x = PhysicsWorld.BOUND_LEFT + body.height / 2;
+        if (body.x < PhysicsWorld.BOUND_LEFT) body.x = PhysicsWorld.BOUND_LEFT + body.width / 2;
 
         const bodyTileX = Math.floor(body.x / TILE_SIZE);
         const bodyTileY = Math.floor(body.y / TILE_SIZE);
@@ -92,7 +92,7 @@ export default class PhysicsWorld {
         return xAxis && yAxis;
     }
 
-    public getTile(tx: number, ty: number) {
+    public getTile(tx: number, ty: number): number {
         return this.map[ty * TILES_WIDTH + tx];
     }
 }

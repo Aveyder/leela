@@ -6,6 +6,14 @@ Leela is an open-source MMO game
 - Node `v14.x`
 
 ### Installing
+Make sure you have npm updated:
+
+```console
+npm install -g npm@latest
+```
+
+Install npm packages:
+
 ```console
 npm install
 ```

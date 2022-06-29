@@ -8,8 +8,5 @@
   },
   "devDependencies": {
     "typescript": "^4.6.4"
-  },
-  "dependencies": {
-    "eventemitter3": "^4.0.7"
   }
 }
