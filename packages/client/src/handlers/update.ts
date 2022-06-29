@@ -23,13 +23,12 @@ type UnitState = {
     vy: number
 }
 
-
 function handleUpdate(worldSession: WorldSession, worldPacket: WorldPacket) {
     const worldScene = worldSession.worldScene;
 
     worldPacket.shift(); // opcode
     const timestamp = worldPacket.shift() as number;
-    const tick = worldPacket.shift() as number;
+    const ackTick = worldPacket.shift() as number;
 
     const updates = deserializeUpdate(worldSession, worldPacket);
 
@@ -56,15 +55,15 @@ function handleUpdate(worldSession: WorldSession, worldPacket: WorldPacket) {
 
         unit.skin = unitState.skin;
 
+        pushToUnitSnapshots(unit, unitState, timestamp);
+
         if (CLIENT_PREDICT && isPlayer(unit)) {
-            unit.getData(PLAYER_STATE).ackTick = tick;
-            reconcilePlayerPosition(unit, unitState);
-        } else {
-            pushToUnitStateBuffer(unit, unitState, timestamp);
-            if (!INTERPOLATE) {
-                unit.setPosition(unitState.x, unitState.y);
-                unit.setDir(unitState.vx, unitState.vy);
-            }
+            reconcilePlayerPosition(unit, unitState, ackTick);
+        }
+
+        if (!INTERPOLATE) {
+            unit.setPosition(unitState.x, unitState.y);
+            unit.setDir(unitState.vx, unitState.vy);
         }
     });
 }
@@ -93,20 +92,20 @@ function deserializeUnitState(index: number, serialized: unknown[]) {
     } as UnitState;
 }
 
-function pushToUnitStateBuffer(unit: Unit, unitState: SnapshotState, timestamp: number) {
+function pushToUnitSnapshots(unit: Unit, snapshotState: SnapshotState, timestamp: number) {
     const worldScene = unit.scene as WorldScene;
 
-    const unitStateBuffer = unit.snapshots;
+    const snapshots = unit.snapshots;
 
     const serverNow = worldScene.worldClient.ts.now();
 
-    trimStateBuffer(unitStateBuffer, serverNow);
+    trimStateBuffer(snapshots, serverNow);
 
     if (INTERPOLATE_DROP_DUPLICATES) {
-        deduplicateUnitStateBuffer(unitStateBuffer, unitState);
+        deduplicateUnitSnapshots(snapshots, snapshotState);
     }
 
-    unitStateBuffer.push({state: unitState, timestamp});
+    snapshots.push({state: snapshotState, timestamp});
 }
 
 function trimStateBuffer(snapshots: Snapshot[], serverNow: number) {
@@ -118,7 +117,7 @@ function trimStateBuffer(snapshots: Snapshot[], serverNow: number) {
     }
 }
 
-function deduplicateUnitStateBuffer(snapshots: Snapshot[], unitState: SnapshotState) {
+function deduplicateUnitSnapshots(snapshots: Snapshot[], unitState: SnapshotState) {
     if (snapshots.length > 2) {
         const lastIndex = snapshots.length - 1;
         const last = snapshots[lastIndex];

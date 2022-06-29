@@ -1,8 +1,8 @@
 import {Opcode} from "@leela/common";
 import WorldPacketHandler from "./WorldPacketHandler";
-import {handlePong} from "../../handlers/pongHandler";
-import {handleJoin} from "../../handlers/joinHandler";
-import {handleDestroy, handleUpdate} from "../../handlers/updateHandler";
+import {handlePong} from "../../handlers/pong";
+import {handleJoin} from "../../handlers/join";
+import {handleDestroy, handleUpdate} from "../../handlers/update";
 
 export default class OpcodeTable {
 

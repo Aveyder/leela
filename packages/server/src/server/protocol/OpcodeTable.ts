@@ -1,6 +1,6 @@
 import {Opcode} from "@leela/common";
 import WorldPacketHandler from "./WorldPacketHandler";
-import {handlePlayerJoin, handlePlayerMove, handlePlayerUpdateRateChange} from "../../handlers/playerHandler";
+import {handlePlayerJoin, handlePlayerMove, handlePlayerUpdateRateChange} from "../../handlers/player";
 
 export default class OpcodeTable {
 

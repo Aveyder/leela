@@ -64,8 +64,10 @@ function predictPlayerPosition(player: Unit, dir: Vec2) {
 }
 
 
-function reconcilePlayerPosition(player: Unit, playerUpdateState: SnapshotState) {
+function reconcilePlayerPosition(player: Unit, playerUpdateState: SnapshotState, ack: number) {
     const playerState = player.getData(PLAYER_STATE) as PlayerState;
+
+    playerState.ackTick = ack;
 
     playerState.reconciledBody.x = playerUpdateState.x;
     playerState.reconciledBody.y = playerUpdateState.y;
@@ -73,8 +75,6 @@ function reconcilePlayerPosition(player: Unit, playerUpdateState: SnapshotState)
     const physics = (player.scene as WorldScene).phys;
 
     const appliedControls = playerState.appliedControls;
-
-    const ack = playerState.ackTick;
 
     let ackIndex = -1;
     for (let i = 0; i < appliedControls.length; i++) {
