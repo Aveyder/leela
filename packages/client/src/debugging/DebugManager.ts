@@ -1,8 +1,9 @@
 import {GUI} from "dat.gui";
 import DebugPositionsManager from "./DebugPositionsManager";
 import WorldScene from "../world/WorldScene";
-import {PlayerKey} from "../entities/PlayerKey";
 import UPDATE = Phaser.Scenes.Events.UPDATE;
+import {SERVER_HOST} from "../config";
+import {PLAYER_STATE} from "../entities/PlayerState";
 
 export default class DebugManager {
 
@@ -43,15 +44,17 @@ export default class DebugManager {
 
             if (latency == undefined) latency = "?";
 
-            const player = this.worldScene.worldSession?.player;
+            const playerState = this.worldScene.worldSession?.player?.getData(PLAYER_STATE);
             const tick = this.worldScene.tick;
-            const acktick = player ? player.getData(PlayerKey.PREDICTION_ACK_TICK) : "?";
-            const uncofirmed = player ? player.getData(PlayerKey.PREDICTION_APPLIED_CONTROLS).length : "?"
+
+            const ackTick = playerState ? playerState.ackTick : "?";
+            const unack = playerState ? playerState.appliedControls.length : "?"
 
             text.text = `ping: ${latency} ms
+host: ${SERVER_HOST}
 tick: ${tick}
-ack: ${acktick}
-unack: ${uncofirmed}`;
+ack: ${ackTick}
+unack: ${unack}`;
         });
     }
 }

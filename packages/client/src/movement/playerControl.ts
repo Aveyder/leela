@@ -3,7 +3,7 @@ import {Opcode, Vec2} from "@leela/common";
 import {CLIENT_PREDICT} from "../config";
 import {predictPlayerPosition} from "./playerPrediction";
 import Keys from "../world/Keys";
-import {PlayerKey} from "../entities/PlayerKey";
+import PlayerState, {PLAYER_STATE} from "../entities/PlayerState";
 
 
 const MOVE_INPUT_NONE = serializeMoveInput(0, 0);
@@ -28,11 +28,13 @@ function playerControl(worldScene: WorldScene) {
     }
 
     const moveInput = serializeMoveInput(dir.x, dir.y);
-    const lastMoveInput = player.getData(PlayerKey.LAST_MOVE_INPUT) as number;
 
-    if (lastMoveInput == MOVE_INPUT_NONE && moveInput == MOVE_INPUT_NONE) return;
+    const playerState = player.getData(PLAYER_STATE) as PlayerState;
 
-    player.setData(PlayerKey.LAST_MOVE_INPUT, moveInput);
+    if (playerState.lastMoveInput == MOVE_INPUT_NONE && moveInput == MOVE_INPUT_NONE) return;
+
+    playerState.lastMoveInput = moveInput;
+
     worldSession.sendPacket([Opcode.CMSG_MOVE, worldScene.tick, moveInput]);
 }
 

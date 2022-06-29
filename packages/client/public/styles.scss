@@ -1,6 +1,10 @@
 html, body {
     background: black;
-    height: 100%;
     margin: 0;
     padding: 0;
+}
+
+.game > canvas {
+    display: block;
+    margin: 0 auto;
 }

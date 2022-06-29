@@ -4,31 +4,25 @@ import {UNIT_BODY_HEIGHT, UNIT_BODY_WIDTH, Vec2} from "@leela/common";
 import PhysBody from "../physics/PhysBody";
 import WorldScene from "../world/WorldScene";
 
-type UnitState = {
-    guid: number,
-    typeId: number,
-    skin: number,
+
+type SnapshotState = {
     x: number,
     y: number,
     vx: number,
     vy: number
 }
 
-type UnitStateBuffer = {
-    state: UnitState,
+type Snapshot = {
+    state: SnapshotState,
     timestamp: number
-}[]
+}
 
 export default class Unit extends Sprite {
 
-    private _skin: number;
     public guid: number;
     public typeId: number;
-
-    public remotePos: Vec2;
-
-    public readonly stateBuffer: UnitStateBuffer;
-
+    private _skin: number;
+    public readonly snapshots: Snapshot[];
     public readonly physBody: PhysBody;
 
     constructor(scene: Scene, skin = 0, x?: number, y?: number) {
@@ -44,9 +38,7 @@ export default class Unit extends Sprite {
 
         this.skin = skin;
 
-        this.remotePos = {x: 0, y: 0};
-
-        this.stateBuffer = [];
+        this.snapshots = [];
     }
 
     public set skin(value: number) {
@@ -143,8 +135,8 @@ function isPlayer(unit: Unit) {
 }
 
 export {
-    UnitState,
-    UnitStateBuffer,
+    Snapshot,
+    SnapshotState,
     addUnitToWorld,
     deleteUnitFromWorld,
     isPlayer

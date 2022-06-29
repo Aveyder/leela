@@ -1,5 +1,5 @@
 import "phaser";
-import "../scss/styles.scss";
+import "../public/styles.scss";
 import WorldScene from "./world/WorldScene";
 import {Game} from "phaser";
 import {WORLD_HEIGHT, WORLD_WIDTH} from "@leela/common";
@@ -12,6 +12,7 @@ function boot() {
             width: WORLD_WIDTH,
             height: WORLD_HEIGHT
         },
+        parent: document.querySelector(".game") as HTMLElement,
         scene: WorldScene
     });
 }

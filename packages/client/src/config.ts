@@ -1,6 +1,8 @@
 import {TILE_SIZE} from "@leela/common";
 
-const SERVER_HOST = "http://localhost:3000";
+const SERVER_PROTO = "http"
+const SERVER_HOST = "localhost:3000";
+const SERVER_URL = `${SERVER_PROTO}://${SERVER_HOST}`
 
 const INTERPOLATE = true;
 const INTERPOLATE_BUFFER_MS = 1000;
@@ -31,6 +33,7 @@ const TICK_CAP = 100;
 
 export {
     SERVER_HOST,
+    SERVER_URL,
     INTERPOLATE,
     INTERPOLATE_BUFFER_MS,
     INTERPOLATE_DROP_DUPLICATES,

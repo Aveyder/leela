@@ -1,11 +1,27 @@
 import WorldSession from "../client/WorldSession";
 import {WorldPacket} from "@leela/common";
-import Unit, {addUnitToWorld, deleteUnitFromWorld, isPlayer, UnitState, UnitStateBuffer} from "../entities/Unit";
-import {PlayerKey} from "../entities/PlayerKey";
+import Unit, {
+    addUnitToWorld,
+    deleteUnitFromWorld,
+    isPlayer,
+    Snapshot,
+    SnapshotState
+} from "../entities/Unit";
 import {reconcilePlayerPosition, resetPrediction} from "../movement/playerPrediction";
 import {CLIENT_PREDICT, INTERPOLATE, INTERPOLATE_BUFFER_MS, INTERPOLATE_DROP_DUPLICATES} from "../config";
 import WorldScene from "../world/WorldScene";
 import {posEquals} from "../movement/position";
+import PlayerState, {PLAYER_STATE} from "../entities/PlayerState";
+
+type UnitState = {
+    guid: number,
+    typeId: number,
+    skin: number,
+    x: number,
+    y: number,
+    vx: number,
+    vy: number
+}
 
 
 function handleUpdate(worldSession: WorldSession, worldPacket: WorldPacket) {
@@ -30,8 +46,7 @@ function handleUpdate(worldSession: WorldSession, worldPacket: WorldPacket) {
             if (isPlayer(unit)) {
                 worldSession.player = unit;
 
-                unit.setData(PlayerKey.WORLD_SESSION, worldSession);
-                unit.setData(PlayerKey.PREDICTION_APPLIED_CONTROLS, []);
+                unit.setData(PLAYER_STATE, new PlayerState())
 
                 resetPrediction(unit);
             }
@@ -41,16 +56,12 @@ function handleUpdate(worldSession: WorldSession, worldPacket: WorldPacket) {
 
         unit.skin = unitState.skin;
 
-        unit.remotePos.x = unitState.x;
-        unit.remotePos.y = unitState.y;
-
         if (CLIENT_PREDICT && isPlayer(unit)) {
-            unit.setData(PlayerKey.PREDICTION_ACK_TICK, tick);
+            unit.getData(PLAYER_STATE).ackTick = tick;
             reconcilePlayerPosition(unit, unitState);
         } else {
-            if (INTERPOLATE) {
-                pushToUnitStateBuffer(unit, unitState, timestamp);
-            } else {
+            pushToUnitStateBuffer(unit, unitState, timestamp);
+            if (!INTERPOLATE) {
                 unit.setPosition(unitState.x, unitState.y);
                 unit.setDir(unitState.vx, unitState.vy);
             }
@@ -82,10 +93,10 @@ function deserializeUnitState(index: number, serialized: unknown[]) {
     } as UnitState;
 }
 
-function pushToUnitStateBuffer(unit: Unit, unitState: UnitState, timestamp: number) {
+function pushToUnitStateBuffer(unit: Unit, unitState: SnapshotState, timestamp: number) {
     const worldScene = unit.scene as WorldScene;
 
-    const unitStateBuffer = unit.stateBuffer;
+    const unitStateBuffer = unit.snapshots;
 
     const serverNow = worldScene.worldClient.ts.now();
 
@@ -98,23 +109,23 @@ function pushToUnitStateBuffer(unit: Unit, unitState: UnitState, timestamp: numb
     unitStateBuffer.push({state: unitState, timestamp});
 }
 
-function trimStateBuffer(unitStateBuffer: UnitStateBuffer, serverNow: number) {
-    if (unitStateBuffer.length > 0) {
+function trimStateBuffer(snapshots: Snapshot[], serverNow: number) {
+    if (snapshots.length > 0) {
         let i = 0;
-        while (serverNow - unitStateBuffer[i].timestamp > INTERPOLATE_BUFFER_MS && ++i < unitStateBuffer.length);
+        while (serverNow - snapshots[i].timestamp > INTERPOLATE_BUFFER_MS && ++i < snapshots.length);
 
-        unitStateBuffer.splice(0, i);
+        snapshots.splice(0, i);
     }
 }
 
-function deduplicateUnitStateBuffer(unitStateBuffer: UnitStateBuffer, unitState: UnitState) {
-    if (unitStateBuffer.length > 2) {
-        const lastIndex = unitStateBuffer.length - 1;
-        const last = unitStateBuffer[lastIndex];
+function deduplicateUnitStateBuffer(snapshots: Snapshot[], unitState: SnapshotState) {
+    if (snapshots.length > 2) {
+        const lastIndex = snapshots.length - 1;
+        const last = snapshots[lastIndex];
         if (!posEquals(unitState, last.state)) {
             let count = 1;
             for(let i = lastIndex - 1; i >= 0; i--) {
-                const cur = unitStateBuffer[i];
+                const cur = snapshots[i];
                 if (posEquals(cur.state, last.state)) {
                     if (count < INTERPOLATE_DROP_DUPLICATES) {
                         count++;
@@ -123,7 +134,7 @@ function deduplicateUnitStateBuffer(unitStateBuffer: UnitStateBuffer, unitState:
                     }
                 } else {
                     if (count > 1) {
-                        unitStateBuffer.splice(i + 2);
+                        snapshots.splice(i + 2);
                     }
                     break;
                 }

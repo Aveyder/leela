@@ -1,34 +1,34 @@
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+const path = require("path");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const {CleanWebpackPlugin} = require("clean-webpack-plugin");
 
 let config = {
-    mode: 'development',
-    devtool: 'eval-source-map',
+    mode: "development",
+    devtool: "eval-source-map",
     entry: {
-        index: './src/index.ts'
+        index: "./src/index.ts"
     },
     devServer: {
-        static: './dist'
+        static: "./dist"
     },
     module: {
         rules: [
             {
                 test: /\.ts(x?)$/,
-                use: 'ts-loader',
+                use: "ts-loader",
                 exclude: /node_modules/
             },
             {
-                type: 'javascript/auto',
+                type: "javascript/auto",
                 test: /\.(png|xml|json|woff(2?))$/,
-                use: 'file-loader'
+                use: "file-loader"
             },
             {
                 test: /\.(s?)css$/,
                 use: [
-                    'style-loader',
-                    'css-loader',
-                    'sass-loader'
+                    "style-loader",
+                    "css-loader",
+                    "sass-loader"
                 ]
             },
             {
@@ -40,7 +40,7 @@ let config = {
         ]
     },
     resolve: {
-        extensions: ['.ts', '.tsx', '.js'],
+        extensions: [".ts", ".tsx", ".js"],
         alias: {
             "@leela/common": path.resolve(__dirname, "../common/src")
         }
@@ -48,21 +48,21 @@ let config = {
     plugins: [
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
-            title: 'Leela Client'
+            template: path.resolve(__dirname, "./public/index.html")
         })
     ],
     output: {
-        filename: '[name].[contenthash].js',
-        path: path.resolve(__dirname, 'dist')
+        filename: "[name].[contenthash].js",
+        path: path.resolve(__dirname, "dist")
     },
     optimization: {
-        runtimeChunk: 'single',
+        runtimeChunk: "single",
         splitChunks: {
             cacheGroups: {
                 vendor: {
                     test: /[\\/]node_modules[\\/]/,
-                    name: 'vendors',
-                    chunks: 'all',
+                    name: "vendors",
+                    chunks: "all",
                 }
             }
         }

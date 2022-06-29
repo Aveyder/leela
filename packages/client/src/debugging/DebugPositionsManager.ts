@@ -1,9 +1,8 @@
 import Graphics = Phaser.GameObjects.Graphics;
 import UPDATE = Phaser.Scenes.Events.UPDATE;
 import WorldScene from "../world/WorldScene";
-import {Body, Vec2} from "@leela/common";
-import {PlayerKey} from "../entities/PlayerKey";
 import {CLIENT_PREDICT} from "../config";
+import {PLAYER_STATE} from "../entities/PlayerState";
 
 export default class DebugPositionsManager {
 
@@ -48,8 +47,12 @@ export default class DebugPositionsManager {
         Object.values(units).forEach(unit => {
             const body = unit.physBody;
 
-            this.graphics.strokeRect(unit.remotePos.x - body.width / 2, unit.remotePos.y - body.height / 2, body.width, body.height);
-            this.graphics.lineBetween(unit.remotePos.x, unit.remotePos.y, unit.x, unit.y);
+            const pos = unit.snapshots[unit.snapshots.length - 1]?.state;
+
+            if (!pos) return;
+
+            this.graphics.strokeRect(pos.x - body.width / 2, pos.y - body.height / 2, body.width, body.height);
+            this.graphics.lineBetween(pos.x, pos.y, unit.x, unit.y);
         });
     }
 
@@ -59,12 +62,11 @@ export default class DebugPositionsManager {
         if (!CLIENT_PREDICT || !worldSession?.player) return;
 
         const player = worldSession.player;
-
-        const initial = player.getData(PlayerKey.PREDICTION_INITIAL_POS) as Vec2;
+        const initialPos = player.getData(PLAYER_STATE).initialPos;
 
         this.graphics.lineStyle(2, 0x808080);
-        this.graphics.strokeRect(initial.x - player.physBody.width / 2, initial.y - player.physBody.height / 2, player.physBody.width, player.physBody.height);
-        this.graphics.lineBetween(player.x, player.y, initial.x, initial.y);
+        this.graphics.strokeRect(initialPos.x - player.physBody.width / 2, initialPos.y - player.physBody.height / 2, player.physBody.width, player.physBody.height);
+        this.graphics.lineBetween(player.x, player.y, initialPos.x, initialPos.y);
     }
 
     private drawPredictedPosition() {
@@ -73,12 +75,11 @@ export default class DebugPositionsManager {
         if (!CLIENT_PREDICT || !worldSession?.player) return;
 
         const player = worldSession.player;
-
-        const predicted = player.getData(PlayerKey.PREDICTION_PREDICTED_BODY) as Body;
+        const predictedBody = player.getData(PLAYER_STATE).predictedBody;
 
         this.graphics.lineStyle(2, 0xeed856);
-        this.graphics.strokeRect(predicted.x - predicted.width / 2, predicted.y - predicted.height / 2, predicted.width, predicted.height);
-        this.graphics.lineBetween(player.x, player.y, predicted.x, predicted.y);
+        this.graphics.strokeRect(predictedBody.x - predictedBody.width / 2, predictedBody.y - predictedBody.height / 2, predictedBody.width, predictedBody.height);
+        this.graphics.lineBetween(player.x, player.y, predictedBody.x, predictedBody.y);
     }
 
     private drawTargetPosition() {
@@ -87,12 +88,11 @@ export default class DebugPositionsManager {
         if (!CLIENT_PREDICT || !worldSession?.player) return;
 
         const player = worldSession.player;
-
-        const target = player.getData(PlayerKey.PREDICTION_TARGET_POS) as Vec2;
+        const targetPos = player.getData(PLAYER_STATE).targetPos;
 
         this.graphics.lineStyle(2, 0x2b3eb4);
-        this.graphics.strokeRect(target.x - player.physBody.width / 2, target.y - player.physBody.height / 2, player.physBody.width, player.physBody.height);
-        this.graphics.lineBetween(player.x, player.y, target.x, target.y);
+        this.graphics.strokeRect(targetPos.x - player.physBody.width / 2, targetPos.y - player.physBody.height / 2, player.physBody.width, player.physBody.height);
+        this.graphics.lineBetween(player.x, player.y, targetPos.x, targetPos.y);
     }
 
     private drawReconciledPosition() {
@@ -101,12 +101,11 @@ export default class DebugPositionsManager {
         if (!CLIENT_PREDICT || !worldSession?.player) return;
 
         const player = worldSession.player;
-
-        const reconciled = player.getData(PlayerKey.PREDICTION_RECONCILED_BODY) as Body;
+        const reconciledBody = player.getData(PLAYER_STATE).reconciledBody;
 
         this.graphics.lineStyle(2, 0x71dbff);
-        this.graphics.strokeRect(reconciled.x - reconciled.width / 2, reconciled.y - reconciled.height / 2, reconciled.width, reconciled.height);
-        this.graphics.lineBetween(player.x, player.y, reconciled.x, reconciled.y);
+        this.graphics.strokeRect(reconciledBody.x - reconciledBody.width / 2, reconciledBody.y - reconciledBody.height / 2, reconciledBody.width, reconciledBody.height);
+        this.graphics.lineBetween(player.x, player.y, reconciledBody.x, reconciledBody.y);
     }
 
     private drawLocalPosition() {

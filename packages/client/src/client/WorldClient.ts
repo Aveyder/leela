@@ -1,6 +1,6 @@
 import WorldScene from "../world/WorldScene";
 import {io, Socket} from "socket.io-client";
-import {SERVER_HOST, TIMESYNC_INTERVAL_MS} from "../config";
+import {SERVER_URL, TIMESYNC_INTERVAL_MS} from "../config";
 import * as timesync from "timesync";
 import {TimeSync} from "timesync";
 import WorldSocket from "./WorldSocket";
@@ -23,7 +23,7 @@ export default class WorldClient {
     }
 
     private initIOSocket() {
-        this._socket = io(SERVER_HOST, {
+        this._socket = io(SERVER_URL, {
             parser: msgpack
         });
 
