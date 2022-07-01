@@ -10,7 +10,7 @@ const UNIT_BODY_WIDTH = TILE_SIZE / 2;
 const UNIT_BODY_HEIGHT = TILE_SIZE;
 
 const UNIT_SKINS = 6;
-const UNIT_SPEED = 200;
+const UNIT_SPEED = 100;
 
 export {
     TILE_SIZE,

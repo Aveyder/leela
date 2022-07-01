@@ -1,44 +1,35 @@
 import World from "../../world/World";
 import Mob from "./Mob";
-import {moveUnit, scaleVec2, SIMULATION_DELTA, TMP_VEC2, Type, WORLD_HEIGHT, WORLD_WIDTH} from "@leela/common";
+import {TILE_SIZE, Type} from "@leela/common";
 import {addUnitToWorld} from "../Unit";
+import {PathMotion, Waypoint} from "../../motion/motions";
 
 function spawnMob(world: World) {
     const mob = new Mob(world);
 
     mob.guid = world.guid();
     mob.skin = 5;
-    mob.x = Math.random() * WORLD_WIDTH;
-    mob.y = Math.random() * WORLD_HEIGHT;
+    mob.x = TILE_SIZE * 3 / 2 + TILE_SIZE * 8;
+    mob.y = TILE_SIZE * 3 / 2;
     mob.vx = 0;
     mob.vy = 0;
 
-    mob.moveProgress = 0;
-    mob.moveShift = Math.random();
-    mob.moveS = Math.random();
+    const path = [
+        [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 8, y: TILE_SIZE * 3 / 2}, 0],
+        [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 17, y: TILE_SIZE * 3 / 2}, 0],
+        [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 17, y: TILE_SIZE * 3 / 2 + TILE_SIZE * 6}, 0],
+        [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 8, y: TILE_SIZE * 3 / 2 + TILE_SIZE * 5}, 0],
+    ];
+
+    mob.motion = new PathMotion(mob, path as Waypoint[]);
 
     addUnitToWorld(mob);
 }
 
-function updateMobs(world: World) {
+function updateMobs(world: World, delta) {
     Object.values(world.units)
         .filter(unit => unit.typeId == Type.MOB)
-        .forEach((mob: Mob) => updateMob(mob));
-}
-
-function updateMob(mob: Mob) {
-    const progress = mob.moveProgress += SIMULATION_DELTA;
-    const shift = mob.moveShift;
-    const s = mob.moveS;
-
-    const dir = TMP_VEC2;
-
-    dir.x = Math.sin(progress / s + shift);
-    dir.y = Math.cos(progress + shift / s);
-
-    const physics = mob.world.physics;
-
-    moveUnit(physics, mob, scaleVec2(dir, SIMULATION_DELTA));
+        .forEach((mob: Mob) => mob.motion.update(delta));
 }
 
 export {

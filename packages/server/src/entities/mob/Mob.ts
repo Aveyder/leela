@@ -1,6 +1,7 @@
 import World from "../../world/World";
 import {Unit} from "../Unit";
 import {Type, UNIT_BODY_HEIGHT, UNIT_BODY_WIDTH} from "@leela/common";
+import {Motion} from "../../motion/motions";
 
 export default class Mob implements Unit {
     public guid: number;
@@ -13,9 +14,7 @@ export default class Mob implements Unit {
     public readonly width: number;
     public readonly height: number;
     public readonly bullet: boolean;
-    public moveProgress: number;
-    public moveShift: number;
-    public moveS: number;
+    public motion: Motion;
 
     public readonly world: World;
 

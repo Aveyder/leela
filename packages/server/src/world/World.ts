@@ -29,8 +29,6 @@ export default class World {
         this._physics = new PhysicsWorld(map);
 
         spawnMob(this);
-        spawnMob(this);
-        spawnMob(this);
     }
 
     public guid(): number {
@@ -59,7 +57,7 @@ export default class World {
 
     public update(delta: number): void {
         this.updateSessions(delta);
-        updateMobs(this);
+        updateMobs(this, delta);
     }
 
     private updateSessions(delta: number) {
