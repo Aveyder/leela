@@ -1,7 +1,6 @@
 import WorldSession from "../server/WorldSession";
 import Player from "../entities/Player";
 import {
-    moveUnit,
     Opcode,
     UNIT_RUN_SPEED,
     UNIT_SKINS,
@@ -55,7 +54,7 @@ function handlePlayerMove(worldSession: WorldSession, worldPacket: WorldPacket, 
 
     const physics = player.world.physics;
 
-    moveUnit(physics, player, dir, player.speed);
+    physics.move(player, dir, player.speed);
 
     player.tick = tick;
 }

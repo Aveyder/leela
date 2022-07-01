@@ -1,4 +1,4 @@
-import {moveUnit, PhysicsWorld, SIMULATION_DELTA, TMP_VEC2, Vec2} from "@leela/common";
+import {PhysicsWorld, SIMULATION_DELTA, TMP_VEC2, Vec2} from "@leela/common";
 import {Unit} from "../entities/Unit";
 
 interface Motion {
@@ -60,7 +60,7 @@ class PathMotion implements Motion {
         dir.x = Math.abs(dx) > stepDistance ? Math.sign(dx) : dx / stepDistance;
         dir.y = Math.abs(dy) > stepDistance ? Math.sign(dy) : dy / stepDistance;
 
-        moveUnit(this.physics, this.unit, dir, this.unit.speed);
+        this.physics.move(this.unit, dir, this.unit.speed);
 
         if (Math.abs(this.unit.x - position.x) <= PathMotion.ALLOWED_POSITION_ERROR &&
             Math.abs(this.unit.y - position.y) <= PathMotion.ALLOWED_POSITION_ERROR) {

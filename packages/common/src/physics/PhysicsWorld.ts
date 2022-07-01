@@ -1,5 +1,7 @@
 import {TILE_SIZE, TILES_WIDTH, WORLD_HEIGHT, WORLD_WIDTH} from "../constants/world";
 import Body from "./Body";
+import {Vec2} from "../utils/math";
+import {SIMULATION_DELTA} from "../config";
 
 export default class PhysicsWorld {
 
@@ -28,6 +30,20 @@ export default class PhysicsWorld {
     constructor(private readonly map: number[]) {
     }
 
+    public move(body: Body, dir: Vec2, speed: number) {
+        body.vx = dir.x * speed * SIMULATION_DELTA;
+        body.vy = dir.y * speed * SIMULATION_DELTA;
+
+        const moveSteps = body.bullet ? PhysicsWorld.BULLET_MOVE_STEPS : PhysicsWorld.MOVE_STEPS;
+
+        for(let i = 0; i < moveSteps; i++) {
+            body.x += body.vx / moveSteps;
+            body.y += body.vy / moveSteps;
+
+            this.collideAndRespond(body);
+        }
+    }
+
     public update(body: Body): void {
         const moveSteps = body.bullet ? PhysicsWorld.BULLET_MOVE_STEPS : PhysicsWorld.MOVE_STEPS;
 
@@ -39,7 +55,7 @@ export default class PhysicsWorld {
         }
     }
 
-    private collideAndRespond(body: Body) {
+    public collideAndRespond(body: Body): void {
         if (body.y < PhysicsWorld.BOUND_TOP) body.y = PhysicsWorld.BOUND_TOP + body.height / 2;
         if (body.x > PhysicsWorld.BOUND_RIGHT) body.x = PhysicsWorld.BOUND_RIGHT - body.width / 2;
         if (body.y > PhysicsWorld.BOUND_BOTTOM) body.y = PhysicsWorld.BOUND_BOTTOM - body.height / 2;
