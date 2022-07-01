@@ -1,7 +1,7 @@
 import WorldSession from "../server/WorldSession";
 import {map, PhysicsWorld} from "@leela/common";
-import {spawnMob, updateMobs} from "../entities/mob/mobs";
 import {Unit} from "../entities/Unit";
+import {spawnMob, updateMobs} from "../entities/Mob";
 
 export default class World {
 

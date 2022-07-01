@@ -1,6 +1,8 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const {CleanWebpackPlugin} = require("clean-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 let config = {
     mode: "development",
@@ -26,7 +28,7 @@ let config = {
             {
                 test: /\.(s?)css$/,
                 use: [
-                    "style-loader",
+                    MiniCssExtractPlugin.loader,
                     "css-loader",
                     "sass-loader"
                 ]
@@ -47,8 +49,14 @@ let config = {
     },
     plugins: [
         new CleanWebpackPlugin(),
+        new MiniCssExtractPlugin(),
         new HtmlWebpackPlugin({
             template: path.resolve(__dirname, "./public/index.html")
+        }),
+        new CopyWebpackPlugin({
+            patterns: [
+                "public/logo.png"
+            ]
         })
     ],
     output: {

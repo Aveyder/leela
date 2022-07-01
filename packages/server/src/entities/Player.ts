@@ -42,12 +42,12 @@ function sendUpdateToPlayer(worldSession: WorldSession) {
 
     const packet = [Opcode.SMSG_UPDATE, Date.now(), player?.tick == undefined ? -1 : player.tick] as WorldPacket;
 
-    Object.values(units).forEach(unit => pushSerializedUnit(player, unit, packet));
+    Object.values(units).forEach(unit => pushSerializedUnit(unit, packet));
 
     worldSession.sendPacket(packet);
 }
 
-function pushSerializedUnit(player: Player, unit: Unit, worldPacket: WorldPacket) {
+function pushSerializedUnit(unit: Unit, worldPacket: WorldPacket) {
     worldPacket.push(
         unit.guid,
         unit.typeId,

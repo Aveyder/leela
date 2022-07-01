@@ -4,6 +4,14 @@ html, body {
     padding: 0;
 }
 
+.header {
+    text-align: center;
+}
+
+.header > img {
+    height: 60px;
+}
+
 .game > canvas {
     display: block;
     margin: 0 auto;
