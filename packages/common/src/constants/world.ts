@@ -10,7 +10,8 @@ const UNIT_BODY_WIDTH = TILE_SIZE / 2;
 const UNIT_BODY_HEIGHT = TILE_SIZE;
 
 const UNIT_SKINS = 6;
-const UNIT_SPEED = 100;
+const UNIT_WALK_SPEED = 100;
+const UNIT_RUN_SPEED = 200;
 
 export {
     TILE_SIZE,
@@ -21,5 +22,6 @@ export {
     UNIT_BODY_WIDTH,
     UNIT_BODY_HEIGHT,
     UNIT_SKINS,
-    UNIT_SPEED
+    UNIT_WALK_SPEED,
+    UNIT_RUN_SPEED
 }

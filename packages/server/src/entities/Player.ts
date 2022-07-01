@@ -14,6 +14,7 @@ export default class Player implements Unit {
     public readonly height: number;
     public readonly bullet: boolean;
     public tick: number;
+    public speed: number;
 
     private readonly _session: WorldSession;
 
@@ -40,7 +41,7 @@ function sendUpdateToPlayer(worldSession: WorldSession) {
 
     const units = worldSession.world.units;
 
-    const packet = [Opcode.SMSG_UPDATE, Date.now(), player?.tick == undefined ? -1 : player.tick] as WorldPacket;
+    const packet = [Opcode.SMSG_UPDATE, Date.now(), player?.tick == undefined ? -1 : player.tick, player?.speed] as WorldPacket;
 
     Object.values(units).forEach(unit => pushSerializedUnit(unit, packet));
 

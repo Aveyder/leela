@@ -1,19 +1,13 @@
 import WorldSession from "../client/WorldSession";
 import {WorldPacket} from "@leela/common";
-import Unit, {
-    addUnitToWorld,
-    deleteUnitFromWorld,
-    isPlayer,
-    Snapshot,
-    SnapshotState
-} from "../entities/Unit";
+import Unit, {addUnitToWorld, deleteUnitFromWorld, isPlayer, Snapshot, SnapshotState} from "../entities/Unit";
 import {reconcilePlayerPosition, resetPrediction} from "../movement/playerPrediction";
 import {CLIENT_PREDICT, INTERPOLATE, INTERPOLATE_BUFFER_MS, INTERPOLATE_DROP_DUPLICATES} from "../config";
 import WorldScene from "../world/WorldScene";
 import {posEquals} from "../movement/position";
 import PlayerState, {PLAYER_STATE} from "../entities/PlayerState";
 
-type UnitState = {
+type UnitUpdateState = {
     guid: number,
     typeId: number,
     skin: number,
@@ -29,46 +23,35 @@ function handleUpdate(worldSession: WorldSession, worldPacket: WorldPacket) {
     worldPacket.shift(); // opcode
     const timestamp = worldPacket.shift() as number;
     const ackTick = worldPacket.shift() as number;
+    const speed = worldPacket.shift() as number;
 
-    const updates = deserializeUpdate(worldSession, worldPacket);
+    const update = deserializeUpdate(worldSession, worldPacket);
 
-    updates.forEach(unitState => {
-        let unit = worldScene.units[unitState.guid] as Unit;
+    update.forEach(unitUpdateState => {
+        let unit = worldScene.units[unitUpdateState.guid] as Unit;
 
-        if (!unit) {
-            unit = new Unit(worldScene);
+        if (!unit) unit = initUnit(worldSession, unitUpdateState)
 
-            unit.guid = unitState.guid;
-            unit.typeId = unitState.typeId;
-            unit.setPosition(unitState.x, unitState.y);
+        unit.skin = unitUpdateState.skin;
 
-            if (isPlayer(unit)) {
-                worldSession.player = unit;
+        pushToUnitSnapshots(unit, unitUpdateState, timestamp);
 
-                unit.setData(PLAYER_STATE, new PlayerState())
+        if (isPlayer(unit)) {
+            const playerState = unit.getData(PLAYER_STATE) as PlayerState;
 
-                resetPrediction(unit);
-            }
+            playerState.speed = speed;
 
-            addUnitToWorld(unit);
-        }
-
-        unit.skin = unitState.skin;
-
-        pushToUnitSnapshots(unit, unitState, timestamp);
-
-        if (CLIENT_PREDICT && isPlayer(unit)) {
-            reconcilePlayerPosition(unit, unitState, ackTick);
+            if (CLIENT_PREDICT) reconcilePlayerPosition(unit, unitUpdateState, ackTick);
         }
 
         if (!INTERPOLATE) {
-            unit.setPosition(unitState.x, unitState.y);
-            unit.setDir(unitState.vx, unitState.vy);
+            unit.setPosition(unitUpdateState.x, unitUpdateState.y);
+            unit.setDir(unitUpdateState.vx, unitUpdateState.vy);
         }
     });
 }
 
-function deserializeUpdate(worldSession: WorldSession, input: unknown[]): UnitState[] {
+function deserializeUpdate(worldSession: WorldSession, input: unknown[]): UnitUpdateState[] {
     const update = [];
 
     for (let i = 0; i < input.length; i += 7) {
@@ -89,7 +72,29 @@ function deserializeUnitState(index: number, serialized: unknown[]) {
         skin: serialized[index + 4] as number,
         vx: serialized[index + 5] as number,
         vy: serialized[index + 6] as number
-    } as UnitState;
+    } as UnitUpdateState;
+}
+
+function initUnit(worldSession: WorldSession, unitUpdateState: UnitUpdateState) {
+    const worldScene = worldSession.worldScene;
+
+    const unit = new Unit(worldScene);
+
+    unit.guid = unitUpdateState.guid;
+    unit.typeId = unitUpdateState.typeId;
+    unit.setPosition(unitUpdateState.x, unitUpdateState.y);
+
+    if (isPlayer(unit)) {
+        worldSession.player = unit;
+
+        unit.setData(PLAYER_STATE, new PlayerState())
+
+        resetPrediction(unit);
+    }
+
+    addUnitToWorld(unit);
+
+    return unit;
 }
 
 function pushToUnitSnapshots(unit: Unit, snapshotState: SnapshotState, timestamp: number) {

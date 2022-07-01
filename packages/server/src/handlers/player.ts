@@ -3,8 +3,7 @@ import Player from "../entities/Player";
 import {
     moveUnit,
     Opcode,
-    scaleVec2,
-    SIMULATION_DELTA,
+    UNIT_RUN_SPEED,
     UNIT_SKINS,
     Vec2,
     WORLD_HEIGHT,
@@ -29,6 +28,7 @@ function handlePlayerJoin(worldSession: WorldSession) {
     player.vx = 0;
     player.vy = 0;
     player.tick = -1;
+    player.speed = UNIT_RUN_SPEED;
 
     worldSession.player = player;
 
@@ -51,11 +51,11 @@ function handlePlayerMove(worldSession: WorldSession, worldPacket: WorldPacket, 
     const tick = worldPacket[1] as number;
     const move = worldPacket[2] as number;
 
-    const vec2 = deserializeMove(move);
+    const dir = deserializeMove(move);
 
     const physics = player.world.physics;
 
-    moveUnit(physics, player, scaleVec2(vec2, SIMULATION_DELTA));
+    moveUnit(physics, player, dir, player.speed);
 
     player.tick = tick;
 }

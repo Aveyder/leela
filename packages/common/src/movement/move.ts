@@ -1,16 +1,13 @@
 import {Vec2} from "../utils/math";
-import {UNIT_SPEED} from "../constants/world";
 import Body from "../physics/Body";
 import PhysicsWorld from "../physics/PhysicsWorld";
+import {SIMULATION_DELTA} from "../config";
 
-function moveUnit(physics: PhysicsWorld, unit: Body, vec2: Vec2) {
-    applyUnitSpeed(unit, vec2);
-    physics.update(unit);
-}
+function moveUnit(physics: PhysicsWorld, body: Body, dir: Vec2, speed: number) {
+    body.vx = dir.x * speed * SIMULATION_DELTA;
+    body.vy = dir.y * speed * SIMULATION_DELTA;
 
-function applyUnitSpeed(body: Body, vec2: Vec2) {
-    body.vx = vec2.x * UNIT_SPEED;
-    body.vy = vec2.y * UNIT_SPEED;
+    physics.update(body);
 }
 
 export {

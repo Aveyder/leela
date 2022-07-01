@@ -1,6 +1,6 @@
 import World from "../world/World";
 import {addUnitToWorld, Unit} from "./Unit";
-import {TILE_SIZE, Type, UNIT_BODY_HEIGHT, UNIT_BODY_WIDTH} from "@leela/common";
+import {TILE_SIZE, Type, UNIT_BODY_HEIGHT, UNIT_BODY_WIDTH, UNIT_WALK_SPEED} from "@leela/common";
 import {Motion, PathMotion, Waypoint} from "../motion/motions";
 
 export default class Mob implements Unit {
@@ -15,6 +15,7 @@ export default class Mob implements Unit {
     public readonly height: number;
     public readonly bullet: boolean;
     public motion: Motion;
+    public speed: number;
 
     public readonly world: World;
 
@@ -37,6 +38,7 @@ function spawnMob(world: World) {
     mob.y = TILE_SIZE * 3 / 2;
     mob.vx = 0;
     mob.vy = 0;
+    mob.speed = UNIT_WALK_SPEED;
 
     const path = [
         [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 8, y: TILE_SIZE * 3 / 2}, 0],

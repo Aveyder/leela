@@ -1,15 +1,5 @@
 import Unit, {SnapshotState} from "../entities/Unit";
-import {
-    cloneBody,
-    cloneVec2,
-    moveUnit,
-    posInterpolator,
-    scaleVec2,
-    SIMULATION_DELTA,
-    SIMULATION_DELTA_MS,
-    TMP_VEC2,
-    Vec2
-} from "@leela/common";
+import {cloneBody, moveUnit, posInterpolator, SIMULATION_DELTA_MS, TMP_VEC2, Vec2} from "@leela/common";
 import WorldScene from "../world/WorldScene";
 import {posDiff} from "./position";
 import {
@@ -40,11 +30,8 @@ function predictPlayerPosition(player: Unit, dir: Vec2) {
     initialPos.x = player.x;
     initialPos.y = player.y;
 
-    const vec2 = cloneVec2(dir, TMP_VEC2);
-    const scaledVec2 = scaleVec2(vec2, SIMULATION_DELTA);
-
-    moveUnit(worldScene.phys, predictedBody, scaledVec2);
-    moveUnit(worldScene.phys, reconciledBody, scaledVec2);
+    moveUnit(worldScene.phys, predictedBody, dir, playerState.speed);
+    moveUnit(worldScene.phys, reconciledBody, dir, playerState.speed);
 
     targetPos.x = predictedBody.x;
     targetPos.y = predictedBody.y;
@@ -69,8 +56,10 @@ function reconcilePlayerPosition(player: Unit, playerUpdateState: SnapshotState,
 
     playerState.ackTick = ack;
 
-    playerState.reconciledBody.x = playerUpdateState.x;
-    playerState.reconciledBody.y = playerUpdateState.y;
+    const reconciledBody = playerState.reconciledBody;
+
+    reconciledBody.x = playerUpdateState.x;
+    reconciledBody.y = playerUpdateState.y;
 
     const physics = (player.scene as WorldScene).phys;
 
@@ -89,9 +78,7 @@ function reconcilePlayerPosition(player: Unit, playerUpdateState: SnapshotState,
     for (let i = 0; i < appliedControls.length; i++) {
         const control = appliedControls[i];
 
-        const vec2 = cloneVec2(control.dir, TMP_VEC2);
-
-        moveUnit(physics, playerState.reconciledBody, scaleVec2(vec2, SIMULATION_DELTA));
+        moveUnit(physics, reconciledBody, control.dir, playerState.speed);
     }
 
     refreshPredictionError(player);

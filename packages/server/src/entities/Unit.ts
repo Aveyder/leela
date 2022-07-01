@@ -13,6 +13,7 @@ interface Unit extends Body {
     width: number;
     height: number;
     bullet: boolean;
+    speed: number;
 }
 
 function addUnitToWorld(unit: Unit) {

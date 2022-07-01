@@ -21,6 +21,8 @@ export default class PlayerState {
 
     public lastMoveInput: number;
 
+    public speed: number;
+
     constructor() {
         this.appliedControls = [];
 
@@ -37,6 +39,8 @@ export default class PlayerState {
         this.errorTimer = -1;
 
         this.lastMoveInput = null;
+
+        this.speed = 0;
     }
 }
 
