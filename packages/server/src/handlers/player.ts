@@ -3,7 +3,7 @@ import Player from "../entities/Player";
 import {
     Opcode,
     UNIT_RUN_SPEED,
-    UNIT_SKINS,
+    UNIT_SKINS, UNIT_WALK_SPEED,
     Vec2,
     WORLD_HEIGHT,
     WORLD_WIDTH,
@@ -74,8 +74,19 @@ function deserializeMove(move: number): Vec2 {
     return result;
 }
 
+function handleSwitchWalkMode(worldSession: WorldSession) {
+    const player = worldSession.player;
+
+    if (!player) return;
+
+    player.run = !player.run;
+
+    player.speed = player.run ? UNIT_RUN_SPEED : UNIT_WALK_SPEED;
+}
+
 export {
     handlePlayerJoin,
     handlePlayerUpdateRateChange,
-    handlePlayerMove
+    handlePlayerMove,
+    handleSwitchWalkMode
 }

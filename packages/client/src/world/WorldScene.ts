@@ -15,7 +15,7 @@ import WorldSession from "../client/WorldSession";
 import WorldClient from "../client/WorldClient";
 import Unit from "../entities/Unit";
 import Loop from "../Loop";
-import {playerControl} from "../movement/playerControl";
+import {playerControl, switchWalkMode} from "../movement/playerControl";
 import {DEBUG_MODE, TICK_CAP} from "../config";
 import {updatePlayerPosition} from "../movement/playerPrediction";
 import DebugManager from "../debugging/DebugManager";
@@ -55,7 +55,7 @@ export default class WorldScene extends Phaser.Scene {
     }
 
     public create(): void {
-        this._keys = this.input.keyboard.addKeys("W,A,S,D,up,left,down,right") as Keys;
+        this._keys = this.input.keyboard.addKeys("W,A,S,D,up,left,down,right,Z") as Keys;
 
         if (DEBUG_MODE) {
             const debug = new DebugManager(this);
@@ -77,6 +77,10 @@ export default class WorldScene extends Phaser.Scene {
         this.drawShade();
         this.drawJoinButton();
         this.drawDisconnectedText();
+
+        this._keys.Z.on("up", () => {
+            switchWalkMode(this._worldSession);
+        });
     }
 
     public update(time: number, delta: number): void {

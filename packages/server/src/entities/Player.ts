@@ -15,6 +15,7 @@ export default class Player implements Unit {
     public readonly bullet: boolean;
     public tick: number;
     public speed: number;
+    public run: boolean;
 
     private readonly _session: WorldSession;
 
@@ -25,6 +26,7 @@ export default class Player implements Unit {
         this.width = UNIT_BODY_WIDTH;
         this.height = UNIT_BODY_HEIGHT;
         this.bullet = false;
+        this.run = true;
     }
 
     public get session() {

@@ -8,7 +8,8 @@ type Keys = {
     up: Key,
     left: Key,
     down: Key,
-    right: Key
+    right: Key,
+    Z: Key
 };
 
 export default Keys;

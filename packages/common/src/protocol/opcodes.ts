@@ -7,7 +7,8 @@ enum Opcode {
     MSG_JOIN,
     CMSG_MOVE,
     SMSG_UPDATE,
-    SMSG_DESTROY
+    SMSG_DESTROY,
+    CMSG_SWITCH_WALK
 }
 
 export {

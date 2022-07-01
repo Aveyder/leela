@@ -23,6 +23,8 @@ export default class PlayerState {
 
     public speed: number;
 
+    public run: boolean;
+
     constructor() {
         this.appliedControls = [];
 
@@ -41,6 +43,7 @@ export default class PlayerState {
         this.lastMoveInput = null;
 
         this.speed = 0;
+        this.run = true;
     }
 }
 
