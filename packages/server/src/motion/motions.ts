@@ -2,7 +2,7 @@ import {PhysicsWorld, SIMULATION_DELTA, TMP_VEC2, Vec2} from "@leela/common";
 import {Unit} from "../entities/Unit";
 
 interface Motion {
-    update(delta: number);
+    update(delta: number): void;
 }
 
 type Waypoint = [Vec2, number];
@@ -55,12 +55,16 @@ class PathMotion implements Motion {
 
         const dir = TMP_VEC2;
 
+        dir.x = dx;
+        dir.y = dy;
+
         const stepDistance = this.unit.speed * SIMULATION_DELTA;
 
-        dir.x = Math.abs(dx) > stepDistance ? Math.sign(dx) : dx / stepDistance;
-        dir.y = Math.abs(dy) > stepDistance ? Math.sign(dy) : dy / stepDistance;
+        const distance = Math.sqrt(dx * dx + dy * dy);
 
-        this.physics.move(this.unit, dir, this.unit.speed);
+        const speed = distance > stepDistance ? this.unit.speed : distance / SIMULATION_DELTA;
+
+        this.physics.move(this.unit, dir, speed);
 
         if (Math.abs(this.unit.x - position.x) <= PathMotion.ALLOWED_POSITION_ERROR &&
             Math.abs(this.unit.y - position.y) <= PathMotion.ALLOWED_POSITION_ERROR) {

@@ -1,13 +1,13 @@
 import WorldSession from "../client/WorldSession";
-import {WorldPacket} from "@leela/common";
+import {Update, WorldPacket} from "@leela/common";
 import Unit, {addUnitToWorld, deleteUnitFromWorld, isPlayer, Snapshot, SnapshotState} from "../entities/Unit";
 import {reconcilePlayerPosition, resetPrediction} from "../movement/playerPrediction";
-import {CLIENT_PREDICT, INTERPOLATE, INTERPOLATE_BUFFER_MS, INTERPOLATE_DROP_DUPLICATES} from "../config";
-import WorldScene from "../world/WorldScene";
+import {CLIENT_PREDICT, INTERPOLATE, INTERPOLATE_BUFFER_SIZE, INTERPOLATE_DROP_DUPLICATES} from "../config";
 import {posEquals} from "../movement/position";
 import PlayerState, {PLAYER_STATE} from "../entities/PlayerState";
 
-type UnitUpdateState = {
+type UnitUpdate = {
+    update: Update,
     guid: number,
     typeId: number,
     skin: number,
@@ -25,45 +25,78 @@ function handleUpdate(worldSession: WorldSession, worldPacket: WorldPacket) {
     const ackTick = worldPacket.shift() as number;
     const speed = worldPacket.shift() as number;
 
-    const update = deserializeUpdate(worldSession, worldPacket);
+    const unitUpdates = deserializeUnitUpdates(worldSession, worldPacket);
 
-    update.forEach(unitUpdateState => {
-        let unit = worldScene.units[unitUpdateState.guid] as Unit;
+    unitUpdates.forEach(unitUpdate => {
+        let unit = worldScene.units[unitUpdate.guid] as Unit;
 
-        if (!unit) unit = initUnit(worldSession, unitUpdateState)
+        switch (unitUpdate.update) {
+            case Update.FULL:
+                if (!unit) unit = initUnit(worldSession, unitUpdate);
+                unit.skin = unitUpdate.skin;
+                break;
+            case Update.EMPTY:
+                setLastSnapshotState(unitUpdate, unit);
+                break;
+            case Update.SKIN:
+                unit.skin = unitUpdate.skin;
+                return;
+            case Update.POSITION:
+                break;
+        }
 
-        unit.skin = unitUpdateState.skin;
-
-        pushToUnitSnapshots(unit, unitUpdateState, timestamp);
+        pushToUnitSnapshots(unit, unitUpdate, timestamp);
 
         if (isPlayer(unit)) {
             const playerState = unit.getData(PLAYER_STATE) as PlayerState;
 
             playerState.speed = speed;
 
-            if (CLIENT_PREDICT) reconcilePlayerPosition(unit, unitUpdateState, ackTick);
+            if (CLIENT_PREDICT) reconcilePlayerPosition(unit, unitUpdate, ackTick);
         }
 
         if (!INTERPOLATE) {
-            unit.setPosition(unitUpdateState.x, unitUpdateState.y);
-            unit.setDir(unitUpdateState.vx, unitUpdateState.vy);
+            unit.setPosition(unitUpdate.x, unitUpdate.y);
+            unit.setDir(unitUpdate.vx, unitUpdate.vy);
         }
     });
 }
 
-function deserializeUpdate(worldSession: WorldSession, input: unknown[]): UnitUpdateState[] {
-    const update = [];
+function deserializeUnitUpdates(worldSession: WorldSession, input: unknown[]): UnitUpdate[] {
+    const unitUpdates = [];
 
-    for (let i = 0; i < input.length; i += 7) {
-        const unitState = deserializeUnitState(i, input);
+    for (let i = 0; i < input.length;) {
+        const update = input[i];
 
-        update.push(unitState);
+        let unitUpdate;
+        switch (update) {
+            case Update.FULL:
+                unitUpdate = deserializeFullUnitUpdate(i + 1, input);
+                i += 8;
+                break;
+            case Update.EMPTY:
+                unitUpdate = deserializeEmptyUnitUpdate(i + 1, input);
+                i += 2;
+                break;
+            case Update.SKIN:
+                unitUpdate = deserializeSkinUnitUpdate(i + 1, input);
+                i += 3;
+                break;
+            case Update.POSITION:
+                unitUpdate = deserializePositionUnitUpdate(i + 1, input);
+                i += 6;
+                break;
+        }
+
+        unitUpdate.update = update;
+
+        unitUpdates.push(unitUpdate);
     }
 
-    return update;
+    return unitUpdates;
 }
 
-function deserializeUnitState(index: number, serialized: unknown[]) {
+function deserializeFullUnitUpdate(index: number, serialized: unknown[]) {
     return {
         guid: serialized[index] as number,
         typeId: serialized[index + 1] as number,
@@ -72,10 +105,33 @@ function deserializeUnitState(index: number, serialized: unknown[]) {
         skin: serialized[index + 4] as number,
         vx: serialized[index + 5] as number,
         vy: serialized[index + 6] as number
-    } as UnitUpdateState;
+    } as UnitUpdate;
 }
 
-function initUnit(worldSession: WorldSession, unitUpdateState: UnitUpdateState) {
+function deserializeEmptyUnitUpdate(index: number, serialized: unknown[]) {
+    return {
+        guid: serialized[index] as number
+    } as UnitUpdate;
+}
+
+function deserializeSkinUnitUpdate(index: number, serialized: unknown[]) {
+    return {
+        guid: serialized[index] as number,
+        skin: serialized[index + 1] as number,
+    } as UnitUpdate;
+}
+
+function deserializePositionUnitUpdate(index: number, serialized: unknown[]) {
+    return {
+        guid: serialized[index] as number,
+        x: serialized[index + 1] as number,
+        y: serialized[index + 2] as number,
+        vx: serialized[index + 3] as number,
+        vy: serialized[index + 4] as number
+    } as UnitUpdate;
+}
+
+function initUnit(worldSession: WorldSession, unitUpdateState: UnitUpdate) {
     const worldScene = worldSession.worldScene;
 
     const unit = new Unit(worldScene);
@@ -97,14 +153,21 @@ function initUnit(worldSession: WorldSession, unitUpdateState: UnitUpdateState) 
     return unit;
 }
 
-function pushToUnitSnapshots(unit: Unit, snapshotState: SnapshotState, timestamp: number) {
-    const worldScene = unit.scene as WorldScene;
-
+function setLastSnapshotState(unitUpdate: UnitUpdate, unit: Unit) {
     const snapshots = unit.snapshots;
 
-    const serverNow = worldScene.worldClient.ts.now();
+    const lastSnapshotState = snapshots[snapshots.length - 1];
 
-    trimStateBuffer(snapshots, serverNow);
+    unitUpdate.x = lastSnapshotState.state.x;
+    unitUpdate.y = lastSnapshotState.state.y;
+    unitUpdate.vx = lastSnapshotState.state.vx;
+    unitUpdate.vy = lastSnapshotState.state.vy;
+}
+
+function pushToUnitSnapshots(unit: Unit, snapshotState: SnapshotState, timestamp: number) {
+    const snapshots = unit.snapshots;
+
+    trimStateBuffer(snapshots);
 
     if (INTERPOLATE_DROP_DUPLICATES) {
         deduplicateUnitSnapshots(snapshots, snapshotState);
@@ -113,13 +176,8 @@ function pushToUnitSnapshots(unit: Unit, snapshotState: SnapshotState, timestamp
     snapshots.push({state: snapshotState, timestamp});
 }
 
-function trimStateBuffer(snapshots: Snapshot[], serverNow: number) {
-    if (snapshots.length > 0) {
-        let i = 0;
-        while (serverNow - snapshots[i].timestamp > INTERPOLATE_BUFFER_MS && ++i < snapshots.length);
-
-        snapshots.splice(0, i);
-    }
+function trimStateBuffer(snapshots: Snapshot[]) {
+    if (snapshots.length > INTERPOLATE_BUFFER_SIZE) snapshots.splice(0, 1);
 }
 
 function deduplicateUnitSnapshots(snapshots: Snapshot[], unitState: SnapshotState) {

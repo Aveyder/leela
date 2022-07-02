@@ -31,11 +31,23 @@ function deleteUnitFromWorld(unit: Unit) {
 
     delete world.units[unit.guid];
 
-    world.forEachSession(session => session.sendPacket([Opcode.SMSG_DESTROY, unit.guid]));
+    world.forEachSession(worldSession => {
+        delete worldSession.lastSentUpdate[unit.guid];
+        worldSession.sendPacket([Opcode.SMSG_DESTROY, unit.guid]);
+    });
+}
+
+function cloneUnit(unit: Unit, result?: Unit) {
+    if (!result) {
+        result = {} as Unit;
+    }
+
+    return Object.assign(result, unit);
 }
 
 export {
     Unit,
     addUnitToWorld,
-    deleteUnitFromWorld
+    deleteUnitFromWorld,
+    cloneUnit
 }

@@ -43,8 +43,12 @@ export default class PhysicsWorld {
     }
 
     public move(body: Body, dir: Vec2, speed: number) {
-        body.vx = dir.x * speed * SIMULATION_DELTA;
-        body.vy = dir.y * speed * SIMULATION_DELTA;
+        if (dir.x == 0 && dir.y == 0) return;
+
+        const angle = Math.atan2(dir.y, dir.x);
+
+        body.vx = Math.cos(angle) * speed * SIMULATION_DELTA;
+        body.vy = Math.sin(angle) * speed * SIMULATION_DELTA;
 
         const moveSteps = body.bullet ? PhysicsWorld.BULLET_MOVE_STEPS : PhysicsWorld.MOVE_STEPS;
 

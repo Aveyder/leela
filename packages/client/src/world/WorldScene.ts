@@ -15,6 +15,7 @@ import UPDATE = Phaser.Scenes.Events.UPDATE;
 import Text = Phaser.GameObjects.Text;
 import * as map from "@leela/common/map/map.json";
 import cursor from "../../public/assets/cursor.png";
+import cursorPlant from "../../public/assets/cursor-plant.png";
 
 
 export default class WorldScene extends Phaser.Scene {
@@ -82,9 +83,17 @@ export default class WorldScene extends Phaser.Scene {
 
         const tilemap = this.add.tilemap("map");
         const baseTileset = tilemap.addTilesetImage("base", "base");
-        tilemap.createLayer("ground", baseTileset);
+        const grassTileset = tilemap.addTilesetImage("grass", "grass");
+        tilemap.createLayer("ground", [baseTileset, grassTileset]);
+        tilemap.createLayer("item", baseTileset);
         tilemap.createLayer("tree", baseTileset);
         tilemap.createLayer("building", baseTileset);
+
+        const plant = this.add.sprite(500, 400, "base", 52);
+
+        plant.setInteractive({
+            cursor: `url(${cursorPlant}), pointer`
+        });
     }
 
     public update(time: number, delta: number): void {

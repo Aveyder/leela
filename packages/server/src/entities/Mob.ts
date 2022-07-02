@@ -42,7 +42,11 @@ function spawnCat(world: World) {
 
     const path = [
         [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 10, y: TILE_SIZE * 3 / 2}, 0],
-        [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 16, y: TILE_SIZE * 3 / 2}, 5],
+        [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 15, y: TILE_SIZE * 3 / 2}, 5],
+        [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 15, y: TILE_SIZE * 3 / 2 + TILE_SIZE}, 0],
+        [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 16, y: TILE_SIZE * 3 / 2 + TILE_SIZE}, 0],
+        [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 16, y: TILE_SIZE * 3 / 2 + TILE_SIZE * 3}, 0],
+        [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 17, y: TILE_SIZE * 3 / 2 + TILE_SIZE * 3}, 0],
         [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 17, y: TILE_SIZE * 3 / 2 + TILE_SIZE * 5}, 0],
         [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 10, y: TILE_SIZE * 3 / 2 + TILE_SIZE * 5}, 0]
     ];
@@ -52,13 +56,27 @@ function spawnCat(world: World) {
     addUnitToWorld(mob);
 }
 
+function spawnVendor(world: World) {
+    const mob = new Mob(world);
+
+    mob.guid = world.guid();
+    mob.skin = 6;
+    mob.x = TILE_SIZE * 3 / 2 + TILE_SIZE * 16;
+    mob.y = TILE_SIZE * 3 / 2;
+    mob.vx = 0;
+    mob.vy = 0;
+
+    addUnitToWorld(mob);
+}
+
 function updateMobs(world: World, delta) {
     Object.values(world.units)
         .filter(unit => unit.typeId == Type.MOB)
-        .forEach((mob: Mob) => mob.motion.update(delta));
+        .forEach((mob: Mob) => mob.motion?.update(delta));
 }
 
 export {
     spawnCat,
+    spawnVendor,
     updateMobs
 }

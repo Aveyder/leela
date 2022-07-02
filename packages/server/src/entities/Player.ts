@@ -1,6 +1,15 @@
 import WorldSession from "../server/WorldSession";
-import {Unit} from "./Unit";
-import {FRACTION_DIGITS, Opcode, toFixed, Type, UNIT_BODY_HEIGHT, UNIT_BODY_WIDTH, WorldPacket} from "@leela/common";
+import {cloneUnit, Unit} from "./Unit";
+import {
+    FRACTION_DIGITS,
+    Opcode,
+    toFixed,
+    Type,
+    UNIT_BODY_HEIGHT,
+    UNIT_BODY_WIDTH,
+    Update,
+    WorldPacket
+} from "@leela/common";
 
 export default class Player implements Unit {
     public guid: number;
@@ -17,10 +26,10 @@ export default class Player implements Unit {
     public speed: number;
     public run: boolean;
 
-    private readonly _session: WorldSession;
+    private readonly _worldSession: WorldSession;
 
     constructor(worldSession: WorldSession) {
-        this._session = worldSession;
+        this._worldSession = worldSession;
 
         this.typeId = Type.PLAYER;
         this.width = UNIT_BODY_WIDTH;
@@ -29,12 +38,12 @@ export default class Player implements Unit {
         this.run = true;
     }
 
-    public get session() {
-        return this._session;
+    public get worldSession() {
+        return this._worldSession;
     }
 
     public get world() {
-        return this._session.world;
+        return this._worldSession.world;
     }
 }
 
@@ -43,15 +52,47 @@ function sendUpdateToPlayer(worldSession: WorldSession) {
 
     const units = worldSession.world.units;
 
-    const packet = [Opcode.SMSG_UPDATE, Date.now(), player?.tick == undefined ? -1 : player.tick, player?.speed] as WorldPacket;
+    const serializedUnitUpdates = [];
 
-    Object.values(units).forEach(unit => pushSerializedUnit(unit, packet));
+    Object.values(units).forEach(unit => pushSerializedUnitUpdate(worldSession, unit, serializedUnitUpdates));
 
-    worldSession.sendPacket(packet);
+    if (serializedUnitUpdates.length) {
+        const packet = [
+            Opcode.SMSG_UPDATE,
+            Date.now(),
+            player?.tick == undefined ? -1 : player.tick,
+            player?.speed,
+            ...serializedUnitUpdates
+        ] as WorldPacket;
+
+        worldSession.sendPacket(packet);
+    }
 }
 
-function pushSerializedUnit(unit: Unit, worldPacket: WorldPacket) {
-    worldPacket.push(
+function pushSerializedUnitUpdate(worldSession: WorldSession, unit: Unit, unitUpdates: unknown[]) {
+    const lastSentUnitUpdate = worldSession.lastSentUpdate[unit.guid];
+
+    if (!lastSentUnitUpdate) {
+        pushSerializedFullUnitUpdate(unit, unitUpdates);
+    } else {
+        if (lastSentUnitUpdate.skin != unit.skin) {
+            pushSerializedSkinUnitUpdate(unit, unitUpdates);
+        }
+        if (lastSentUnitUpdate.x != unit.x ||
+            lastSentUnitUpdate.y != unit.y ||
+            lastSentUnitUpdate.vx != unit.vx ||
+            lastSentUnitUpdate.vy != unit.vy) {
+            pushSerializedPositionUnitUpdate(unit, unitUpdates);
+        } else {
+            pushSerializedEmptyUnitUpdate(unit, unitUpdates);
+        }
+    }
+
+    worldSession.lastSentUpdate[unit.guid] = cloneUnit(unit, lastSentUnitUpdate);
+}
+
+function pushSerializedFullUnitUpdate(unit: Unit, unitUpdates: unknown[]) {
+    unitUpdates.push(Update.FULL,
         unit.guid,
         unit.typeId,
         toFixed(unit.x, FRACTION_DIGITS),
@@ -59,8 +100,32 @@ function pushSerializedUnit(unit: Unit, worldPacket: WorldPacket) {
         unit.skin,
         toFixed(unit.vx, FRACTION_DIGITS),
         toFixed(unit.vy, FRACTION_DIGITS)
-    )
+    );
 }
+
+function pushSerializedSkinUnitUpdate(unit: Unit, unitUpdates: unknown[]) {
+    unitUpdates.push(Update.SKIN,
+        unit.guid,
+        unit.skin
+    );
+}
+
+function pushSerializedPositionUnitUpdate(unit: Unit, unitUpdates: unknown[]) {
+    unitUpdates.push(Update.POSITION,
+        unit.guid,
+        toFixed(unit.x, FRACTION_DIGITS),
+        toFixed(unit.y, FRACTION_DIGITS),
+        toFixed(unit.vx, FRACTION_DIGITS),
+        toFixed(unit.vy, FRACTION_DIGITS)
+    );
+}
+
+function pushSerializedEmptyUnitUpdate(unit: Unit, unitUpdates: unknown[]) {
+    unitUpdates.push(Update.EMPTY,
+        unit.guid
+    );
+}
+
 
 export {
     sendUpdateToPlayer

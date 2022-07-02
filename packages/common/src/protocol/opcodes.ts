@@ -11,6 +11,14 @@ enum Opcode {
     CMSG_SWITCH_WALK
 }
 
+enum Update {
+    FULL,
+    EMPTY,
+    SKIN,
+    POSITION
+}
+
 export {
-    Opcode
+    Opcode,
+    Update
 };
