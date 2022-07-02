@@ -1,16 +1,20 @@
-import {TILE_SIZE, TILES_WIDTH, WORLD_HEIGHT, WORLD_WIDTH} from "../constants/world";
 import Body from "./Body";
 import {Vec2} from "../utils/math";
 import {SIMULATION_DELTA} from "../config";
+import TileMap from "./TileMap";
 
 export default class PhysicsWorld {
 
-    private static readonly BLOCKER_TILE = 1;
+    private static readonly EMPTY_TILE = 0;
 
-    private static readonly BOUND_TOP = TILE_SIZE;
-    private static readonly BOUND_RIGHT = WORLD_WIDTH - TILE_SIZE;
-    private static readonly BOUND_BOTTOM = WORLD_HEIGHT - TILE_SIZE;
-    private static readonly BOUND_LEFT = TILE_SIZE;
+    public readonly map: TileMap;
+
+    public readonly tileSize: number;
+
+    public readonly boundTop: number;
+    public readonly boundRight: number;
+    public readonly boundBottom: number;
+    public readonly boundLeft: number;
 
     private static readonly COLLISION_AREA_PASS_ORDER = [
         {dx: 0, dy: 0},
@@ -27,7 +31,15 @@ export default class PhysicsWorld {
     private static readonly MOVE_STEPS = 5;
     private static readonly BULLET_MOVE_STEPS = 20;
 
-    constructor(private readonly map: number[]) {
+    constructor(map: TileMap) {
+        this.map = map;
+
+        this.tileSize = map.tileSize;
+
+        this.boundTop = this.tileSize;
+        this.boundRight = this.tileSize * (map.tilesWidth - 1);
+        this.boundBottom = this.tileSize * (map.tilesHeight - 1);
+        this.boundLeft = this.tileSize;
     }
 
     public move(body: Body, dir: Vec2, speed: number) {
@@ -44,25 +56,18 @@ export default class PhysicsWorld {
         }
     }
 
-    public update(body: Body): void {
-        const moveSteps = body.bullet ? PhysicsWorld.BULLET_MOVE_STEPS : PhysicsWorld.MOVE_STEPS;
-
-        for(let i = 0; i < moveSteps; i++) {
-            body.x += body.vx / moveSteps;
-            body.y += body.vy / moveSteps;
-
-            this.collideAndRespond(body);
-        }
-    }
-
     public collideAndRespond(body: Body): void {
-        if (body.y < PhysicsWorld.BOUND_TOP) body.y = PhysicsWorld.BOUND_TOP + body.height / 2;
-        if (body.x > PhysicsWorld.BOUND_RIGHT) body.x = PhysicsWorld.BOUND_RIGHT - body.width / 2;
-        if (body.y > PhysicsWorld.BOUND_BOTTOM) body.y = PhysicsWorld.BOUND_BOTTOM - body.height / 2;
-        if (body.x < PhysicsWorld.BOUND_LEFT) body.x = PhysicsWorld.BOUND_LEFT + body.width / 2;
+        const boundTop = this.boundTop + body.height / 2;
+        if (body.y < boundTop) body.y = boundTop;
+        const boundRight = this.boundRight - body.width / 2;
+        if (body.x > boundRight) body.x = boundRight;
+        const boundBottom = this.boundBottom - body.height / 2;
+        if (body.y > boundBottom) body.y = boundBottom;
+        const boundLeft = this.boundLeft + body.width / 2;
+        if (body.x < boundLeft) body.x = boundLeft;
 
-        const bodyTileX = Math.floor(body.x / TILE_SIZE);
-        const bodyTileY = Math.floor(body.y / TILE_SIZE);
+        const bodyTileX = Math.floor(body.x / this.tileSize);
+        const bodyTileY = Math.floor(body.y / this.tileSize);
 
         const passOrder = PhysicsWorld.COLLISION_AREA_PASS_ORDER;
         for(let i = 0; i < passOrder.length; i++) {
@@ -73,42 +78,42 @@ export default class PhysicsWorld {
 
             const tile = this.getTile(tx, ty);
 
-            if (tile == PhysicsWorld.BLOCKER_TILE && this.collidesWithTile(body, tx, ty)) {
+            if (tile != PhysicsWorld.EMPTY_TILE && this.collidesWithTile(body, tx, ty)) {
                 this.respond(body, tx, ty);
             }
         }
     }
 
     private respond(body: Body, tx: number, ty: number) {
-        const tilePosX = tx * TILE_SIZE + TILE_SIZE / 2;
-        const tilePosY = ty * TILE_SIZE + TILE_SIZE / 2;
+        const tilePosX = tx * this.tileSize + this.tileSize / 2;
+        const tilePosY = ty * this.tileSize + this.tileSize / 2;
 
         const dx = body.x - tilePosX;
         const dy = body.y - tilePosY;
 
         if (Math.abs(dx) > Math.abs(dy)) {
             if (dx > 0) {
-                body.x = tilePosX + TILE_SIZE / 2 + body.width / 2;
+                body.x = tilePosX + this.tileSize / 2 + body.width / 2;
             } else {
-                body.x = tilePosX - TILE_SIZE / 2 - body.width / 2;
+                body.x = tilePosX - this.tileSize / 2 - body.width / 2;
             }
         } else {
             if (dy > 0) {
-                body.y = tilePosY + TILE_SIZE / 2 + body.height / 2;
+                body.y = tilePosY + this.tileSize / 2 + body.height / 2;
             } else {
-                body.y = tilePosY - TILE_SIZE / 2 - body.height / 2;
+                body.y = tilePosY - this.tileSize / 2 - body.height / 2;
             }
         }
     }
 
     private collidesWithTile(body: Body, tx: number, ty: number) {
-        const xAxis = (tx * TILE_SIZE < body.x + body.width / 2) && (tx * TILE_SIZE + TILE_SIZE > body.x - body.width / 2);
-        const yAxis = (ty * TILE_SIZE < body.y + body.height / 2) && (ty * TILE_SIZE + TILE_SIZE > body.y - body.height / 2);
+        const xAxis = (tx * this.tileSize < body.x + body.width / 2) && (tx * this.tileSize + this.tileSize > body.x - body.width / 2);
+        const yAxis = (ty * this.tileSize < body.y + body.height / 2) && (ty * this.tileSize + this.tileSize > body.y - body.height / 2);
 
         return xAxis && yAxis;
     }
 
-    public getTile(tx: number, ty: number): number {
-        return this.map[ty * TILES_WIDTH + tx];
+    private getTile(tx: number, ty: number): number {
+        return this.map.data[ty * this.map.tilesWidth + tx];
     }
 }

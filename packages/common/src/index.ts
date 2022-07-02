@@ -3,7 +3,7 @@ export * from "./entities/Type";
 export * from "./movement/position";
 export {default as Body} from "./physics/Body";
 export * from "./physics/Body";
-export {default as map} from "./physics/map";
+export {default as TileMap} from "./physics/TileMap";
 export {default as PhysicsWorld} from "./physics/PhysicsWorld";
 export * from "./protocol/opcodes";
 export {default as WorldPacket} from "./protocol/WorldPacket";

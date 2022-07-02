@@ -23,7 +23,7 @@ function addUnitToWorld(unit: Unit) {
 
     world.units[guid] = unit;
 
-    physics.update(unit);
+    physics.collideAndRespond(unit);
 }
 
 function deleteUnitFromWorld(unit: Unit) {

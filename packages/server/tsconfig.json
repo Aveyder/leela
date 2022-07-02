@@ -3,6 +3,7 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "es2020",
+    "resolveJsonModule": true,
 
     "outDir": "dist",
     "rootDir": "src",
@@ -13,7 +14,7 @@
     "types": []
   },
   "include": [
-    "src", "types"
+    "src", "types", "../common/map"
   ],
   "references": [
     {

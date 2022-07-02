@@ -1,14 +1,6 @@
 import WorldSession from "../server/WorldSession";
 import Player from "../entities/Player";
-import {
-    Opcode,
-    UNIT_RUN_SPEED,
-    UNIT_SKINS, UNIT_WALK_SPEED,
-    Vec2,
-    WORLD_HEIGHT,
-    WORLD_WIDTH,
-    WorldPacket
-} from "@leela/common";
+import {Opcode, UNIT_RUN_SPEED, UNIT_WALK_SPEED, Vec2, WorldPacket} from "@leela/common";
 import {addUnitToWorld} from "../entities/Unit";
 
 
@@ -20,10 +12,12 @@ function handlePlayerJoin(worldSession: WorldSession) {
 
     const player = new Player(worldSession);
 
+    const map = world.physics.map;
+
     player.guid = world.guid();
-    player.skin = Math.floor(Math.random() * UNIT_SKINS);
-    player.x = Math.random() * WORLD_WIDTH;
-    player.y = Math.random() * WORLD_HEIGHT;
+    player.skin = Math.floor(Math.random() * 5);
+    player.x = Math.random() * map.tilesWidth * map.tileSize;
+    player.y = Math.random() * map.tilesHeight * map.tileSize;
     player.vx = 0;
     player.vy = 0;
     player.tick = -1;

@@ -2,8 +2,11 @@
 
 import {Scene} from "phaser";
 import {UNIT_SKINS} from "@leela/common";
+import map from "../../../common/map/map.json";
+import base from "../../../common/map/tilesets/base.png";
 import LoaderPlugin = Phaser.Loader.LoaderPlugin;
 import AnimationManager = Phaser.Animations.AnimationManager;
+import cursor from "../../public/assets/cursor.png";
 
 export default class Preloader {
 
@@ -17,6 +20,7 @@ export default class Preloader {
 
     public preload(): void {
         this.loadSpritesheets();
+        this.loadTiledMap();
 
         this.load.on("complete", () => this.createAnims());
     }
@@ -30,6 +34,11 @@ export default class Preloader {
             const unitUri = require(`../../public/assets/units/unit${i}.png`);
             this.load.spritesheet(`unit:${i}`, unitUri.default, {frameWidth: 32, frameHeight: 32});
         }
+    }
+
+    private loadTiledMap() {
+        this.load.image("base", base);
+        this.load.tilemapTiledJSON("map", map);
     }
 
     private createAnims() {

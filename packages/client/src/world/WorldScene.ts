@@ -1,28 +1,20 @@
 import Preloader from "./Preloader";
 import Keys from "./Keys";
-import {
-    map,
-    Opcode,
-    PhysicsWorld,
-    SIMULATION_RATE,
-    TILE_SIZE,
-    TILES_HEIGHT,
-    TILES_WIDTH,
-    WORLD_HEIGHT,
-    WORLD_WIDTH
-} from "@leela/common";
+import {Opcode, PhysicsWorld, SIMULATION_RATE} from "@leela/common";
 import WorldSession from "../client/WorldSession";
 import WorldClient from "../client/WorldClient";
 import Unit from "../entities/Unit";
 import Loop from "../Loop";
 import {playerControl, switchWalkMode} from "../movement/playerControl";
-import {DEBUG_MODE, TICK_CAP} from "../config";
+import {DEBUG_MODE, GAME_HEIGHT, GAME_WIDTH, TICK_CAP} from "../config";
 import {updatePlayerPosition} from "../movement/playerPrediction";
 import DebugManager from "../debugging/DebugManager";
 import {updateUnitPositions} from "../movement/unitPositionInterpolation";
 import Graphics = Phaser.GameObjects.Graphics;
 import UPDATE = Phaser.Scenes.Events.UPDATE;
 import Text = Phaser.GameObjects.Text;
+import * as map from "@leela/common/map/map.json";
+import cursor from "../../public/assets/cursor.png";
 
 
 export default class WorldScene extends Phaser.Scene {
@@ -40,7 +32,6 @@ export default class WorldScene extends Phaser.Scene {
 
     private simulationLoop: Loop;
 
-    private mapGraphics: Graphics;
     private shadeGraphics: Graphics;
     private joinButton: Text;
     private disconnectedText: Text;
@@ -55,6 +46,7 @@ export default class WorldScene extends Phaser.Scene {
     }
 
     public create(): void {
+        this.input.setDefaultCursor(`url(${cursor}), pointer`);
         this._keys = this.input.keyboard.addKeys("W,A,S,D,up,left,down,right,Z") as Keys;
 
         if (DEBUG_MODE) {
@@ -67,13 +59,19 @@ export default class WorldScene extends Phaser.Scene {
 
         this._units = {};
 
-        this._phys = new PhysicsWorld(map);
+        const map = this.cache.tilemap.get("map").data;
+
+        this._phys = new PhysicsWorld({
+            data: map.layers.find(layer => layer.name == "collision").data,
+            tilesWidth: map.width,
+            tilesHeight: map.height,
+            tileSize: map.tileheight
+        });
 
         this._tick = -1;
 
         this.events.on(UPDATE, this.update, this);
 
-        this.drawMap();
         this.drawShade();
         this.drawJoinButton();
         this.drawDisconnectedText();
@@ -81,6 +79,12 @@ export default class WorldScene extends Phaser.Scene {
         this._keys.Z.on("up", () => {
             switchWalkMode(this._worldSession);
         });
+
+        const tilemap = this.add.tilemap("map");
+        const baseTileset = tilemap.addTilesetImage("base", "base");
+        tilemap.createLayer("ground", baseTileset);
+        tilemap.createLayer("tree", baseTileset);
+        tilemap.createLayer("building", baseTileset);
     }
 
     public update(time: number, delta: number): void {
@@ -156,28 +160,10 @@ export default class WorldScene extends Phaser.Scene {
         return this._tick;
     }
 
-    private drawMap() {
-        this.mapGraphics = this.add.graphics();
-
-        for(let y = 0; y < TILES_HEIGHT; y++) {
-            for(let x = 0; x < TILES_WIDTH; x++) {
-                const tile = map[y * TILES_WIDTH + x];
-
-                // this.mapGraphics.lineStyle(1, 0xffffff, 0.1);
-                // this.mapGraphics.strokeRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-
-                if (tile == 1) {
-                    this.mapGraphics.fillStyle(0x6b2343);
-                    this.mapGraphics.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-                }
-            }
-        }
-    }
-
     private drawShade() {
         this.shadeGraphics = this.add.graphics(this);
         this.shadeGraphics.fillStyle(0x000, 0.65);
-        this.shadeGraphics.fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+        this.shadeGraphics.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
         this.shadeGraphics.setDepth(999);
     }
 

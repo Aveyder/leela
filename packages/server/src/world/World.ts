@@ -1,7 +1,8 @@
 import WorldSession from "../server/WorldSession";
-import {map, PhysicsWorld} from "@leela/common";
+import {PhysicsWorld} from "@leela/common";
 import {Unit} from "../entities/Unit";
-import {spawnMob, updateMobs} from "../entities/Mob";
+import {spawnCat, updateMobs} from "../entities/Mob";
+import * as map from "@leela/common/map/map.json";
 
 export default class World {
 
@@ -26,9 +27,14 @@ export default class World {
     }
 
     public init(): void {
-        this._physics = new PhysicsWorld(map);
+        this._physics = new PhysicsWorld({
+            data: map.layers.find(layer => layer.name == "collision").data,
+            tilesWidth: map.width,
+            tilesHeight: map.height,
+            tileSize: map.tileheight
+        });
 
-        spawnMob(this);
+        spawnCat(this);
     }
 
     public guid(): number {

@@ -29,20 +29,22 @@ export default class Mob implements Unit {
     }
 }
 
-function spawnMob(world: World) {
+function spawnCat(world: World) {
     const mob = new Mob(world);
 
     mob.guid = world.guid();
     mob.skin = 5;
-    mob.x = TILE_SIZE * 3 / 2 + TILE_SIZE * 8;
+    mob.x = TILE_SIZE * 3 / 2 + TILE_SIZE * 10;
     mob.y = TILE_SIZE * 3 / 2;
     mob.vx = 0;
     mob.vy = 0;
     mob.speed = UNIT_WALK_SPEED;
 
     const path = [
-        [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 8, y: TILE_SIZE * 3 / 2}, 0],
-        [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 17, y: TILE_SIZE * 3 / 2}, 0]
+        [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 10, y: TILE_SIZE * 3 / 2}, 0],
+        [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 16, y: TILE_SIZE * 3 / 2}, 5],
+        [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 17, y: TILE_SIZE * 3 / 2 + TILE_SIZE * 5}, 0],
+        [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 10, y: TILE_SIZE * 3 / 2 + TILE_SIZE * 5}, 0]
     ];
 
     mob.motion = new PathMotion(mob, path as Waypoint[]);
@@ -57,6 +59,6 @@ function updateMobs(world: World, delta) {
 }
 
 export {
-    spawnMob,
+    spawnCat,
     updateMobs
 }

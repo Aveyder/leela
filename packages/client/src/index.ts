@@ -2,15 +2,15 @@ import "phaser";
 import "../public/styles.scss";
 import WorldScene from "./world/WorldScene";
 import {Game} from "phaser";
-import {WORLD_HEIGHT, WORLD_WIDTH} from "@leela/common";
+import {GAME_HEIGHT, GAME_WIDTH} from "./config";
 
 
 function boot() {
     new Game({
         backgroundColor: "#83957d",
         scale: {
-            width: WORLD_WIDTH,
-            height: WORLD_HEIGHT
+            width: GAME_WIDTH,
+            height: GAME_HEIGHT
         },
         parent: document.querySelector(".game") as HTMLElement,
         scene: WorldScene

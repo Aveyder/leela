@@ -1,5 +1,8 @@
 import {TILE_SIZE} from "@leela/common";
 
+const GAME_WIDTH = 640;
+const GAME_HEIGHT = 640;
+
 const SERVER_PROTO = "http"
 const SERVER_HOST = "localhost:3000";
 const SERVER_URL = `${SERVER_PROTO}://${SERVER_HOST}`
@@ -31,6 +34,8 @@ const DEBUG_MODE = true;
 const TICK_CAP = 100;
 
 export {
+    GAME_WIDTH,
+    GAME_HEIGHT,
     SERVER_HOST,
     SERVER_URL,
     INTERPOLATE,
