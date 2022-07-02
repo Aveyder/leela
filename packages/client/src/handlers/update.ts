@@ -1,15 +1,17 @@
 import WorldSession from "../client/WorldSession";
-import {Update, WorldPacket} from "@leela/common";
-import Unit, {addUnitToWorld, deleteUnitFromWorld, isPlayer, Snapshot, SnapshotState} from "../entities/Unit";
+import {Role, Update, WorldPacket} from "@leela/common";
+import Unit, {addUnitToWorld, deleteUnitFromWorld, hasRole, isPlayer, Snapshot, SnapshotState} from "../entities/Unit";
 import {reconcilePlayerPosition, resetPrediction} from "../movement/playerPrediction";
 import {CLIENT_PREDICT, INTERPOLATE, INTERPOLATE_BUFFER_SIZE, INTERPOLATE_DROP_DUPLICATES} from "../config";
 import {posEquals} from "../movement/position";
 import PlayerState, {PLAYER_STATE} from "../entities/PlayerState";
+import cursorVendor from "../../public/assets/cursor-vendor.png";
 
 type UnitUpdate = {
     update: Update,
     guid: number,
     typeId: number,
+    roles: number[],
     skin: number,
     x: number,
     y: number,
@@ -34,6 +36,9 @@ function handleUpdate(worldSession: WorldSession, worldPacket: WorldPacket) {
             case Update.FULL:
                 if (!unit) unit = initUnit(worldSession, unitUpdate);
                 unit.skin = unitUpdate.skin;
+                if (hasRole(unit, Role.VENDOR)) {
+                    unit.setInteractive({cursor: `url(${cursorVendor}), pointer`})
+                }
                 break;
             case Update.EMPTY:
                 setLastSnapshotState(unitUpdate, unit);
@@ -72,7 +77,7 @@ function deserializeUnitUpdates(worldSession: WorldSession, input: unknown[]): U
         switch (update) {
             case Update.FULL:
                 unitUpdate = deserializeFullUnitUpdate(i + 1, input);
-                i += 8;
+                i += 9;
                 break;
             case Update.EMPTY:
                 unitUpdate = deserializeEmptyUnitUpdate(i + 1, input);
@@ -100,11 +105,12 @@ function deserializeFullUnitUpdate(index: number, serialized: unknown[]) {
     return {
         guid: serialized[index] as number,
         typeId: serialized[index + 1] as number,
-        x: serialized[index + 2] as number,
-        y: serialized[index + 3] as number,
-        skin: serialized[index + 4] as number,
-        vx: serialized[index + 5] as number,
-        vy: serialized[index + 6] as number
+        roles: serialized[index + 2] as number[],
+        x: serialized[index + 3] as number,
+        y: serialized[index + 4] as number,
+        skin: serialized[index + 5] as number,
+        vx: serialized[index + 6] as number,
+        vy: serialized[index + 7] as number
     } as UnitUpdate;
 }
 
@@ -138,6 +144,7 @@ function initUnit(worldSession: WorldSession, unitUpdateState: UnitUpdate) {
 
     unit.guid = unitUpdateState.guid;
     unit.typeId = unitUpdateState.typeId;
+    unit.roles = unitUpdateState.roles;
     unit.setPosition(unitUpdateState.x, unitUpdateState.y);
 
     if (isPlayer(unit)) {

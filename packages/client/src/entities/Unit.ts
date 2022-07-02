@@ -1,6 +1,6 @@
 import Sprite = Phaser.GameObjects.Sprite;
 import {Scene} from "phaser";
-import {UNIT_BODY_HEIGHT, UNIT_BODY_WIDTH, Vec2} from "@leela/common";
+import {Role, UNIT_BODY_HEIGHT, UNIT_BODY_WIDTH, Vec2} from "@leela/common";
 import PhysBody from "../physics/PhysBody";
 import WorldScene from "../world/WorldScene";
 
@@ -21,6 +21,7 @@ export default class Unit extends Sprite {
 
     public guid: number;
     public typeId: number;
+    public roles: number[];
     private _skin: number;
     public readonly snapshots: Snapshot[];
     public readonly physBody: PhysBody;
@@ -134,10 +135,15 @@ function isPlayer(unit: Unit) {
     return worldSession.playerGuid == unit.guid;
 }
 
+function hasRole(unit: Unit, role: Role) {
+    return unit.roles && unit.roles.findIndex(r => r == role) != -1;
+}
+
 export {
     Snapshot,
     SnapshotState,
     addUnitToWorld,
     deleteUnitFromWorld,
-    isPlayer
+    isPlayer,
+    hasRole
 }

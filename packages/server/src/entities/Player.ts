@@ -2,7 +2,7 @@ import WorldSession from "../server/WorldSession";
 import {cloneUnit, Unit} from "./Unit";
 import {
     FRACTION_DIGITS,
-    Opcode,
+    Opcode, Role,
     toFixed,
     Type,
     UNIT_BODY_HEIGHT,
@@ -14,6 +14,7 @@ import {
 export default class Player implements Unit {
     public guid: number;
     public readonly typeId: number;
+    public readonly roles: Role[];
     public skin: number;
     public x: number;
     public y: number;
@@ -32,6 +33,7 @@ export default class Player implements Unit {
         this._worldSession = worldSession;
 
         this.typeId = Type.PLAYER;
+        this.roles = null;
         this.width = UNIT_BODY_WIDTH;
         this.height = UNIT_BODY_HEIGHT;
         this.bullet = false;
@@ -95,6 +97,7 @@ function pushSerializedFullUnitUpdate(unit: Unit, unitUpdates: unknown[]) {
     unitUpdates.push(Update.FULL,
         unit.guid,
         unit.typeId,
+        unit.roles,
         toFixed(unit.x, FRACTION_DIGITS),
         toFixed(unit.y, FRACTION_DIGITS),
         unit.skin,

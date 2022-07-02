@@ -1,4 +1,5 @@
 export * from "./constants/world";
+export * from "./entities/Role";
 export * from "./entities/Type";
 export * from "./movement/position";
 export {default as Body} from "./physics/Body";

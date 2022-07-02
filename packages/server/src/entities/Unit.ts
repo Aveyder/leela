@@ -1,10 +1,11 @@
 import World from "../world/World";
-import {Body, Opcode} from "@leela/common";
+import {Body, Opcode, Role} from "@leela/common";
 
 interface Unit extends Body {
     world: World;
     guid: number;
     typeId: number;
+    roles: Role[];
     skin: number;
     x: number;
     y: number;

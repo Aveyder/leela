@@ -1,11 +1,12 @@
 import World from "../world/World";
 import {addUnitToWorld, Unit} from "./Unit";
-import {TILE_SIZE, Type, UNIT_BODY_HEIGHT, UNIT_BODY_WIDTH, UNIT_WALK_SPEED} from "@leela/common";
+import {Role, TILE_SIZE, Type, UNIT_BODY_HEIGHT, UNIT_BODY_WIDTH, UNIT_WALK_SPEED} from "@leela/common";
 import {Motion, PathMotion, Waypoint} from "../motion/motions";
 
 export default class Mob implements Unit {
     public guid: number;
     public typeId: number;
+    public roles: Role[];
     public skin: number;
     public x: number;
     public y: number;
@@ -23,6 +24,7 @@ export default class Mob implements Unit {
         this.world = world;
 
         this.typeId = Type.MOB;
+        this.roles = [];
         this.width = UNIT_BODY_WIDTH;
         this.height = UNIT_BODY_HEIGHT;
         this.bullet = false;
@@ -65,6 +67,8 @@ function spawnVendor(world: World) {
     mob.y = TILE_SIZE * 3 / 2;
     mob.vx = 0;
     mob.vy = 0;
+
+    mob.roles.push(Role.VENDOR);
 
     addUnitToWorld(mob);
 }
