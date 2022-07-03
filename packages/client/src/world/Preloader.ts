@@ -5,6 +5,10 @@ import {UNIT_SKINS} from "@leela/common";
 import map from "../../../common/map/map.json";
 import base from "../../../common/map/tilesets/base.png";
 import grass from "../../../common/map/tilesets/grass.png";
+
+import cursor from "../../public/assets/cursor.png";
+import cursorPlant from "../../public/assets/cursor-plant.png";
+import cursorVendor from "../../public/assets/cursor-vendor.png";
 import LoaderPlugin = Phaser.Loader.LoaderPlugin;
 import AnimationManager = Phaser.Animations.AnimationManager;
 
@@ -21,6 +25,7 @@ export default class Preloader {
     public preload(): void {
         this.loadSpritesheets();
         this.loadTiledMap();
+        this.loadCursors();
 
         this.load.on("complete", () => this.createAnims());
     }
@@ -40,6 +45,12 @@ export default class Preloader {
         this.load.spritesheet("base", base, {frameWidth: 32, frameHeight: 32});
         this.load.image("grass", grass)
         this.load.tilemapTiledJSON("map", map);
+    }
+
+    private loadCursors() {
+        this.load.image("cursor", cursor);
+        this.load.image("cursor-plant", cursorPlant);
+        this.load.image("cursor-vendor", cursorVendor);
     }
 
     private createAnims() {

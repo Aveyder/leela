@@ -43,7 +43,10 @@ export default class PhysicsWorld {
     }
 
     public move(body: Body, dir: Vec2, speed: number) {
-        if (dir.x == 0 && dir.y == 0) return;
+        if (dir.x == 0 && dir.y == 0) {
+            body.vx = body.vy = 0;
+            return;
+        }
 
         const angle = Math.atan2(dir.y, dir.x);
 

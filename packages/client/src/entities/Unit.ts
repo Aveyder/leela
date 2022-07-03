@@ -1,8 +1,10 @@
 import Sprite = Phaser.GameObjects.Sprite;
 import {Scene} from "phaser";
-import {Role, UNIT_BODY_HEIGHT, UNIT_BODY_WIDTH, Vec2} from "@leela/common";
+import {Role, UNIT_BODY_HEIGHT, UNIT_BODY_WIDTH} from "@leela/common";
 import PhysBody from "../physics/PhysBody";
 import WorldScene from "../world/WorldScene";
+import Depth from "../world/Depth";
+import {appear, hideAndDestroy} from "./object";
 
 
 type SnapshotState = {
@@ -114,19 +116,21 @@ function addUnitToWorld(unit: Unit) {
 
     worldScene.add.existing(unit);
 
+    unit.depth = Depth.UNIT;
+
     const guid = unit.guid;
 
     worldScene.units[guid] = unit;
+
+    appear(unit);
 }
 
 function deleteUnitFromWorld(unit: Unit) {
     const worldScene = unit.scene as WorldScene;
 
-    unit.destroy();
+    hideAndDestroy(unit);
 
-    const guid = unit.guid;
-
-    delete worldScene.units[guid];
+    delete worldScene.units[unit.guid];
 }
 
 function isPlayer(unit: Unit) {

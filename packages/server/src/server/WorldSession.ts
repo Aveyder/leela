@@ -4,13 +4,13 @@ import WorldSocket from "./WorldSocket";
 import Player, {sendUpdateToPlayer} from "../entities/Player";
 import Loop from "../Loop";
 import {UPDATE_RATE} from "../config";
-import {deleteUnitFromWorld, Unit} from "../entities/Unit";
+import GameObject, {deleteObjectFromWorld} from "../entities/GameObject";
 
 export default class WorldSession {
 
     private worldSocket: WorldSocket;
     private readonly recvQueue: WorldPacket[];
-    public readonly lastSentUpdate: Record<number, Unit>;
+    public readonly lastSentUpdate: Record<number, GameObject>;
 
     private updateLoop: Loop;
 
@@ -69,7 +69,7 @@ export default class WorldSession {
     public destroy() {
         this.updateLoop?.stop();
 
-        if (this.player) deleteUnitFromWorld(this.player);
+        if (this.player) deleteObjectFromWorld(this.player);
 
         this.worldSocket = null;
         this.recvQueue.length = 0;

@@ -1,6 +1,7 @@
 enum Type {
     PLAYER,
-    MOB
+    MOB,
+    PLANT
 }
 
 export {

@@ -1,13 +1,21 @@
 import WorldSession from "../client/WorldSession";
-import {Role, Update, WorldPacket} from "@leela/common";
+import {Role, Type, Update, WorldPacket} from "@leela/common";
 import Unit, {addUnitToWorld, deleteUnitFromWorld, hasRole, isPlayer, Snapshot, SnapshotState} from "../entities/Unit";
 import {reconcilePlayerPosition, resetPrediction} from "../movement/playerPrediction";
 import {CLIENT_PREDICT, INTERPOLATE, INTERPOLATE_BUFFER_SIZE, INTERPOLATE_DROP_DUPLICATES} from "../config";
 import {posEquals} from "../movement/position";
 import PlayerState, {PLAYER_STATE} from "../entities/PlayerState";
-import cursorVendor from "../../public/assets/cursor-vendor.png";
+import Plant, {addPlantToWorld, deletePlantFromWorld} from "../entities/Plant";
 
-type UnitUpdate = {
+type ObjectUpdate = {
+    update: Update,
+    guid: number,
+    typeId: number,
+    x: number,
+    y: number
+}
+
+interface UnitUpdate extends ObjectUpdate {
     update: Update,
     guid: number,
     typeId: number,
@@ -19,86 +27,79 @@ type UnitUpdate = {
     vy: number
 }
 
-function handleUpdate(worldSession: WorldSession, worldPacket: WorldPacket) {
-    const worldScene = worldSession.worldScene;
+interface PlantUpdate extends ObjectUpdate {
+    update: Update,
+    guid: number,
+    typeId: number,
+    x: number,
+    y: number,
+    kind: number
+}
 
+function handleUpdate(worldSession: WorldSession, worldPacket: WorldPacket) {
     worldPacket.shift(); // opcode
     const timestamp = worldPacket.shift() as number;
     const ackTick = worldPacket.shift() as number;
     const speed = worldPacket.shift() as number;
 
-    const unitUpdates = deserializeUnitUpdates(worldSession, worldPacket);
+    const objectUpdates = deserializeObjectUpdates(worldSession, worldPacket);
 
-    unitUpdates.forEach(unitUpdate => {
-        let unit = worldScene.units[unitUpdate.guid] as Unit;
-
-        switch (unitUpdate.update) {
-            case Update.FULL:
-                if (!unit) unit = initUnit(worldSession, unitUpdate);
-                unit.skin = unitUpdate.skin;
-                if (hasRole(unit, Role.VENDOR)) {
-                    unit.setInteractive({cursor: `url(${cursorVendor}), pointer`})
-                }
-                break;
-            case Update.EMPTY:
-                setLastSnapshotState(unitUpdate, unit);
-                break;
-            case Update.SKIN:
-                unit.skin = unitUpdate.skin;
-                return;
-            case Update.POSITION:
-                break;
-        }
-
-        pushToUnitSnapshots(unit, unitUpdate, timestamp);
-
-        if (isPlayer(unit)) {
-            const playerState = unit.getData(PLAYER_STATE) as PlayerState;
-
-            playerState.speed = speed;
-
-            if (CLIENT_PREDICT) reconcilePlayerPosition(unit, unitUpdate, ackTick);
-        }
-
-        if (!INTERPOLATE) {
-            unit.setPosition(unitUpdate.x, unitUpdate.y);
-            unit.setDir(unitUpdate.vx, unitUpdate.vy);
+    objectUpdates.forEach(objectUpdate => {
+        if (objectUpdate.typeId == Type.PLANT) {
+            handlePlantUpdate(worldSession, objectUpdate as PlantUpdate);
+        } else {
+            handleUnitUpdate(worldSession, timestamp, ackTick, speed, objectUpdate as UnitUpdate);
         }
     });
 }
 
-function deserializeUnitUpdates(worldSession: WorldSession, input: unknown[]): UnitUpdate[] {
-    const unitUpdates = [];
+function deserializeObjectUpdates(worldSession: WorldSession, input: unknown[]): ObjectUpdate[] {
+    const objectUpdates = [];
 
     for (let i = 0; i < input.length;) {
         const update = input[i];
+        const typeId = input[i + 2];
 
-        let unitUpdate;
+        let objectUpdate;
         switch (update) {
             case Update.FULL:
-                unitUpdate = deserializeFullUnitUpdate(i + 1, input);
-                i += 9;
+                if (typeId == Type.PLANT) {
+                    objectUpdate = deserializeFullPlantUpdate(i + 1, input);
+                    i += 6;
+                } else {
+                    objectUpdate = deserializeFullUnitUpdate(i + 1, input);
+                    i += 9;
+                }
                 break;
             case Update.EMPTY:
-                unitUpdate = deserializeEmptyUnitUpdate(i + 1, input);
+                objectUpdate = deserializeEmptyUnitUpdate(i + 1, input);
                 i += 2;
                 break;
             case Update.SKIN:
-                unitUpdate = deserializeSkinUnitUpdate(i + 1, input);
+                objectUpdate = deserializeSkinUnitUpdate(i + 1, input);
                 i += 3;
                 break;
             case Update.POSITION:
-                unitUpdate = deserializePositionUnitUpdate(i + 1, input);
+                objectUpdate = deserializePositionUnitUpdate(i + 1, input);
                 i += 6;
                 break;
         }
 
-        unitUpdate.update = update;
-
-        unitUpdates.push(unitUpdate);
+        objectUpdate.update = update;
+        objectUpdates.push(objectUpdate);
     }
 
-    return unitUpdates;
+    return objectUpdates;
+}
+
+function deserializeFullPlantUpdate(index: number, serialized: unknown[]) {
+    return {
+        guid: serialized[index] as number,
+        typeId: serialized[index + 1] as number,
+        x: serialized[index + 2] as number,
+        y: serialized[index + 3] as number,
+        kind: serialized[index + 4] as number,
+    } as PlantUpdate;
 }
 
 function deserializeFullUnitUpdate(index: number, serialized: unknown[]) {
@@ -137,6 +138,45 @@ function deserializePositionUnitUpdate(index: number, serialized: unknown[]) {
     } as UnitUpdate;
 }
 
+function handleUnitUpdate(worldSession: WorldSession, timestamp: number, ackTick: number, speed: number, unitUpdate: UnitUpdate) {
+    const worldScene = worldSession.worldScene;
+
+    let unit = worldScene.units[unitUpdate.guid] as Unit;
+
+    switch (unitUpdate.update) {
+        case Update.FULL:
+            if (!unit) unit = initUnit(worldSession, unitUpdate);
+            unit.skin = unitUpdate.skin;
+            break;
+        case Update.EMPTY:
+            setLastSnapshotState(unitUpdate, unit);
+            break;
+        case Update.SKIN:
+            unit.skin = unitUpdate.skin;
+            return;
+        case Update.POSITION:
+            break;
+    }
+
+    pushToUnitSnapshots(unit, unitUpdate, timestamp);
+
+    if (isPlayer(unit)) {
+        const playerState = unit.getData(PLAYER_STATE) as PlayerState;
+
+        playerState.speed = speed;
+
+        if (CLIENT_PREDICT) reconcilePlayerPosition(unit, unitUpdate, ackTick);
+    }
+
+    if (!INTERPOLATE) {
+        unit.setPosition(unitUpdate.x, unitUpdate.y);
+        unit.setDir(unitUpdate.vx, unitUpdate.vy);
+    }
+
+    return unit;
+}
+
+
 function initUnit(worldSession: WorldSession, unitUpdateState: UnitUpdate) {
     const worldScene = worldSession.worldScene;
 
@@ -154,6 +194,8 @@ function initUnit(worldSession: WorldSession, unitUpdateState: UnitUpdate) {
 
         resetPrediction(unit);
     }
+
+    if (hasRole(unit, Role.VENDOR)) unit.setInteractive();
 
     addUnitToWorld(unit);
 
@@ -212,12 +254,33 @@ function deduplicateUnitSnapshots(snapshots: Snapshot[], unitState: SnapshotStat
     }
 }
 
+function handlePlantUpdate(worldSession: WorldSession, plantUpdate: PlantUpdate) {
+    const worldScene = worldSession.worldScene;
+
+    const plant = new Plant(worldScene, plantUpdate.kind, plantUpdate.x, plantUpdate.y);
+
+    plant.guid = plantUpdate.guid;
+    plant.typeId = plantUpdate.typeId;
+
+    plant.setInteractive();
+
+    addPlantToWorld(plant);
+}
+
 function handleDestroy(worldSession: WorldSession, worldPacket: WorldPacket) {
     const worldScene = worldSession.worldScene;
 
     const guid = worldPacket[1] as number;
 
     const unit = worldScene.units[guid];
+    if (unit) handleUnitDestroy(worldSession, unit);
+
+    const plant = worldScene.plants[guid] as Plant;
+    if (plant) deletePlantFromWorld(plant);
+}
+
+function handleUnitDestroy(worldSession: WorldSession, unit: Unit) {
+    const worldScene = worldSession.worldScene;
 
     if (isPlayer(unit)) {
         worldSession.playerGuid = null;

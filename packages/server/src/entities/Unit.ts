@@ -1,7 +1,7 @@
 import World from "../world/World";
-import {Body, Opcode, Role} from "@leela/common";
+import {Body, Role} from "@leela/common";
 
-interface Unit extends Body {
+interface Unit extends Object, Body {
     world: World;
     guid: number;
     typeId: number;
@@ -27,28 +27,7 @@ function addUnitToWorld(unit: Unit) {
     physics.collideAndRespond(unit);
 }
 
-function deleteUnitFromWorld(unit: Unit) {
-    const world = unit.world;
-
-    delete world.units[unit.guid];
-
-    world.forEachSession(worldSession => {
-        delete worldSession.lastSentUpdate[unit.guid];
-        worldSession.sendPacket([Opcode.SMSG_DESTROY, unit.guid]);
-    });
-}
-
-function cloneUnit(unit: Unit, result?: Unit) {
-    if (!result) {
-        result = {} as Unit;
-    }
-
-    return Object.assign(result, unit);
-}
-
 export {
     Unit,
-    addUnitToWorld,
-    deleteUnitFromWorld,
-    cloneUnit
+    addUnitToWorld
 }

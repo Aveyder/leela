@@ -1,31 +1,34 @@
 import Preloader from "./Preloader";
 import Keys from "./Keys";
-import {Opcode, PhysicsWorld, SIMULATION_RATE} from "@leela/common";
+import {Opcode, PhysicsWorld, Role, SIMULATION_RATE, Type} from "@leela/common";
 import WorldSession from "../client/WorldSession";
 import WorldClient from "../client/WorldClient";
-import Unit from "../entities/Unit";
+import Unit, {hasRole} from "../entities/Unit";
 import Loop from "../Loop";
 import {playerControl, switchWalkMode} from "../movement/playerControl";
 import {DEBUG_MODE, GAME_HEIGHT, GAME_WIDTH, TICK_CAP} from "../config";
 import {updatePlayerPosition} from "../movement/playerPrediction";
 import DebugManager from "../debugging/DebugManager";
 import {updateUnitPositions} from "../movement/unitPositionInterpolation";
+import Depth from "./Depth";
+import Plant from "../entities/Plant";
+import {GameObject} from "../entities/object";
 import Graphics = Phaser.GameObjects.Graphics;
 import UPDATE = Phaser.Scenes.Events.UPDATE;
 import Text = Phaser.GameObjects.Text;
-import * as map from "@leela/common/map/map.json";
-import cursor from "../../public/assets/cursor.png";
-import cursorPlant from "../../public/assets/cursor-plant.png";
+import Image = Phaser.GameObjects.Image;
 
 
 export default class WorldScene extends Phaser.Scene {
 
+    private _cursor: Image;
     private _keys: Keys;
 
     private _worldClient: WorldClient;
     private _worldSession: WorldSession;
 
-    public _units: Record<number, Unit>;
+    private _units: Record<number, Unit>;
+    private _plants: Record<number, Plant>;
 
     public _phys: PhysicsWorld;
 
@@ -47,7 +50,11 @@ export default class WorldScene extends Phaser.Scene {
     }
 
     public create(): void {
-        this.input.setDefaultCursor(`url(${cursor}), pointer`);
+        this.input.setDefaultCursor(`none`);
+
+        this._cursor = this.add.image(0, 0, "cursor");
+        this._cursor.depth = Depth.CURSOR;
+
         this._keys = this.input.keyboard.addKeys("W,A,S,D,up,left,down,right,Z") as Keys;
 
         if (DEBUG_MODE) {
@@ -59,6 +66,7 @@ export default class WorldScene extends Phaser.Scene {
         this._worldClient.init();
 
         this._units = {};
+        this._plants = {};
 
         const map = this.cache.tilemap.get("map").data;
 
@@ -81,24 +89,39 @@ export default class WorldScene extends Phaser.Scene {
             switchWalkMode(this._worldSession);
         });
 
-        const tilemap = this.add.tilemap("map");
-        const baseTileset = tilemap.addTilesetImage("base", "base");
-        const grassTileset = tilemap.addTilesetImage("grass", "grass");
-        tilemap.createLayer("ground", [baseTileset, grassTileset]);
-        tilemap.createLayer("item", baseTileset);
-        tilemap.createLayer("tree", baseTileset);
-        tilemap.createLayer("building", baseTileset);
-
-        const plant = this.add.sprite(500, 400, "base", 52);
-
-        plant.setInteractive({
-            cursor: `url(${cursorPlant}), pointer`
-        });
+        this.drawTiledMap();
     }
 
     public update(time: number, delta: number): void {
+        this.updateCursor();
         updatePlayerPosition(this.worldSession?.player, delta);
         updateUnitPositions(this);
+        Object.values(this._units).forEach(unit => {
+            unit.depth = Depth.UNIT + unit.y / 1000000;
+        });
+    }
+
+    private updateCursor() {
+        const activePointer = this.input.activePointer;
+
+        this._cursor.alpha = 1;
+        this._cursor.setPosition(activePointer.worldX, activePointer.worldY);
+
+        const currentlyOver = this.input.hitTestPointer(activePointer)[0] as unknown as GameObject;
+
+        if (this.worldSession?.player && currentlyOver?.typeId) {
+            if (currentlyOver.typeId == Type.PLANT) {
+                this._cursor.setTexture("cursor-plant");
+                this._cursor.alpha = 0.6;
+            }
+            if (currentlyOver.typeId == Type.MOB && hasRole(currentlyOver as Unit, Role.VENDOR)) {
+                this._cursor.setTexture("cursor-vendor");
+            }
+            this._cursor.setOrigin(0, 0);
+        } else {
+            this._cursor.setTexture("cursor");
+            this._cursor.setOrigin(0.25, 0);
+        }
     }
 
     public addSession(worldSession: WorldSession) {
@@ -114,8 +137,10 @@ export default class WorldScene extends Phaser.Scene {
         this._worldSession = null;
 
         Object.values(this._units).forEach(unit => unit.destroy());
+        Object.values(this._plants).forEach(plant => plant.destroy());
 
         this._units = {};
+        this._plants = {};
 
         this.simulationLoop.stop();
         this.simulationLoop = null;
@@ -161,6 +186,10 @@ export default class WorldScene extends Phaser.Scene {
         return this._units;
     }
 
+    public get plants() {
+        return this._plants;
+    }
+
     public get phys() {
         return this._phys;
     }
@@ -173,7 +202,7 @@ export default class WorldScene extends Phaser.Scene {
         this.shadeGraphics = this.add.graphics(this);
         this.shadeGraphics.fillStyle(0x000, 0.65);
         this.shadeGraphics.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-        this.shadeGraphics.setDepth(999);
+        this.shadeGraphics.depth = Depth.MENU;
     }
 
     private drawJoinButton() {
@@ -185,12 +214,12 @@ export default class WorldScene extends Phaser.Scene {
         })
             .setOrigin(0.5)
             .setPadding(10)
-            .setInteractive({ useHandCursor: true })
+            .setInteractive()
             .on("pointerdown", () => {
                 this._worldSession.sendPacket([Opcode.MSG_JOIN]);
             });
         this.joinButton.visible = false;
-        this.joinButton.setDepth(999);
+        this.joinButton.depth = Depth.MENU;
     }
 
     private drawDisconnectedText() {
@@ -205,6 +234,23 @@ export default class WorldScene extends Phaser.Scene {
                 this._worldSession.sendPacket([Opcode.MSG_JOIN]);
             });
         this.disconnectedText.visible = false;
-        this.disconnectedText.setDepth(999);
+        this.disconnectedText.depth = Depth.MENU;
+    }
+
+    private drawTiledMap() {
+        const tilemap = this.add.tilemap("map");
+
+        const baseTileset = tilemap.addTilesetImage("base", "base");
+        const grassTileset = tilemap.addTilesetImage("grass", "grass");
+
+        const groundLayer = tilemap.createLayer("ground", [baseTileset, grassTileset]);
+        const itemLayer = tilemap.createLayer("item", baseTileset);
+        const treeLayer = tilemap.createLayer("tree", baseTileset);
+        const buildingLayer = tilemap.createLayer("building", baseTileset);
+
+
+        groundLayer.depth = buildingLayer.depth = Depth.MAP;
+        itemLayer.depth = Depth.MAP_ITEM;
+        treeLayer.depth = Depth.TREE;
     }
 }
