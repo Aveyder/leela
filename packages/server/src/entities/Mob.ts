@@ -36,21 +36,18 @@ function spawnCat(world: World) {
 
     mob.guid = world.guid();
     mob.skin = 5;
-    mob.x = TILE_SIZE * 3 / 2 + TILE_SIZE * 10;
+    mob.x = TILE_SIZE * 3 / 2 + TILE_SIZE * 15;
     mob.y = TILE_SIZE * 3 / 2;
     mob.vx = 0;
     mob.vy = 0;
     mob.speed = UNIT_WALK_SPEED;
 
     const path = [
-        [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 10, y: TILE_SIZE * 3 / 2}, 0],
         [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 15, y: TILE_SIZE * 3 / 2}, 5],
-        [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 15, y: TILE_SIZE * 3 / 2 + TILE_SIZE}, 0],
-        [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 16, y: TILE_SIZE * 3 / 2 + TILE_SIZE}, 0],
-        [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 16, y: TILE_SIZE * 3 / 2 + TILE_SIZE * 3}, 0],
-        [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 17, y: TILE_SIZE * 3 / 2 + TILE_SIZE * 3}, 0],
-        [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 17, y: TILE_SIZE * 3 / 2 + TILE_SIZE * 5}, 0],
-        [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 10, y: TILE_SIZE * 3 / 2 + TILE_SIZE * 5}, 0]
+        [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 15, y: TILE_SIZE * 3 / 2 + TILE_SIZE * 4}, 0],
+        [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 17, y: TILE_SIZE * 3 / 2 + TILE_SIZE * 4}, 5],
+        [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 13,  y: TILE_SIZE * 3 / 2 + TILE_SIZE * 7}, 5],
+        [{x: TILE_SIZE * 3 / 2 + TILE_SIZE * 15, y: TILE_SIZE * 3 / 2 + TILE_SIZE * 2}, 0],
     ];
 
     mob.motion = new PathMotion(mob, path as Waypoint[]);

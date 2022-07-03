@@ -13,10 +13,14 @@ import {updateUnitPositions} from "../movement/unitPositionInterpolation";
 import Depth from "./Depth";
 import Plant from "../entities/Plant";
 import {GameObject} from "../entities/object";
+import Inventory from "../entities/Inventory";
 import Graphics = Phaser.GameObjects.Graphics;
 import UPDATE = Phaser.Scenes.Events.UPDATE;
 import Text = Phaser.GameObjects.Text;
 import Image = Phaser.GameObjects.Image;
+import POINTER_OVER = Phaser.Input.Events.POINTER_OVER;
+import POINTER_OUT = Phaser.Input.Events.POINTER_OUT;
+import POINTER_UP = Phaser.Input.Events.POINTER_UP;
 
 
 export default class WorldScene extends Phaser.Scene {
@@ -39,6 +43,8 @@ export default class WorldScene extends Phaser.Scene {
     private shadeGraphics: Graphics;
     private joinButton: Text;
     private disconnectedText: Text;
+
+    private inventory: Inventory;
 
     constructor() {
         super("world");
@@ -90,6 +96,8 @@ export default class WorldScene extends Phaser.Scene {
         });
 
         this.drawTiledMap();
+        this.drawInventory();
+        this.drawInventoryButton();
     }
 
     public update(time: number, delta: number): void {
@@ -109,15 +117,19 @@ export default class WorldScene extends Phaser.Scene {
 
         const currentlyOver = this.input.hitTestPointer(activePointer)[0] as unknown as GameObject;
 
-        if (this.worldSession?.player && currentlyOver?.typeId) {
-            if (currentlyOver.typeId == Type.PLANT) {
-                this._cursor.setTexture("cursor-plant");
+        if (currentlyOver) {
+            if (this.worldSession?.player && currentlyOver?.typeId) {
                 this._cursor.alpha = 0.6;
+                if (currentlyOver.typeId == Type.PLANT) {
+                    this._cursor.setTexture("cursor-plant");
+                }
+                if (currentlyOver.typeId == Type.MOB && hasRole(currentlyOver as Unit, Role.VENDOR)) {
+                    this._cursor.setTexture("cursor-vendor");
+                }
+                this._cursor.setOrigin(0, 0);
+            } else {
+                this._cursor.setTexture("cursor-hand");
             }
-            if (currentlyOver.typeId == Type.MOB && hasRole(currentlyOver as Unit, Role.VENDOR)) {
-                this._cursor.setTexture("cursor-vendor");
-            }
-            this._cursor.setOrigin(0, 0);
         } else {
             this._cursor.setTexture("cursor");
             this._cursor.setOrigin(0.25, 0);
@@ -248,9 +260,38 @@ export default class WorldScene extends Phaser.Scene {
         const treeLayer = tilemap.createLayer("tree", baseTileset);
         const buildingLayer = tilemap.createLayer("building", baseTileset);
 
-
         groundLayer.depth = buildingLayer.depth = Depth.MAP;
         itemLayer.depth = Depth.MAP_ITEM;
         treeLayer.depth = Depth.TREE;
+    }
+
+    private drawInventory() {
+        this.inventory = new Inventory(this);
+        this.inventory.setPosition(620, 620 - 40);
+        this.inventory.setDepth(Depth.MENU);
+        this.inventory.visible = false;
+
+        this.add.existing(this.inventory);
+
+        this.inventory.putItem(0, 0, 1);
+        this.inventory.putItem(3, 1, 12);
+        this.inventory.putItem(5, 2, 20);
+    }
+
+    private drawInventoryButton() {
+        const inventoryButton = this.add.image(620, 620, "bag");
+        inventoryButton.setInteractive();
+        inventoryButton.setScale(2 / 3, 2 / 3);
+        inventoryButton.on(POINTER_OVER, () => {
+            if (!this.worldSession?.player) return;
+            inventoryButton.setScale(3 / 4, 3 / 4);
+        });
+        inventoryButton.on(POINTER_OUT, () => {
+            inventoryButton.setScale(2 / 3, 2 / 3);
+        });
+        inventoryButton.on(POINTER_UP, () => {
+            if (!this.worldSession?.player) return;
+            this.inventory.visible = !this.inventory.visible;
+        });
     }
 }

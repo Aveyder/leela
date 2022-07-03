@@ -7,8 +7,12 @@ import base from "../../../common/map/tilesets/base.png";
 import grass from "../../../common/map/tilesets/grass.png";
 
 import cursor from "../../public/assets/cursor.png";
+import cursorHand from "../../public/assets/cursor-hand.png";
 import cursorPlant from "../../public/assets/cursor-plant.png";
 import cursorVendor from "../../public/assets/cursor-vendor.png";
+
+import rpgItems from "../../public/assets/rpg-items.png";
+import bag from "../../public/assets/bag.png";
 import LoaderPlugin = Phaser.Loader.LoaderPlugin;
 import AnimationManager = Phaser.Animations.AnimationManager;
 
@@ -26,6 +30,8 @@ export default class Preloader {
         this.loadSpritesheets();
         this.loadTiledMap();
         this.loadCursors();
+        this.load.spritesheet("rpg-items", rpgItems, {frameWidth: 16, frameHeight: 16});
+        this.load.image("bag", bag);
 
         this.load.on("complete", () => this.createAnims());
     }
@@ -49,6 +55,7 @@ export default class Preloader {
 
     private loadCursors() {
         this.load.image("cursor", cursor);
+        this.load.image("cursor-hand", cursorHand);
         this.load.image("cursor-plant", cursorPlant);
         this.load.image("cursor-vendor", cursorVendor);
     }
