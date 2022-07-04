@@ -3,6 +3,7 @@ import WorldPacketHandler from "./WorldPacketHandler";
 import {handlePong} from "../../handlers/pong";
 import {handleJoin} from "../../handlers/join";
 import {handleDestroy, handleUpdate} from "../../handlers/update";
+import {handlePutItem} from "../../handlers/item";
 
 export default class OpcodeTable {
 
@@ -23,6 +24,7 @@ export default class OpcodeTable {
         this.defineHandler(Opcode.MSG_JOIN, handleJoin);
         this.defineHandler(Opcode.SMSG_UPDATE, handleUpdate);
         this.defineHandler(Opcode.SMSG_DESTROY, handleDestroy);
+        this.defineHandler(Opcode.SMSG_PUT_ITEM, handlePutItem);
     }
 
     private defineHandler(opcode: Opcode, handler: WorldPacketHandler) {

@@ -1,4 +1,4 @@
-import Unit, {SnapshotState} from "../entities/Unit";
+import Unit from "../entities/Unit";
 import {cloneBody, posInterpolator, SIMULATION_DELTA_MS, TMP_VEC2, Vec2} from "@leela/common";
 import WorldScene from "../world/WorldScene";
 import {posDiff} from "./position";
@@ -10,6 +10,7 @@ import {
     CLIENT_SMOOTH_POS_MS
 } from "../config";
 import PlayerState, {PLAYER_STATE} from "../entities/PlayerState";
+import {PlayerUpdate} from "../handlers/update";
 
 
 function predictPlayerPosition(player: Unit, dir: Vec2) {
@@ -51,15 +52,15 @@ function predictPlayerPosition(player: Unit, dir: Vec2) {
 }
 
 
-function reconcilePlayerPosition(player: Unit, playerUpdateState: SnapshotState, ack: number) {
+function reconcilePlayerPosition(player: Unit, playerUpdate: PlayerUpdate, ack: number) {
     const playerState = player.getData(PLAYER_STATE) as PlayerState;
 
     playerState.ackTick = ack;
 
     const reconciledBody = playerState.reconciledBody;
 
-    reconciledBody.x = playerUpdateState.x;
-    reconciledBody.y = playerUpdateState.y;
+    reconciledBody.x = playerUpdate.x;
+    reconciledBody.y = playerUpdate.y;
 
     const physics = (player.scene as WorldScene).phys;
 

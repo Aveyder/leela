@@ -14,6 +14,7 @@ import Depth from "./Depth";
 import Plant from "../entities/Plant";
 import {GameObject} from "../entities/object";
 import Inventory from "../entities/Inventory";
+import {PLAYER_STATE} from "../entities/PlayerState";
 import Graphics = Phaser.GameObjects.Graphics;
 import UPDATE = Phaser.Scenes.Events.UPDATE;
 import Text = Phaser.GameObjects.Text;
@@ -43,8 +44,6 @@ export default class WorldScene extends Phaser.Scene {
     private shadeGraphics: Graphics;
     private joinButton: Text;
     private disconnectedText: Text;
-
-    private inventory: Inventory;
 
     constructor() {
         super("world");
@@ -96,7 +95,6 @@ export default class WorldScene extends Phaser.Scene {
         });
 
         this.drawTiledMap();
-        this.drawInventory();
         this.drawInventoryButton();
     }
 
@@ -146,6 +144,8 @@ export default class WorldScene extends Phaser.Scene {
     }
 
     public removeSession() {
+        this._worldSession.player?.getData(PLAYER_STATE).destroy();
+
         this._worldSession = null;
 
         Object.values(this._units).forEach(unit => unit.destroy());
@@ -260,38 +260,40 @@ export default class WorldScene extends Phaser.Scene {
         const treeLayer = tilemap.createLayer("tree", baseTileset);
         const buildingLayer = tilemap.createLayer("building", baseTileset);
 
-        groundLayer.depth = buildingLayer.depth = Depth.MAP;
-        itemLayer.depth = Depth.MAP_ITEM;
+        groundLayer.depth = Depth.MAP;
+        itemLayer.depth = Depth.MAP;
+        buildingLayer.depth = Depth.BUILDING;
         treeLayer.depth = Depth.TREE;
     }
 
-    private drawInventory() {
-        this.inventory = new Inventory(this);
-        this.inventory.setPosition(620, 620 - 40);
-        this.inventory.setDepth(Depth.MENU);
-        this.inventory.visible = false;
+    public drawInventory(inventory: Inventory) {
+        inventory.setPosition(620, 580);
+        inventory.setDepth(Depth.HUD);
+        inventory.visible = false;
 
-        this.add.existing(this.inventory);
-
-        this.inventory.putItem(0, 0, 1);
-        this.inventory.putItem(3, 1, 12);
-        this.inventory.putItem(5, 2, 20);
+        this.add.existing(inventory);
     }
 
     private drawInventoryButton() {
         const inventoryButton = this.add.image(620, 620, "bag");
         inventoryButton.setInteractive();
-        inventoryButton.setScale(2 / 3, 2 / 3);
+        inventoryButton.setScale(0.66, 0.66);
         inventoryButton.on(POINTER_OVER, () => {
             if (!this.worldSession?.player) return;
-            inventoryButton.setScale(3 / 4, 3 / 4);
+            inventoryButton.setScale(0.75, 0.75);
         });
         inventoryButton.on(POINTER_OUT, () => {
-            inventoryButton.setScale(2 / 3, 2 / 3);
+            inventoryButton.setScale(0.75, 0.75);
         });
         inventoryButton.on(POINTER_UP, () => {
-            if (!this.worldSession?.player) return;
-            this.inventory.visible = !this.inventory.visible;
+            const player = this.worldSession?.player;
+
+            if (!player) return;
+
+            const inventory = player.getData(PLAYER_STATE).inventory;
+
+            inventory.visible = !inventory.visible;
         });
+        inventoryButton.depth = Depth.HUD;
     }
 }

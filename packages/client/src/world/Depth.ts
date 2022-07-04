@@ -1,9 +1,10 @@
 enum Depth {
     MAP,
     PLANT,
-    MAP_ITEM,
+    BUILDING,
     TREE,
     UNIT,
+    HUD,
     MENU = 1000,
     CURSOR
 }

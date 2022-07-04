@@ -4,59 +4,72 @@ import Text = Phaser.GameObjects.Text;
 import {Scene} from "phaser";
 import {INVENTORY_SIZE} from "@leela/common";
 import Slot from "./Slot";
-import {itemTexture} from "./Item";
+import {Item, itemTexture} from "./Item";
 
 export default class Inventory extends Container {
 
     private readonly slots: Slot[];
     private readonly itemIcons: Image[];
-    private readonly itemAmountTexts: Text[];
-    private readonly itemAmounts: number[];
+    private readonly itemStackTexts: Text[];
+
+    private readonly _items: Item[];
 
     constructor(scene: Scene, x?: number, y?: number) {
-        super(scene, 500, 500);
+        super(scene, x, y);
 
         this.slots = [];
         this.itemIcons = [];
-        this.itemAmountTexts = [];
-        this.itemAmounts = [];
+        this.itemStackTexts = [];
+
+        this._items = [];
 
         for(let i = 0; i < INVENTORY_SIZE; i++) {
             this.createSlot(i);
             this.createItemIcon(i);
-            this.createItemAmountText(i);
-            this.itemAmounts.push(0);
-        }
+            this.createItemStackText(i);
 
-        this.add(this.slots);
-        this.add(this.itemIcons);
-        this.add(this.itemAmountTexts);
+            this._items.push(null);
+        }
     }
 
-    public putItem(id: number, slot: number, amount: number) {
-        const oldAmount = this.itemAmounts[slot];
+    public putItem(slot: number, item: Item) {
+        const itemInSlot = this._items[slot];
 
-        let newAmount = oldAmount + amount;
+        if (itemInSlot) {
+            itemInSlot.id = item.id;
+            itemInSlot.stack += item.stack;
 
-        if (newAmount < 0) newAmount = 0;
-
-        this.itemAmounts[slot] = newAmount;
-
-        const itemIcon = this.itemIcons[slot];
-        const itemAmountText = this.itemAmountTexts[slot];
-
-        if (newAmount > 0) {
-            const itemTextureInfo = itemTexture[id];
-
-            itemIcon.visible = true;
-            itemIcon.setTexture(itemTextureInfo.key);
-            if (itemTextureInfo.frame) itemIcon.setFrame(itemTextureInfo.frame);
-
-            itemAmountText.visible = newAmount != 1;
-            itemAmountText.text = String(newAmount);
+            if (itemInSlot.stack == 0) this._items[slot] = null;
         } else {
-            itemIcon.visible = false;
-            itemAmountText.visible = false;
+            this._items[slot] = item;
+        }
+
+        this.drawItems();
+    }
+
+    public get items() {
+        return this._items;
+    }
+
+    private drawItems() {
+        for (let slot = 0; slot < this._items.length; slot++) {
+            const item = this._items[slot];
+
+            const itemIcon = this.itemIcons[slot];
+            const itemAmountText = this.itemStackTexts[slot];
+            if (item) {
+                const itemTextureInfo = itemTexture[item.id];
+
+                itemIcon.visible = true;
+                itemIcon.setTexture(itemTextureInfo.key);
+                if (itemTextureInfo.frame) itemIcon.setFrame(itemTextureInfo.frame);
+
+                itemAmountText.visible = item.stack != 1;
+                itemAmountText.text = String(item.stack);
+            } else {
+                itemIcon.visible = false;
+                itemAmountText.visible = false;
+            }
         }
     }
 
@@ -66,21 +79,27 @@ export default class Inventory extends Container {
         slot.y = 0 - index * (Slot.SIZE + 4);
         this.slots.push(slot);
         this.scene.add.existing(slot);
+
+        this.add(slot);
     }
 
     private createItemIcon(index: number) {
-        const item = this.scene.add.image(this.slots[index].x, this.slots[index].y, "");
-        item.visible = false;
-        this.itemIcons.push(item);
+        const itemIcon = this.scene.add.image(this.slots[index].x, this.slots[index].y, "");
+        itemIcon.visible = false;
+        this.itemIcons.push(itemIcon);
+
+        this.add(itemIcon);
     }
 
-    private createItemAmountText(index: number) {
-        const itemAmountText = this.scene.add.text(this.slots[index].x + Slot.SIZE / 3, this.slots[index].y + Slot.SIZE / 3, "", {
+    private createItemStackText(index: number) {
+        const itemStackText = this.scene.add.text(this.slots[index].x + Slot.SIZE / 3, this.slots[index].y + Slot.SIZE / 3, "", {
             fontSize: "12px",
             backgroundColor: "rgba(0,0,0,0.5)"
         });
-        itemAmountText.setOrigin(0.5, 0.5);
-        itemAmountText.visible = false;
-        this.itemAmountTexts.push(itemAmountText);
+        itemStackText.setOrigin(0.5, 0.5);
+        itemStackText.visible = false;
+        this.itemStackTexts.push(itemStackText);
+
+        this.add(itemStackText);
     }
 }

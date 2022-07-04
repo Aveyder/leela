@@ -1,4 +1,7 @@
-
+interface Item {
+    id: number;
+    stack: number;
+}
 
 type TextureInfo = {
     key: string,
@@ -6,32 +9,33 @@ type TextureInfo = {
 }
 
 const itemTexture: Record<number, TextureInfo> = {
-    0: {
+    1: {
         key: "base",
         frame: 52
     },
-    1: {
+    2: {
         key: "base",
         frame: 53
     },
-    2: {
+    3: {
         key: "base",
         frame: 54
     },
-    3: {
+    4: {
         key: "base",
         frame: 55
     },
-    4: {
+    5: {
         key: "base",
         frame: 156
     },
-    5: {
+    6: {
         key: "rpg-items",
         frame: 44
     }
 }
 
 export {
+    Item,
     itemTexture
 }

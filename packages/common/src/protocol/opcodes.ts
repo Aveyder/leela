@@ -8,7 +8,9 @@ enum Opcode {
     CMSG_MOVE,
     SMSG_UPDATE,
     SMSG_DESTROY,
-    CMSG_SWITCH_WALK
+    CMSG_SWITCH_WALK,
+    SMSG_PUT_ITEM,
+    SMGS_FULL_BAG
 }
 
 enum Update {

@@ -2,6 +2,7 @@ import WorldSession from "../server/WorldSession";
 import {Unit} from "./Unit";
 import {
     FRACTION_DIGITS,
+    INVENTORY_SIZE,
     Opcode,
     Role,
     toFixed,
@@ -13,6 +14,7 @@ import {
 } from "@leela/common";
 import {cloneObject} from "./GameObject";
 import Plant from "./Plant";
+import Item, {itemData} from "./Item";
 
 export default class Player implements Unit {
     public guid: number;
@@ -29,6 +31,7 @@ export default class Player implements Unit {
     public tick: number;
     public speed: number;
     public run: boolean;
+    public readonly inventory: Item[];
 
     private readonly _worldSession: WorldSession;
 
@@ -41,6 +44,8 @@ export default class Player implements Unit {
         this.height = UNIT_BODY_HEIGHT;
         this.bullet = false;
         this.run = true;
+        this.inventory = [];
+        for(let i = 0; i < INVENTORY_SIZE; i++) this.inventory.push(null);
     }
 
     public get worldSession() {
@@ -53,8 +58,6 @@ export default class Player implements Unit {
 }
 
 function sendUpdateToPlayer(worldSession: WorldSession) {
-    const player = worldSession.player;
-
     const units = worldSession.world.units;
     const serializedUnitUpdates = [];
     Object.values(units).forEach(unit => pushSerializedUnitUpdate(worldSession, unit, serializedUnitUpdates));
@@ -67,8 +70,6 @@ function sendUpdateToPlayer(worldSession: WorldSession) {
         const packet = [
             Opcode.SMSG_UPDATE,
             Date.now(),
-            player?.tick == undefined ? -1 : player.tick,
-            player?.speed,
             ...serializedUnitUpdates,
             ...serializedPlantUpdates
         ] as WorldPacket;
@@ -82,6 +83,9 @@ function pushSerializedUnitUpdate(worldSession: WorldSession, unit: Unit, unitUp
 
     if (!lastSentUnitUpdate) {
         pushSerializedFullUnitUpdate(unit, unitUpdates);
+        if (worldSession.player == unit) {
+            pushSerializedFullPlayerUpdate(unit as Player, unitUpdates);
+        }
     } else {
         if (lastSentUnitUpdate.skin != unit.skin) {
             pushSerializedSkinUnitUpdate(unit, unitUpdates);
@@ -91,6 +95,9 @@ function pushSerializedUnitUpdate(worldSession: WorldSession, unit: Unit, unitUp
             lastSentUnitUpdate.vx != unit.vx ||
             lastSentUnitUpdate.vy != unit.vy) {
             pushSerializedPositionUnitUpdate(unit, unitUpdates);
+            if (worldSession.player == unit) {
+                pushSerializedPositionPlayerUpdate(unit as Player, unitUpdates);
+            }
         } else {
             pushSerializedEmptyUnitUpdate(unit, unitUpdates);
         }
@@ -104,12 +111,29 @@ function pushSerializedFullUnitUpdate(unit: Unit, unitUpdates: unknown[]) {
         unit.guid,
         unit.typeId,
         unit.roles,
+        unit.skin,
         toFixed(unit.x, FRACTION_DIGITS),
         toFixed(unit.y, FRACTION_DIGITS),
-        unit.skin,
         toFixed(unit.vx, FRACTION_DIGITS),
         toFixed(unit.vy, FRACTION_DIGITS)
     );
+}
+
+function pushSerializedFullPlayerUpdate(player: Player, unitUpdates: unknown[]) {
+    pushSerializedPositionPlayerUpdate(player, unitUpdates);
+    pushSerializedInventoryUpdate(player, unitUpdates);
+}
+
+function pushSerializedInventoryUpdate(player: Player, unitUpdates: unknown[]) {
+    const inventory = [];
+    player.inventory.map(item => {
+        if (item) {
+            inventory.push(item.id, item.stack);
+        } else {
+            inventory.push(0);
+        }
+    });
+    unitUpdates.push(inventory);
 }
 
 function pushSerializedSkinUnitUpdate(unit: Unit, unitUpdates: unknown[]) {
@@ -126,6 +150,13 @@ function pushSerializedPositionUnitUpdate(unit: Unit, unitUpdates: unknown[]) {
         toFixed(unit.y, FRACTION_DIGITS),
         toFixed(unit.vx, FRACTION_DIGITS),
         toFixed(unit.vy, FRACTION_DIGITS)
+    );
+}
+
+function pushSerializedPositionPlayerUpdate(player: Player, unitUpdates: unknown[]) {
+    unitUpdates.push(
+        player.tick,
+        player.speed
     );
 }
 
@@ -151,6 +182,39 @@ function pushSerializedPlantUpdate(worldSession: WorldSession, plant: Plant, pla
     worldSession.lastSentUpdate[plant.guid] = cloneObject(plant, lastSentPlantUpdate) as Plant;
 }
 
+function putItemToInventory(player: Player, id: number, stack: number) {
+    if (!id) return;
+
+    if (stack <= 0) return;
+
+    let putStack = stack;
+
+    const maxStack = itemData[id].maxStack;
+
+    const worldSession = player.worldSession;
+
+    for(let slot = 0; slot < player.inventory.length && putStack != 0; slot++) {
+        let itemInSlot = player.inventory[slot];
+
+        if (!itemInSlot) {
+            itemInSlot = player.inventory[slot] = new Item(id, 0);
+        }
+
+        if (itemInSlot.id == id) {
+            const putSlotStack = Math.min(maxStack - itemInSlot.stack, putStack);
+
+            itemInSlot.stack += putSlotStack;
+
+            putStack -= putSlotStack;
+
+            if (putSlotStack != 0) {
+                worldSession.sendPacket([Opcode.SMSG_PUT_ITEM, slot, id, putSlotStack]);
+            }
+        }
+    }
+}
+
 export {
-    sendUpdateToPlayer
+    sendUpdateToPlayer,
+    putItemToInventory
 }

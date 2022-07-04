@@ -1,4 +1,6 @@
 import {Body, Vec2} from "@leela/common";
+import Inventory from "./Inventory";
+import WorldScene from "../world/WorldScene";
 
 type Control = {dir: Vec2, tick: number};
 
@@ -22,10 +24,11 @@ export default class PlayerState {
     public lastMoveInput: number;
 
     public speed: number;
-
     public run: boolean;
 
-    constructor() {
+    public readonly inventory: Inventory;
+
+    constructor(worldScene: WorldScene) {
         this.appliedControls = [];
 
         this.lerpStartTime = -1;
@@ -44,6 +47,12 @@ export default class PlayerState {
 
         this.speed = 0;
         this.run = true;
+
+        this.inventory = new Inventory(worldScene);
+    }
+
+    public destroy() {
+        this.inventory.destroy();
     }
 }
 
