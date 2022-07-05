@@ -65,7 +65,7 @@ export default class Unit extends Sprite {
     }
 
     private walk() {
-        const dir = getDirection(this.physBody.vx, this.physBody.vy);
+        const dir = this.getDirection(this.physBody.vx, this.physBody.vy);
 
         const anim = `unit:${this._skin}:walk:${dir}`;
         if (this.anims.currentAnim?.key == anim) {
@@ -74,35 +74,28 @@ export default class Unit extends Sprite {
             this.play(anim);
         }
     }
-}
 
-enum Direction {
-    LEFT = "left",
-    RIGHT = "right",
-    DOWN = "down",
-    UP = "up"
-}
+    private getDirection(vx: number, vy: number) {
+        let dir;
 
-function getDirection(vx: number, vy: number): Direction {
-    let dir;
+        if (Math.abs(vy)/Math.abs(vx) >= 0.9) {
+            if (vy > 0) {
+                dir = "down";
+            }
+            if (vy < 0) {
+                dir = "up";
+            }
+        } else {
+            if (vx > 0) {
+                dir = "right";
+            }
+            if (vx < 0) {
+                dir = "left";
+            }
+        }
 
-    if (Math.abs(vy)/Math.abs(vx) >= 0.9) {
-        if (vy > 0) {
-            dir = Direction.DOWN;
-        }
-        if (vy < 0) {
-            dir = Direction.UP;
-        }
-    } else {
-        if (vx > 0) {
-            dir = Direction.RIGHT;
-        }
-        if (vx < 0) {
-            dir = Direction.LEFT;
-        }
+        return dir;
     }
-
-    return dir;
 }
 
 function addUnitToWorld(unit: Unit) {

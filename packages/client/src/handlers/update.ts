@@ -4,11 +4,9 @@ import Unit, {addUnitToWorld, deleteUnitFromWorld, hasRole, isPlayer, Snapshot} 
 import {reconcilePlayerPosition, resetPrediction} from "../movement/playerPrediction";
 import {CLIENT_PREDICT, INTERPOLATE, INTERPOLATE_BUFFER_SIZE, INTERPOLATE_DROP_DUPLICATES} from "../config";
 import {posEquals} from "../movement/position";
-import PlayerState, {PLAYER_STATE} from "../entities/PlayerState";
+import {getState, initState} from "../entities/PlayerState";
 import Plant, {addPlantToWorld, deletePlantFromWorld} from "../entities/Plant";
 import {Item} from "../entities/Item";
-import Inventory from "../entities/Inventory";
-import WorldScene from "../world/WorldScene";
 
 type ObjectUpdate = {
     update: Update,
@@ -97,11 +95,11 @@ function deserializeObjectUpdates(worldSession: WorldSession, input: unknown[]):
                 objectUpdate = deserializeEmptyUnitUpdate(i + 1, input);
                 i += 2;
                 break;
-            case Update.SKIN:
+            case Update.UNIT_SKIN:
                 objectUpdate = deserializeSkinUnitUpdate(i + 1, input);
                 i += 3;
                 break;
-            case Update.POSITION:
+            case Update.UNIT_POSITION:
                 if (worldSession.playerGuid == guid) {
                     objectUpdate = deserializePositionPlayerUpdate(i + 1, input);
                     i += 2;
@@ -219,7 +217,7 @@ function handleUnitUpdate(worldSession: WorldSession, timestamp: number, unitUpd
             cloneLastSnapshotState(unitUpdate, unit);
             pushToUnitSnapshots(unit, unitUpdate, timestamp);
             return;
-        case Update.SKIN:
+        case Update.UNIT_SKIN:
             unit.skin = unitUpdate.skin;
             return;
         case Update.FULL:
@@ -228,7 +226,7 @@ function handleUnitUpdate(worldSession: WorldSession, timestamp: number, unitUpd
 
             if (isPlayer(unit)) handleFullInventoryUpdate(unit, unitUpdate as PlayerUpdate);
             break;
-        case Update.POSITION:
+        case Update.UNIT_POSITION:
             break;
     }
 
@@ -246,9 +244,11 @@ function initUnit(worldSession: WorldSession, unitUpdateState: UnitUpdate) {
     unit.setPosition(unitUpdateState.x, unitUpdateState.y);
 
     if (isPlayer(unit)) {
-        worldSession.player = unit;
+        const player = unit;
 
-        unit.setData(PLAYER_STATE, new PlayerState(worldScene))
+        worldSession.player = player;
+
+        initState(player).draw();
 
         resetPrediction(unit);
     }
@@ -261,28 +261,25 @@ function initUnit(worldSession: WorldSession, unitUpdateState: UnitUpdate) {
 }
 
 function handleFullInventoryUpdate(player: Unit, playerUpdate: PlayerUpdate) {
-    const worldScene = player.scene as WorldScene;
-
-    const inventory = player.getData(PLAYER_STATE).inventory as Inventory;
+    const inventory = getState(player).inventory;
 
     for(let slot = 0; slot < playerUpdate.inventory.length; slot++) {
         inventory.putItem(slot, playerUpdate.inventory[slot]);
     }
-
-    worldScene.drawInventory(inventory);
 }
 
 function handlePositionUpdate(unit: Unit, unitUpdate: UnitUpdate, timestamp: number) {
     pushToUnitSnapshots(unit, unitUpdate, timestamp);
 
     if (isPlayer(unit)) {
+        const player = unit;
         const playerUpdate = unitUpdate as PlayerUpdate;
 
-        const playerState = unit.getData(PLAYER_STATE) as PlayerState;
+        const playerState = getState(player);
 
         playerState.speed = playerUpdate.speed;
 
-        if (CLIENT_PREDICT) reconcilePlayerPosition(unit, playerUpdate, playerUpdate.ackTick);
+        if (CLIENT_PREDICT) reconcilePlayerPosition(player, playerUpdate, playerUpdate.ackTick);
     }
 
     if (!INTERPOLATE) {

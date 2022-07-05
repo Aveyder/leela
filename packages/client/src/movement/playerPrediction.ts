@@ -9,14 +9,14 @@ import {
     CLIENT_SMOOTH_POS_ERROR_THRESHOLD,
     CLIENT_SMOOTH_POS_MS
 } from "../config";
-import PlayerState, {PLAYER_STATE} from "../entities/PlayerState";
+import {getState} from "../entities/PlayerState";
 import {PlayerUpdate} from "../handlers/update";
 
 
 function predictPlayerPosition(player: Unit, dir: Vec2) {
     const worldScene = player.scene as WorldScene;
 
-    const playerState = player.getData(PLAYER_STATE) as PlayerState;
+    const playerState = getState(player);
 
     playerState.appliedControls.push({tick: worldScene.tick, dir});
 
@@ -53,7 +53,7 @@ function predictPlayerPosition(player: Unit, dir: Vec2) {
 
 
 function reconcilePlayerPosition(player: Unit, playerUpdate: PlayerUpdate, ack: number) {
-    const playerState = player.getData(PLAYER_STATE) as PlayerState;
+    const playerState = getState(player);
 
     playerState.ackTick = ack;
 
@@ -88,7 +88,7 @@ function reconcilePlayerPosition(player: Unit, playerUpdate: PlayerUpdate, ack: 
 function updatePlayerPosition(player: Unit, delta: number) {
     if (!CLIENT_PREDICT || !player) return;
 
-    const playerState = player.getData(PLAYER_STATE) as PlayerState;
+    const playerState = getState(player);
 
     const errorTimer = playerState.errorTimer;
 
@@ -109,7 +109,7 @@ function updatePlayerPosition(player: Unit, delta: number) {
 function refreshPredictionError(player: Unit) {
     if (!CLIENT_SMOOTH) return;
 
-    const playerState = player.getData(PLAYER_STATE) as PlayerState;
+    const playerState = getState(player);
 
     const predicted = playerState.predictedBody;
     const reconciled = playerState.reconciledBody;
@@ -135,7 +135,7 @@ function refreshPredictionError(player: Unit) {
 }
 
 function smoothPredictionError(player: Unit, delta: number) {
-    const playerState = player.getData(PLAYER_STATE) as PlayerState;
+    const playerState = getState(player);
 
     if (playerState.errorTimer != -1) {
         const predicted = playerState.predictedBody;
@@ -170,7 +170,7 @@ function withinSmoothPosErrorThreshold(error: Vec2) {
 }
 
 function resetPrediction(player: Unit) {
-    const playerState = player.getData(PLAYER_STATE) as PlayerState;
+    const playerState = getState(player);
 
     playerState.lerpStartTime = -1;
     playerState.lerpDuration = -1;

@@ -1,12 +1,19 @@
 import {Body, Vec2} from "@leela/common";
-import Inventory from "./Inventory";
+import Inventory from "../inventory/Inventory";
 import WorldScene from "../world/WorldScene";
+import CastBar from "./CastBar";
+import Plant from "./Plant";
+import Unit from "./Unit";
+
 
 type Control = {dir: Vec2, tick: number};
 
-const PLAYER_STATE = "player_state";
+const PLAYER_STATE_KEY = "player_state";
 
 export default class PlayerState {
+
+    private readonly worldScene: WorldScene;
+
     public appliedControls: Control[];
 
     public lerpStartTime: number;
@@ -27,8 +34,13 @@ export default class PlayerState {
     public run: boolean;
 
     public readonly inventory: Inventory;
+    public readonly castBar: CastBar;
+
+    public gathering: Plant;
 
     constructor(worldScene: WorldScene) {
+        this.worldScene = worldScene;
+
         this.appliedControls = [];
 
         this.lerpStartTime = -1;
@@ -49,14 +61,38 @@ export default class PlayerState {
         this.run = true;
 
         this.inventory = new Inventory(worldScene);
+        this.castBar = new CastBar(worldScene);
+
+        this.gathering = null;
+    }
+
+    public draw() {
+        this.worldScene.drawInventory(this.inventory);
+        this.worldScene.drawCastBar(this.castBar);
+
+        this.castBar.visible = false;
     }
 
     public destroy() {
         this.inventory.destroy();
+        this.castBar.destroy();
     }
+}
+
+function initState(player: Unit) {
+    const playerState = new PlayerState(player.scene as WorldScene);
+
+    player.setData(PLAYER_STATE_KEY, playerState);
+
+    return playerState;
+}
+
+function getState(player: Unit) {
+    return player?.getData(PLAYER_STATE_KEY) as PlayerState;
 }
 
 export {
     Control,
-    PLAYER_STATE
+    initState,
+    getState
 }

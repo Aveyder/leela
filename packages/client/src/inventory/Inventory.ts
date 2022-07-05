@@ -4,7 +4,7 @@ import Text = Phaser.GameObjects.Text;
 import {Scene} from "phaser";
 import {INVENTORY_SIZE} from "@leela/common";
 import Slot from "./Slot";
-import {Item, itemTexture} from "./Item";
+import {Item, itemTexture} from "../entities/Item";
 
 export default class Inventory extends Container {
 
@@ -78,13 +78,12 @@ export default class Inventory extends Container {
         slot.x = 0;
         slot.y = 0 - index * (Slot.SIZE + 4);
         this.slots.push(slot);
-        this.scene.add.existing(slot);
 
         this.add(slot);
     }
 
     private createItemIcon(index: number) {
-        const itemIcon = this.scene.add.image(this.slots[index].x, this.slots[index].y, "");
+        const itemIcon = new Image(this.scene, this.slots[index].x, this.slots[index].y, "");
         itemIcon.visible = false;
         this.itemIcons.push(itemIcon);
 
@@ -92,7 +91,7 @@ export default class Inventory extends Container {
     }
 
     private createItemStackText(index: number) {
-        const itemStackText = this.scene.add.text(this.slots[index].x + Slot.SIZE / 3, this.slots[index].y + Slot.SIZE / 3, "", {
+        const itemStackText = new Text(this.scene, this.slots[index].x + Slot.SIZE / 3, this.slots[index].y + Slot.SIZE / 3, "", {
             fontSize: "12px",
             backgroundColor: "rgba(0,0,0,0.5)"
         });

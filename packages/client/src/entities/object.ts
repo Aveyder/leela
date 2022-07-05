@@ -1,6 +1,10 @@
 import WorldScene from "../world/WorldScene";
+import {INTERACT_MAX_DISTANCE} from "@leela/common";
+import Unit from "./Unit";
+import Plant from "./Plant";
 import PhaserGameObject = Phaser.GameObjects.GameObject;
 import Sprite = Phaser.GameObjects.Sprite;
+import Between = Phaser.Math.Distance.Between;
 
 
 interface GameObject {
@@ -35,8 +39,17 @@ function hideAndDestroy(object: PhaserGameObject) {
     });
 }
 
+function canInteract(player: Unit, gameObject: Unit | Plant) {
+    if (gameObject.typeId == undefined) return false;
+
+    const distance = Between(player.x, player.y, gameObject.x, gameObject.y);
+
+    return distance <= INTERACT_MAX_DISTANCE;
+}
+
 export {
     GameObject,
     appear,
-    hideAndDestroy
+    hideAndDestroy,
+    canInteract
 }

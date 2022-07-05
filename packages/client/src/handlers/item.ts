@@ -2,16 +2,15 @@ import WorldSession from "../client/WorldSession";
 import {WorldPacket} from "@leela/common";
 import {itemTexture} from "../entities/Item";
 import Depth from "../world/Depth";
-import {PLAYER_STATE} from "../entities/PlayerState";
 import WorldScene from "../world/WorldScene";
-import Inventory from "../entities/Inventory";
+import {getState} from "../entities/PlayerState";
 
 function handlePutItem(worldSession: WorldSession, worldPacket: WorldPacket) {
     const slot = worldPacket[1] as number;
     const id = worldPacket[2] as number;
     const stack = worldPacket[3] as number;
 
-    const inventory = worldSession.player.getData(PLAYER_STATE).inventory as Inventory;
+    const inventory = getState(worldSession.player).inventory;
 
     inventory.putItem(slot, {id, stack});
 

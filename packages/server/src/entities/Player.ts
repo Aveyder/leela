@@ -2,6 +2,7 @@ import WorldSession from "../server/WorldSession";
 import {Unit} from "./Unit";
 import {
     FRACTION_DIGITS,
+    GATHER_DURATION,
     INVENTORY_SIZE,
     Opcode,
     Role,
@@ -12,9 +13,10 @@ import {
     Update,
     WorldPacket
 } from "@leela/common";
-import {cloneObject} from "./GameObject";
-import Plant from "./Plant";
+import {cloneObject, deleteObjectFromWorld, isInWorld} from "./GameObject";
+import Plant, {plantToItem} from "./Plant";
 import Item, {itemData} from "./Item";
+import World from "../world/World";
 
 export default class Player implements Unit {
     public guid: number;
@@ -32,6 +34,8 @@ export default class Player implements Unit {
     public speed: number;
     public run: boolean;
     public readonly inventory: Item[];
+    public gathering: Plant;
+    public gatheringTimer: number;
 
     private readonly _worldSession: WorldSession;
 
@@ -45,6 +49,7 @@ export default class Player implements Unit {
         this.bullet = false;
         this.run = true;
         this.inventory = [];
+        resetGathering(this);
         for(let i = 0; i < INVENTORY_SIZE; i++) this.inventory.push(null);
     }
 
@@ -137,14 +142,14 @@ function pushSerializedInventoryUpdate(player: Player, unitUpdates: unknown[]) {
 }
 
 function pushSerializedSkinUnitUpdate(unit: Unit, unitUpdates: unknown[]) {
-    unitUpdates.push(Update.SKIN,
+    unitUpdates.push(Update.UNIT_SKIN,
         unit.guid,
         unit.skin
     );
 }
 
 function pushSerializedPositionUnitUpdate(unit: Unit, unitUpdates: unknown[]) {
-    unitUpdates.push(Update.POSITION,
+    unitUpdates.push(Update.UNIT_POSITION,
         unit.guid,
         toFixed(unit.x, FRACTION_DIGITS),
         toFixed(unit.y, FRACTION_DIGITS),
@@ -212,9 +217,56 @@ function putItemToInventory(player: Player, id: number, stack: number) {
             }
         }
     }
+
+    return putStack;
+}
+
+function updatePlayers(world: World, delta: number) {
+    Object.values(world.units)
+        .filter(unit => unit.typeId == Type.PLAYER)
+        .forEach((player: Player) => updatePlayer(player, delta));
+}
+
+function updatePlayer(player: Player, delta: number) {
+    updateGathering(player, delta);
+}
+
+function updateGathering(player: Player, delta: number) {
+    const plant = player.gathering;
+
+    if (plant) {
+        player.gatheringTimer += delta;
+
+        const worldSession = player.worldSession;
+
+        if (!isInWorld(plant)) {
+            resetGathering(player);
+            worldSession.sendPacket([Opcode.SMSG_GATHER_FAIL, plant.guid]);
+            return;
+        }
+
+        if (player.gatheringTimer >= GATHER_DURATION) {
+            resetGathering(player);
+            const leftStack = putItemToInventory(player, plantToItem[plant.kind], 1);
+
+            if (leftStack == 0) {
+                deleteObjectFromWorld(plant);
+                worldSession.sendPacket([Opcode.SMSG_GATHER_SUCCESS, plant.guid]);
+            } else {
+                worldSession.sendPacket([Opcode.SMSG_GATHER_FAIL, plant.guid]);
+            }
+        }
+    }
+}
+
+function resetGathering(player: Player) {
+    player.gathering = null;
+    player.gatheringTimer = 0;
 }
 
 export {
     sendUpdateToPlayer,
-    putItemToInventory
+    putItemToInventory,
+    updatePlayers,
+    resetGathering
 }

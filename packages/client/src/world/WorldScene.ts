@@ -1,9 +1,9 @@
 import Preloader from "./Preloader";
 import Keys from "./Keys";
-import {Opcode, PhysicsWorld, Role, SIMULATION_RATE, Type} from "@leela/common";
+import {Opcode, PhysicsWorld, SIMULATION_RATE} from "@leela/common";
 import WorldSession from "../client/WorldSession";
 import WorldClient from "../client/WorldClient";
-import Unit, {hasRole} from "../entities/Unit";
+import Unit from "../entities/Unit";
 import Loop from "../Loop";
 import {playerControl, switchWalkMode} from "../movement/playerControl";
 import {DEBUG_MODE, GAME_HEIGHT, GAME_WIDTH, TICK_CAP} from "../config";
@@ -12,11 +12,11 @@ import DebugManager from "../debugging/DebugManager";
 import {updateUnitPositions} from "../movement/unitPositionInterpolation";
 import Depth from "./Depth";
 import Plant from "../entities/Plant";
-import {GameObject} from "../entities/object";
-import Inventory from "../entities/Inventory";
-import {PLAYER_STATE} from "../entities/PlayerState";
+import Inventory from "../inventory/Inventory";
+import CastBar, {updateCastBar} from "../entities/CastBar";
+import {initCursor, updateCursor} from "./cursor";
+import {getState} from "../entities/PlayerState";
 import Graphics = Phaser.GameObjects.Graphics;
-import UPDATE = Phaser.Scenes.Events.UPDATE;
 import Text = Phaser.GameObjects.Text;
 import Image = Phaser.GameObjects.Image;
 import POINTER_OVER = Phaser.Input.Events.POINTER_OVER;
@@ -26,7 +26,7 @@ import POINTER_UP = Phaser.Input.Events.POINTER_UP;
 
 export default class WorldScene extends Phaser.Scene {
 
-    private _cursor: Image;
+    public cursor: Image;
     private _keys: Keys;
 
     private _worldClient: WorldClient;
@@ -55,10 +55,7 @@ export default class WorldScene extends Phaser.Scene {
     }
 
     public create(): void {
-        this.input.setDefaultCursor(`none`);
-
-        this._cursor = this.add.image(0, 0, "cursor");
-        this._cursor.depth = Depth.CURSOR;
+        initCursor(this);
 
         this._keys = this.input.keyboard.addKeys("W,A,S,D,up,left,down,right,Z") as Keys;
 
@@ -84,54 +81,28 @@ export default class WorldScene extends Phaser.Scene {
 
         this._tick = -1;
 
-        this.events.on(UPDATE, this.update, this);
-
         this.drawShade();
         this.drawJoinButton();
         this.drawDisconnectedText();
 
-        this._keys.Z.on("up", () => {
-            switchWalkMode(this._worldSession);
-        });
+        this._keys.Z.on("up", () => switchWalkMode(this._worldSession));
 
         this.drawTiledMap();
         this.drawInventoryButton();
     }
 
     public update(time: number, delta: number): void {
-        this.updateCursor();
+        updateCursor(this);
         updatePlayerPosition(this.worldSession?.player, delta);
         updateUnitPositions(this);
+        this.updateUnitsDepth();
+        updateCastBar(this, delta);
+    }
+
+    private updateUnitsDepth() {
         Object.values(this._units).forEach(unit => {
             unit.depth = Depth.UNIT + unit.y / 1000000;
         });
-    }
-
-    private updateCursor() {
-        const activePointer = this.input.activePointer;
-
-        this._cursor.alpha = 1;
-        this._cursor.setPosition(activePointer.worldX, activePointer.worldY);
-
-        const currentlyOver = this.input.hitTestPointer(activePointer)[0] as unknown as GameObject;
-
-        if (currentlyOver) {
-            if (this.worldSession?.player && currentlyOver?.typeId) {
-                this._cursor.alpha = 0.6;
-                if (currentlyOver.typeId == Type.PLANT) {
-                    this._cursor.setTexture("cursor-plant");
-                }
-                if (currentlyOver.typeId == Type.MOB && hasRole(currentlyOver as Unit, Role.VENDOR)) {
-                    this._cursor.setTexture("cursor-vendor");
-                }
-                this._cursor.setOrigin(0, 0);
-            } else {
-                this._cursor.setTexture("cursor-hand");
-            }
-        } else {
-            this._cursor.setTexture("cursor");
-            this._cursor.setOrigin(0.25, 0);
-        }
     }
 
     public addSession(worldSession: WorldSession) {
@@ -144,7 +115,7 @@ export default class WorldScene extends Phaser.Scene {
     }
 
     public removeSession() {
-        this._worldSession.player?.getData(PLAYER_STATE).destroy();
+        getState(this._worldSession.player).destroy();
 
         this._worldSession = null;
 
@@ -274,6 +245,11 @@ export default class WorldScene extends Phaser.Scene {
         this.add.existing(inventory);
     }
 
+    public drawCastBar(castBar: CastBar) {
+        castBar.depth = Depth.HUD;
+        this.add.existing(castBar);
+    }
+
     private drawInventoryButton() {
         const inventoryButton = this.add.image(620, 620, "bag");
         inventoryButton.setInteractive();
@@ -290,7 +266,7 @@ export default class WorldScene extends Phaser.Scene {
 
             if (!player) return;
 
-            const inventory = player.getData(PLAYER_STATE).inventory;
+            const inventory = getState(player).inventory;
 
             inventory.visible = !inventory.visible;
         });

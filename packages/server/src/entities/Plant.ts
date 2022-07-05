@@ -19,6 +19,13 @@ export default class Plant implements GameObject {
     }
 }
 
+const plantToItem = {
+    0: 1,
+    1: 2,
+    2: 3,
+    3: 4
+}
+
 function updatePlants(world: World) {
     if (Object.keys(world.plants).length < 100 && Math.random() < 0.01) {
         const plant = new Plant(world);
@@ -42,6 +49,7 @@ function addPlantToWorld(plant: Plant) {
 }
 
 export {
+    plantToItem,
     updatePlants,
     addPlantToWorld
 }

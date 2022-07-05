@@ -1,5 +1,5 @@
 import WorldSession from "../server/WorldSession";
-import Player from "../entities/Player";
+import Player, {resetGathering} from "../entities/Player";
 import {Opcode, UNIT_RUN_SPEED, UNIT_WALK_SPEED, Vec2, WorldPacket} from "@leela/common";
 import {addUnitToWorld} from "../entities/Unit";
 
@@ -51,6 +51,11 @@ function handlePlayerMove(worldSession: WorldSession, worldPacket: WorldPacket, 
     physics.move(player, dir, player.speed);
 
     player.tick = tick;
+
+    if (player.gathering) {
+        worldSession.sendPacket([Opcode.SMSG_GATHER_FAIL, player.gathering.guid]);
+        resetGathering(player);
+    }
 }
 
 function deserializeMove(move: number): Vec2 {

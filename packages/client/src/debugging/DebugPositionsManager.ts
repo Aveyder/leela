@@ -2,7 +2,8 @@ import Graphics = Phaser.GameObjects.Graphics;
 import UPDATE = Phaser.Scenes.Events.UPDATE;
 import WorldScene from "../world/WorldScene";
 import {CLIENT_PREDICT} from "../config";
-import {PLAYER_STATE} from "../entities/PlayerState";
+import {getState} from "../entities/PlayerState";
+
 
 export default class DebugPositionsManager {
 
@@ -62,7 +63,7 @@ export default class DebugPositionsManager {
         if (!CLIENT_PREDICT || !worldSession?.player) return;
 
         const player = worldSession.player;
-        const initialPos = player.getData(PLAYER_STATE).initialPos;
+        const initialPos = getState(player).initialPos;
 
         this.graphics.lineStyle(2, 0x808080);
         this.graphics.strokeRect(initialPos.x - player.physBody.width / 2, initialPos.y - player.physBody.height / 2, player.physBody.width, player.physBody.height);
@@ -75,7 +76,7 @@ export default class DebugPositionsManager {
         if (!CLIENT_PREDICT || !worldSession?.player) return;
 
         const player = worldSession.player;
-        const predictedBody = player.getData(PLAYER_STATE).predictedBody;
+        const predictedBody = getState(player).predictedBody;
 
         this.graphics.lineStyle(2, 0xeed856);
         this.graphics.strokeRect(predictedBody.x - predictedBody.width / 2, predictedBody.y - predictedBody.height / 2, predictedBody.width, predictedBody.height);
@@ -88,7 +89,7 @@ export default class DebugPositionsManager {
         if (!CLIENT_PREDICT || !worldSession?.player) return;
 
         const player = worldSession.player;
-        const targetPos = player.getData(PLAYER_STATE).targetPos;
+        const targetPos = getState(player).targetPos;
 
         this.graphics.lineStyle(2, 0x2b3eb4);
         this.graphics.strokeRect(targetPos.x - player.physBody.width / 2, targetPos.y - player.physBody.height / 2, player.physBody.width, player.physBody.height);
@@ -101,7 +102,7 @@ export default class DebugPositionsManager {
         if (!CLIENT_PREDICT || !worldSession?.player) return;
 
         const player = worldSession.player;
-        const reconciledBody = player.getData(PLAYER_STATE).reconciledBody;
+        const reconciledBody = getState(player).reconciledBody;
 
         this.graphics.lineStyle(2, 0x71dbff);
         this.graphics.strokeRect(reconciledBody.x - reconciledBody.width / 2, reconciledBody.y - reconciledBody.height / 2, reconciledBody.width, reconciledBody.height);

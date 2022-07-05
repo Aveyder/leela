@@ -10,14 +10,17 @@ enum Opcode {
     SMSG_DESTROY,
     CMSG_SWITCH_WALK,
     SMSG_PUT_ITEM,
-    SMGS_FULL_BAG
+    SMGS_FULL_BAG,
+    SMSG_GATHER_SUCCESS,
+    SMSG_GATHER_FAIL,
+    CMSG_GATHER
 }
 
 enum Update {
     FULL,
     EMPTY,
-    SKIN,
-    POSITION
+    UNIT_SKIN,
+    UNIT_POSITION
 }
 
 export {

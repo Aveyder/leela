@@ -4,6 +4,7 @@ import {handlePong} from "../../handlers/pong";
 import {handleJoin} from "../../handlers/join";
 import {handleDestroy, handleUpdate} from "../../handlers/update";
 import {handlePutItem} from "../../handlers/item";
+import {handleGatherFail, handleGatherSuccess} from "../../handlers/gather";
 
 export default class OpcodeTable {
 
@@ -25,6 +26,8 @@ export default class OpcodeTable {
         this.defineHandler(Opcode.SMSG_UPDATE, handleUpdate);
         this.defineHandler(Opcode.SMSG_DESTROY, handleDestroy);
         this.defineHandler(Opcode.SMSG_PUT_ITEM, handlePutItem);
+        this.defineHandler(Opcode.SMSG_GATHER_FAIL, handleGatherFail);
+        this.defineHandler(Opcode.SMSG_GATHER_SUCCESS, handleGatherSuccess);
     }
 
     private defineHandler(opcode: Opcode, handler: WorldPacketHandler) {

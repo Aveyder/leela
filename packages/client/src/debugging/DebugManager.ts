@@ -1,9 +1,9 @@
 import {GUI} from "dat.gui";
 import DebugPositionsManager from "./DebugPositionsManager";
 import WorldScene from "../world/WorldScene";
-import UPDATE = Phaser.Scenes.Events.UPDATE;
 import {SERVER_HOST} from "../config";
-import {PLAYER_STATE} from "../entities/PlayerState";
+import {getState} from "../entities/PlayerState";
+import UPDATE = Phaser.Scenes.Events.UPDATE;
 
 export default class DebugManager {
 
@@ -44,7 +44,8 @@ export default class DebugManager {
 
             if (latency == undefined) latency = "?";
 
-            const playerState = this.worldScene.worldSession?.player?.getData(PLAYER_STATE);
+            const player = this.worldScene.worldSession?.player;
+            const playerState = getState(player);
             const tick = this.worldScene.tick;
 
             const ackTick = playerState ? playerState.ackTick : "?";

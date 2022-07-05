@@ -48,7 +48,7 @@ function interpolateUnitPosition(unit: Unit, serverNow: number) {
         } else {
             let beforeIndex = -1;
             for (let i = lastIndex; i >= 0 && beforeIndex == -1; i--) {
-                if (snapshots[i].timestamp < lerpMoment) {
+                if (snapshots[i].timestamp <= lerpMoment) {
                     beforeIndex = i;
                 }
             }
