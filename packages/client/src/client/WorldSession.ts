@@ -2,7 +2,7 @@ import {Opcode, SIMULATION_RATE, WorldPacket} from "@leela/common";
 import OpcodeTable from "./protocol/OpcodeTable";
 import WorldSocket from "./WorldSocket";
 import {CLIENT_CMD_LOOP, CLIENT_CMD_RATE, CLIENT_UPDATE_RATE, PING_INTERVAL_MS} from "../config";
-import Loop from "../Loop";
+import Loop from "../utils/Loop";
 import Unit from "../core/Unit";
 
 export default class WorldSession {

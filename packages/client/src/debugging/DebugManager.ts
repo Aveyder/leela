@@ -4,7 +4,6 @@ import WorldScene from "../world/WorldScene";
 import {SERVER_HOST} from "../config";
 import {getPlayerState} from "../player/PlayerState";
 import Depth from "../world/Depth";
-import UPDATE = Phaser.Scenes.Events.UPDATE;
 import Text = Phaser.GameObjects.Text;
 
 export default class DebugManager {
@@ -73,7 +72,5 @@ unack: ${unack}`;
         this.text.destroy();
         this.gui.destroy();
         this.positions.destroy();
-
-        this.worldScene.events.removeListener(UPDATE, this.updateDebugInfo, this);
     }
 }

@@ -1,6 +1,6 @@
 import World from "./world/World";
 import WorldServer from "./server/WorldServer";
-import Loop from "./Loop";
+import Loop from "./utils/Loop";
 import {SIMULATION_RATE} from "@leela/common";
 
 function boot() {

@@ -1,5 +1,4 @@
 import Graphics = Phaser.GameObjects.Graphics;
-import UPDATE = Phaser.Scenes.Events.UPDATE;
 import WorldScene from "../world/WorldScene";
 import {CLIENT_PREDICT} from "../config";
 import {getPlayerState} from "../player/PlayerState";
@@ -122,6 +121,5 @@ export default class DebugPositionsManager {
 
     public destroy() {
         this.graphics.destroy();
-        this.worldScene.events.removeListener(UPDATE, this.update, this);
     }
 }

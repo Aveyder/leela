@@ -2,7 +2,7 @@ import {Opcode, SIMULATION_RATE, WorldPacket} from "@leela/common";
 import OpcodeTable from "./protocol/OpcodeTable";
 import WorldSocket from "./WorldSocket";
 import Player from "../player/Player";
-import Loop from "../Loop";
+import Loop from "../utils/Loop";
 import {UPDATE_RATE} from "../config";
 import {sendUpdateToPlayer} from "../core/update";
 import GameObject, {deleteObjectFromWorld} from "../core/GameObject";

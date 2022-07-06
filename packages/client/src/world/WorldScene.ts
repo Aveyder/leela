@@ -4,7 +4,7 @@ import {PhysicsWorld, SIMULATION_RATE} from "@leela/common";
 import WorldSession from "../client/WorldSession";
 import WorldClient from "../client/WorldClient";
 import Unit from "../core/Unit";
-import Loop from "../Loop";
+import Loop from "../utils/Loop";
 import {movement} from "../player/movement";
 import {DEBUG_MODE, TICK_CAP} from "../config";
 import {updatePlayerPosition} from "../player/prediction";
