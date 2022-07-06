@@ -1,9 +1,10 @@
 import WorldScene from "../world/WorldScene";
 import {CLIENT_PREDICT, ENTITY_EXTRAPOLATE, ENTITY_EXTRAPOLATE_MAX_MS, INTERPOLATE} from "../config";
 import {INTERPOLATE_MS, TMP_VEC2, Vec2} from "@leela/common";
-import Unit, {isPlayer} from "../entities/Unit";
-import {UnitUpdate} from "../entities/update";
+import Unit, {isPlayer} from "../core/Unit";
+import {UnitUpdate} from "../core/update";
 import {interpolate} from "../utils/vec2";
+import Depth from "../world/Depth";
 
 function updateUnitPositions(worldScene: WorldScene) {
     if (!INTERPOLATE) return;
@@ -74,6 +75,13 @@ function interpolateUnitPosition(unit: Unit, serverNow: number) {
     unit.setDir(lerpMomentState.vx, lerpMomentState.vy);
 }
 
+function updateUnitsDepth(worldScene: WorldScene) {
+    Object.values(worldScene.units).forEach(unit => {
+        unit.depth = Depth.UNIT + unit.y / 1000000;
+    });
+}
+
 export {
-    updateUnitPositions
+    updateUnitPositions,
+    updateUnitsDepth
 }

@@ -3,7 +3,8 @@ import Inventory from "../inventory/Inventory";
 import WorldScene from "../world/WorldScene";
 import CastBar from "../plant/CastBar";
 import Plant from "../plant/Plant";
-import Unit from "../entities/Unit";
+import Unit from "../core/Unit";
+import {drawCastBar, drawInventory} from "../gui/hud";
 
 
 type Control = {dir: Vec2, tick: number};
@@ -67,10 +68,8 @@ export default class PlayerState {
     }
 
     public draw() {
-        this.worldScene.drawInventory(this.inventory);
-        this.worldScene.drawCastBar(this.castBar);
-
-        this.castBar.visible = false;
+        drawInventory(this.worldScene, this.inventory);
+        drawCastBar(this.worldScene, this.castBar);
     }
 
     public destroy() {

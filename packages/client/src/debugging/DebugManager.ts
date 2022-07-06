@@ -3,6 +3,7 @@ import DebugPositionsManager from "./DebugPositionsManager";
 import WorldScene from "../world/WorldScene";
 import {SERVER_HOST} from "../config";
 import {getPlayerState} from "../player/PlayerState";
+import Depth from "../world/Depth";
 import UPDATE = Phaser.Scenes.Events.UPDATE;
 import Text = Phaser.GameObjects.Text;
 
@@ -35,17 +36,20 @@ export default class DebugManager {
         this.initDebugInfo();
     }
 
+    public update() {
+        this.positions.update();
+        this.updateDebugInfo();
+    }
+
     private initDebugInfo() {
         this.text = this.worldScene.add.text(0, 0, "", {
             fontSize: "12px",
             backgroundColor: "rgba(0,0,0,0.5)"
         });
-        this.text.setDepth(1000);
-
-        this.worldScene.events.on(UPDATE, this.update, this);
+        this.text.depth = Depth.DEBUG;
     }
 
-    private update() {
+    private updateDebugInfo() {
         let latency = String(this.worldScene.worldSession?.latency);
 
         if (latency == undefined) latency = "?";
@@ -70,6 +74,6 @@ unack: ${unack}`;
         this.gui.destroy();
         this.positions.destroy();
 
-        this.worldScene.events.removeListener(UPDATE, this.update, this);
+        this.worldScene.events.removeListener(UPDATE, this.updateDebugInfo, this);
     }
 }

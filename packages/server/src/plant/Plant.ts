@@ -1,4 +1,4 @@
-import GameObject from "../entities/GameObject";
+import GameObject from "../core/GameObject";
 import World from "../world/World";
 import {Type} from "@leela/common";
 

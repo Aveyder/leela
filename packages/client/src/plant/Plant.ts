@@ -2,7 +2,7 @@ import Sprite = Phaser.GameObjects.Sprite;
 import {Scene} from "phaser";
 import WorldScene from "../world/WorldScene";
 import Depth from "../world/Depth";
-import {appear, hideAndDestroy} from "../entities/GameObject";
+import {appear, hideAndDestroy} from "../core/GameObject";
 
 export default class Plant extends Sprite {
 

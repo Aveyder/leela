@@ -5,7 +5,8 @@ enum Depth {
     TREE,
     UNIT,
     HUD,
-    MENU = 1000,
+    DEBUG,
+    MENU,
     CURSOR
 }
 

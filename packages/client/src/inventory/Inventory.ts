@@ -4,7 +4,7 @@ import Text = Phaser.GameObjects.Text;
 import {Scene} from "phaser";
 import {INVENTORY_SIZE} from "@leela/common";
 import Slot from "./Slot";
-import Item, {itemTexture} from "../entities/Item";
+import Item, {itemTexture} from "../core/Item";
 
 export default class Inventory extends Container {
 

@@ -1,7 +1,7 @@
 import {Opcode} from "@leela/common";
 import WorldPacketHandler from "./WorldPacketHandler";
 import {handleJoin} from "../../player/join";
-import {handleDestroy, handleUpdate} from "../../entities/update";
+import {handleDestroy, handleUpdate} from "../../core/update";
 import {handlePutItem} from "../../inventory/putItem";
 import {handleGatherFail, handleGatherSuccess} from "../../plant/gather";
 import {handlePong} from "../pong";

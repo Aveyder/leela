@@ -1,4 +1,4 @@
-import Unit from "../entities/Unit";
+import Unit from "../core/Unit";
 import {cloneBody, SIMULATION_DELTA_MS, TMP_VEC2, Vec2} from "@leela/common";
 import WorldScene from "../world/WorldScene";
 import {diff, interpolate} from "../utils/vec2";
@@ -10,7 +10,7 @@ import {
     CLIENT_SMOOTH_POS_MS
 } from "../config";
 import {getPlayerState} from "./PlayerState";
-import {PlayerUpdate} from "../entities/update";
+import {PlayerUpdate} from "../core/update";
 
 
 function predictPlayerPosition(player: Unit, dir: Vec2) {

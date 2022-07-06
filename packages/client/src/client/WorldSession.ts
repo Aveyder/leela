@@ -3,7 +3,7 @@ import OpcodeTable from "./protocol/OpcodeTable";
 import WorldSocket from "./WorldSocket";
 import {CLIENT_CMD_LOOP, CLIENT_CMD_RATE, CLIENT_UPDATE_RATE, PING_INTERVAL_MS} from "../config";
 import Loop from "../Loop";
-import Unit from "../entities/Unit";
+import Unit from "../core/Unit";
 
 export default class WorldSession {
 

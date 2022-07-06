@@ -29,7 +29,7 @@ const PING_INTERVAL_MS = 1000;
 
 const TIMESYNC_INTERVAL_MS = 30000;
 
-const DEBUG_MODE = false;
+const DEBUG_MODE = true;
 
 const TICK_CAP = 100;
 

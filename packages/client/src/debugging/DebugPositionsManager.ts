@@ -3,6 +3,7 @@ import UPDATE = Phaser.Scenes.Events.UPDATE;
 import WorldScene from "../world/WorldScene";
 import {CLIENT_PREDICT} from "../config";
 import {getPlayerState} from "../player/PlayerState";
+import Depth from "../world/Depth";
 
 
 export default class DebugPositionsManager {
@@ -24,12 +25,10 @@ export default class DebugPositionsManager {
 
     public init(): void {
         this.graphics = this.worldScene.add.graphics();
-        this.graphics.setDepth(999);
-
-        this.worldScene.events.on(UPDATE, this.drawPositions, this);
+        this.graphics.depth = Depth.DEBUG;
     }
 
-    private drawPositions() {
+    public update() {
         this.graphics.clear();
 
         if (this.showRemotePosition) this.drawRemotePosition();
@@ -123,6 +122,6 @@ export default class DebugPositionsManager {
 
     public destroy() {
         this.graphics.destroy();
-        this.worldScene.events.removeListener(UPDATE, this.drawPositions, this);
+        this.worldScene.events.removeListener(UPDATE, this.update, this);
     }
 }

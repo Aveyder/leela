@@ -2,7 +2,7 @@ import WorldScene from "../world/WorldScene";
 import {Opcode, UNIT_RUN_SPEED, UNIT_WALK_SPEED, Vec2} from "@leela/common";
 import {CLIENT_PREDICT} from "../config";
 import {predictPlayerPosition} from "./prediction";
-import Keys from "../world/Keys";
+import {Keys} from "../world/keys";
 import {getPlayerState} from "./PlayerState";
 import WorldSession from "../client/WorldSession";
 

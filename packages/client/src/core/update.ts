@@ -366,7 +366,7 @@ function handleUnitDestroy(worldSession: WorldSession, unit: Unit) {
     if (isPlayer(unit)) {
         worldSession.playerGuid = null;
         worldSession.player = null;
-        worldScene.showMenu();
+        worldScene.gameMenu.showJoinMenu();
     }
 
     deleteUnitFromWorld(unit);

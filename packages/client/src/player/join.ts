@@ -4,7 +4,7 @@ import {WorldPacket} from "@leela/common";
 function handleJoin(worldSession: WorldSession, worldPacket: WorldPacket) {
     worldSession.playerGuid = worldPacket[1] as number;
 
-    worldSession.worldScene.showGame();
+    worldSession.worldScene.gameMenu.visible = false;
 }
 
 export {

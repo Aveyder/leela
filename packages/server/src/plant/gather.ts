@@ -1,6 +1,6 @@
 import WorldSession from "../server/WorldSession";
 import {GATHER_DURATION, Opcode, WorldPacket} from "@leela/common";
-import {deleteObjectFromWorld, isInWorld} from "../entities/GameObject";
+import {deleteObjectFromWorld, isInWorld} from "../core/GameObject";
 import {plantToItem} from "./Plant";
 import Player from "../player/Player";
 import {putItemToInventory} from "../inventory/putItem";

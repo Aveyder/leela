@@ -1,8 +1,8 @@
 import WorldSession from "../server/WorldSession";
-import {Unit} from "../entities/Unit";
+import {Unit} from "../core/Unit";
 import {INVENTORY_SIZE, Role, Type, UNIT_BODY_HEIGHT, UNIT_BODY_WIDTH} from "@leela/common";
 import Plant from "../plant/Plant";
-import Item from "../entities/Item";
+import Item from "../core/Item";
 import World from "../world/World";
 import {resetGathering, updateGathering} from "../plant/gather";
 

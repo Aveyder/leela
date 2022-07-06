@@ -4,8 +4,8 @@ import WorldSocket from "./WorldSocket";
 import Player from "../player/Player";
 import Loop from "../Loop";
 import {UPDATE_RATE} from "../config";
-import {sendUpdateToPlayer} from "../entities/update";
-import GameObject, {deleteObjectFromWorld} from "../entities/GameObject";
+import {sendUpdateToPlayer} from "../core/update";
+import GameObject, {deleteObjectFromWorld} from "../core/GameObject";
 
 export default class WorldSession {
 

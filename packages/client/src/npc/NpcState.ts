@@ -1,4 +1,4 @@
-import Unit from "../entities/Unit";
+import Unit from "../core/Unit";
 
 const NPC_STATE_KEY = "npc_state";
 

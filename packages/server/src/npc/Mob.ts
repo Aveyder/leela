@@ -1,5 +1,5 @@
 import World from "../world/World";
-import {addUnitToWorld, Unit} from "../entities/Unit";
+import {addUnitToWorld, Unit} from "../core/Unit";
 import {Role, TILE_SIZE, Type, UNIT_BODY_HEIGHT, UNIT_BODY_WIDTH, UNIT_WALK_SPEED} from "@leela/common";
 import {Motion, PathMotion, Waypoint} from "./motions";
 

@@ -1,6 +1,6 @@
 import WorldSession from "../server/WorldSession";
 import {PhysicsWorld} from "@leela/common";
-import {Unit} from "../entities/Unit";
+import {Unit} from "../core/Unit";
 import {spawnCat, spawnVendor, updateMobs} from "../npc/Mob";
 import * as map from "@leela/common/map/map.json";
 import Plant, {updatePlants} from "../plant/Plant";

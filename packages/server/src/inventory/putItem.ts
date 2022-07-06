@@ -1,4 +1,4 @@
-import Item, {itemData} from "../entities/Item";
+import Item, {itemData} from "../core/Item";
 import {Opcode} from "@leela/common";
 import Player from "../player/Player";
 

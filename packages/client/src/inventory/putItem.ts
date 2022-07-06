@@ -1,6 +1,6 @@
 import WorldSession from "../client/WorldSession";
 import {WorldPacket} from "@leela/common";
-import {itemTexture} from "../entities/Item";
+import {itemTexture} from "../core/Item";
 import Depth from "../world/Depth";
 import WorldScene from "../world/WorldScene";
 import {getPlayerState} from "../player/PlayerState";

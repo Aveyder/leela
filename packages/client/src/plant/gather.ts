@@ -2,7 +2,7 @@ import WorldSession from "../client/WorldSession";
 import {getPlayerState} from "../player/PlayerState";
 import {CastBarStatus} from "./CastBar";
 import {GATHER_DURATION, Opcode, WorldPacket} from "@leela/common";
-import Unit from "../entities/Unit";
+import Unit from "../core/Unit";
 import WorldScene from "../world/WorldScene";
 import Plant from "./Plant";
 

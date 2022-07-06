@@ -1,5 +1,5 @@
 import {PhysicsWorld, SIMULATION_DELTA, TMP_VEC2, Vec2} from "@leela/common";
-import {Unit} from "../entities/Unit";
+import {Unit} from "../core/Unit";
 
 interface Motion {
     update(delta: number): void;

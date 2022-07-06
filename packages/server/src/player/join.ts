@@ -1,7 +1,7 @@
 import WorldSession from "../server/WorldSession";
 import Player from "./Player";
 import {Opcode, UNIT_RUN_SPEED} from "@leela/common";
-import {addUnitToWorld} from "../entities/Unit";
+import {addUnitToWorld} from "../core/Unit";
 
 function handlePlayerJoin(worldSession: WorldSession) {
     // TODO: Manage this via required session status, drop such packets: STATUS_AUTH, STATUS_LOGON etc

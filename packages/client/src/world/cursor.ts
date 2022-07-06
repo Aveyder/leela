@@ -1,7 +1,7 @@
 import WorldScene from "./WorldScene";
 import Depth from "./Depth";
-import GameObject, {canInteract} from "../entities/GameObject";
-import Unit, {hasRole} from "../entities/Unit";
+import GameObject, {canInteract} from "../core/GameObject";
+import Unit, {hasRole} from "../core/Unit";
 import Plant from "../plant/Plant";
 import {Role, Type} from "@leela/common";
 import {gatherPlant} from "../plant/gather";
@@ -11,8 +11,8 @@ import Pointer = Phaser.Input.Pointer;
 function initCursor(worldScene: WorldScene) {
     worldScene.input.setDefaultCursor(`none`);
 
-    worldScene.cursor = worldScene.add.image(0, 0, "cursor");
-    worldScene.cursor.depth = Depth.CURSOR;
+    const cursor = worldScene.add.image(0, 0, "cursor");
+    cursor.depth = Depth.CURSOR;
 
     worldScene.input.on(POINTER_UP, (pointer: Pointer, currentlyOver: GameObject[]) => {
         const gameObject = currentlyOver[0] as Unit | Plant;
@@ -27,6 +27,8 @@ function initCursor(worldScene: WorldScene) {
             if (gameObject.typeId == Type.PLANT) gatherPlant(player, gameObject as Plant);
         }
     });
+
+    return cursor;
 }
 
 function updateCursor(worldScene: WorldScene) {
