@@ -19,8 +19,8 @@ function handleGatherFinish(worldSession: WorldSession, worldPacket: WorldPacket
 
     const playerState = getPlayerState(worldSession.player);
 
-    if (playerState.gathering?.guid == plantGuid) {
-        playerState.gathering = null;
+    if (playerState.gatheringPlant?.guid == plantGuid) {
+        playerState.gatheringPlant = null;
         playerState.castBar.status = status;
         playerState.castBar.hide();
     }
@@ -29,9 +29,9 @@ function handleGatherFinish(worldSession: WorldSession, worldPacket: WorldPacket
 function gatherPlant(player: Unit, plant: Plant) {
     const playerState = getPlayerState(player);
 
-    if(playerState.gathering?.guid == plant.guid) return;
+    if(playerState.gatheringPlant?.guid == plant.guid) return;
 
-    playerState.gathering = plant;
+    playerState.gatheringPlant = plant;
 
     const castBar = playerState.castBar;
 

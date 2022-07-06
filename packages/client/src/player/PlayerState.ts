@@ -37,7 +37,7 @@ export default class PlayerState {
     public readonly inventory: Inventory;
     public readonly castBar: CastBar;
 
-    public gathering: Plant;
+    public gatheringPlant: Plant;
 
     constructor(worldScene: WorldScene) {
         this.worldScene = worldScene;
@@ -64,7 +64,7 @@ export default class PlayerState {
         this.inventory = new Inventory(worldScene);
         this.castBar = new CastBar(worldScene);
 
-        this.gathering = null;
+        this.gatheringPlant = null;
     }
 
     public draw() {
