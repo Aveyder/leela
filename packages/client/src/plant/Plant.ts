@@ -2,11 +2,7 @@ import Sprite = Phaser.GameObjects.Sprite;
 import {Scene} from "phaser";
 import WorldScene from "../world/WorldScene";
 import Depth from "../world/Depth";
-import {appear, hideAndDestroy} from "./object";
-import Unit from "./Unit";
-import {getState} from "./PlayerState";
-import {GATHER_DURATION, Opcode} from "@leela/common";
-import {CastBarStatus} from "./CastBar";
+import {appear, hideAndDestroy} from "../entities/GameObject";
 
 export default class Plant extends Sprite {
 
@@ -40,28 +36,8 @@ function deletePlantFromWorld(plant: Plant) {
     delete worldScene.plants[plant.guid];
 }
 
-function gatherPlant(player: Unit, plant: Plant) {
-    const playerState = getState(player);
-
-    if(playerState.gathering?.guid == plant.guid) return;
-
-    playerState.gathering = plant;
-
-    const castBar = playerState.castBar;
-
-    castBar.show();
-    castBar.status = CastBarStatus.IN_PROGRESS;
-    castBar.totalTime = GATHER_DURATION;
-    castBar.currentTime = 0;
-
-    const worldSession = (player.scene as WorldScene).worldSession;
-
-    worldSession.sendPacket([Opcode.CMSG_GATHER, plant.guid]);
-}
-
 
 export {
     addPlantToWorld,
-    deletePlantFromWorld,
-    gatherPlant
+    deletePlantFromWorld
 }

@@ -1,13 +1,13 @@
 import WorldScene from "../world/WorldScene";
 import {INTERACT_MAX_DISTANCE} from "@leela/common";
 import Unit from "./Unit";
-import Plant from "./Plant";
+import Plant from "../plant/Plant";
 import PhaserGameObject = Phaser.GameObjects.GameObject;
 import Sprite = Phaser.GameObjects.Sprite;
 import Between = Phaser.Math.Distance.Between;
 
 
-interface GameObject {
+export default interface GameObject {
     guid: number;
     typeId: number;
 }
@@ -24,18 +24,18 @@ function appear(gameObject: Sprite) {
     });
 }
 
-function hideAndDestroy(object: PhaserGameObject) {
-    const worldScene = object.scene as WorldScene;
+function hideAndDestroy(gameObject: PhaserGameObject) {
+    const worldScene = gameObject.scene as WorldScene;
 
-    object.disableInteractive();
+    gameObject.disableInteractive();
 
-    worldScene.tweens.killTweensOf(object);
+    worldScene.tweens.killTweensOf(gameObject);
     worldScene.add.tween({
-        targets: object,
+        targets: gameObject,
         alpha: 0,
         ease: "Linear",
         duration: 500,
-        onComplete: () => object.destroy()
+        onComplete: () => gameObject.destroy()
     });
 }
 
@@ -48,7 +48,6 @@ function canInteract(player: Unit, gameObject: Unit | Plant) {
 }
 
 export {
-    GameObject,
     appear,
     hideAndDestroy,
     canInteract

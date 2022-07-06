@@ -1,9 +1,10 @@
 import WorldScene from "./WorldScene";
 import Depth from "./Depth";
-import {canInteract, GameObject} from "../entities/object";
+import GameObject, {canInteract} from "../entities/GameObject";
 import Unit, {hasRole} from "../entities/Unit";
-import Plant, {gatherPlant} from "../entities/Plant";
+import Plant from "../plant/Plant";
 import {Role, Type} from "@leela/common";
+import {gatherPlant} from "../plant/gather";
 import POINTER_UP = Phaser.Input.Events.POINTER_UP;
 import Pointer = Phaser.Input.Pointer;
 

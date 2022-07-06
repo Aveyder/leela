@@ -2,7 +2,7 @@ import Graphics = Phaser.GameObjects.Graphics;
 import UPDATE = Phaser.Scenes.Events.UPDATE;
 import WorldScene from "../world/WorldScene";
 import {CLIENT_PREDICT} from "../config";
-import {getState} from "../entities/PlayerState";
+import {getPlayerState} from "../player/PlayerState";
 
 
 export default class DebugPositionsManager {
@@ -26,7 +26,7 @@ export default class DebugPositionsManager {
         this.graphics = this.worldScene.add.graphics();
         this.graphics.setDepth(999);
 
-        this.worldScene.events.on(UPDATE, () => this.drawPositions());
+        this.worldScene.events.on(UPDATE, this.drawPositions, this);
     }
 
     private drawPositions() {
@@ -63,7 +63,7 @@ export default class DebugPositionsManager {
         if (!CLIENT_PREDICT || !worldSession?.player) return;
 
         const player = worldSession.player;
-        const initialPos = getState(player).initialPos;
+        const initialPos = getPlayerState(player).initialPos;
 
         this.graphics.lineStyle(2, 0x808080);
         this.graphics.strokeRect(initialPos.x - player.physBody.width / 2, initialPos.y - player.physBody.height / 2, player.physBody.width, player.physBody.height);
@@ -76,7 +76,7 @@ export default class DebugPositionsManager {
         if (!CLIENT_PREDICT || !worldSession?.player) return;
 
         const player = worldSession.player;
-        const predictedBody = getState(player).predictedBody;
+        const predictedBody = getPlayerState(player).predictedBody;
 
         this.graphics.lineStyle(2, 0xeed856);
         this.graphics.strokeRect(predictedBody.x - predictedBody.width / 2, predictedBody.y - predictedBody.height / 2, predictedBody.width, predictedBody.height);
@@ -89,7 +89,7 @@ export default class DebugPositionsManager {
         if (!CLIENT_PREDICT || !worldSession?.player) return;
 
         const player = worldSession.player;
-        const targetPos = getState(player).targetPos;
+        const targetPos = getPlayerState(player).targetPos;
 
         this.graphics.lineStyle(2, 0x2b3eb4);
         this.graphics.strokeRect(targetPos.x - player.physBody.width / 2, targetPos.y - player.physBody.height / 2, player.physBody.width, player.physBody.height);
@@ -102,7 +102,7 @@ export default class DebugPositionsManager {
         if (!CLIENT_PREDICT || !worldSession?.player) return;
 
         const player = worldSession.player;
-        const reconciledBody = getState(player).reconciledBody;
+        const reconciledBody = getPlayerState(player).reconciledBody;
 
         this.graphics.lineStyle(2, 0x71dbff);
         this.graphics.strokeRect(reconciledBody.x - reconciledBody.width / 2, reconciledBody.y - reconciledBody.height / 2, reconciledBody.width, reconciledBody.height);
@@ -119,5 +119,10 @@ export default class DebugPositionsManager {
             this.graphics.strokeCircle(unit.x, unit.y, 1);
             this.graphics.strokeRect(unit.x - body.width / 2, unit.y - body.height / 2, body.width, body.height);
         });
+    }
+
+    public destroy() {
+        this.graphics.destroy();
+        this.worldScene.events.removeListener(UPDATE, this.drawPositions, this);
     }
 }

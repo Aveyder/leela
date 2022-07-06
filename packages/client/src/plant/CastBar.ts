@@ -3,7 +3,7 @@ import Text = Phaser.GameObjects.Text;
 import Container = Phaser.GameObjects.Container;
 import Tween = Phaser.Tweens.Tween;
 import {Scene} from "phaser";
-import {getState} from "./PlayerState";
+import {getPlayerState} from "../player/PlayerState";
 import {TILE_SIZE} from "@leela/common";
 import WorldScene from "../world/WorldScene";
 
@@ -82,7 +82,7 @@ export default class CastBar extends Container {
         let borderColor;
 
         if (this._status == CastBarStatus.IN_PROGRESS) borderColor = 0x31313180;
-        if (this._status == CastBarStatus.FAIL) borderColor = 0x6E1414;
+        if (this._status == CastBarStatus.FAIL) borderColor = 0xFFFFFF;
         if (this._status == CastBarStatus.SUCCESS) borderColor = 0xFFFFFF;
 
         this.graphics.lineStyle(2, borderColor);
@@ -123,7 +123,7 @@ function updateCastBar(worldScene: WorldScene, delta: number) {
 
     if (!player) return;
 
-    const castBar = getState(player).castBar;
+    const castBar = getPlayerState(player).castBar;
 
     castBar.setPosition(player.x, player.y + TILE_SIZE);
 

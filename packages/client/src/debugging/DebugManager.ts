@@ -2,8 +2,9 @@ import {GUI} from "dat.gui";
 import DebugPositionsManager from "./DebugPositionsManager";
 import WorldScene from "../world/WorldScene";
 import {SERVER_HOST} from "../config";
-import {getState} from "../entities/PlayerState";
+import {getPlayerState} from "../player/PlayerState";
 import UPDATE = Phaser.Scenes.Events.UPDATE;
+import Text = Phaser.GameObjects.Text;
 
 export default class DebugManager {
 
@@ -11,6 +12,8 @@ export default class DebugManager {
     public readonly gui: GUI;
 
     private positions: DebugPositionsManager;
+
+    private text: Text;
 
     constructor(worldScene: WorldScene) {
         this.worldScene = worldScene;
@@ -33,29 +36,40 @@ export default class DebugManager {
     }
 
     private initDebugInfo() {
-        const text = this.worldScene.add.text(0, 0, "", {
+        this.text = this.worldScene.add.text(0, 0, "", {
             fontSize: "12px",
             backgroundColor: "rgba(0,0,0,0.5)"
         });
-        text.setDepth(1000);
+        this.text.setDepth(1000);
 
-        this.worldScene.events.on(UPDATE, () => {
-            let latency = String(this.worldScene.worldSession?.latency);
+        this.worldScene.events.on(UPDATE, this.update, this);
+    }
 
-            if (latency == undefined) latency = "?";
+    private update() {
+        let latency = String(this.worldScene.worldSession?.latency);
 
-            const player = this.worldScene.worldSession?.player;
-            const playerState = getState(player);
-            const tick = this.worldScene.tick;
+        if (latency == undefined) latency = "?";
 
-            const ackTick = playerState ? playerState.ackTick : "?";
-            const unack = playerState ? playerState.appliedControls.length : "?"
+        const player = this.worldScene.worldSession?.player;
+        const playerState = getPlayerState(player);
+        const tick = this.worldScene.tick;
 
-            text.text = `ping: ${latency} ms
+        const ackTick = playerState ? playerState.ackTick : "?";
+        const unack = playerState ? playerState.appliedControls.length : "?"
+
+        this.text.text = `ping: ${latency} ms
 host: ${SERVER_HOST}
 tick: ${tick}
 ack: ${ackTick}
 unack: ${unack}`;
-        });
+    }
+
+
+    public destroy() {
+        this.text.destroy();
+        this.gui.destroy();
+        this.positions.destroy();
+
+        this.worldScene.events.removeListener(UPDATE, this.update, this);
     }
 }

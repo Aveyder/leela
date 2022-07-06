@@ -7,7 +7,7 @@ import Unit from "../entities/Unit";
 
 export default class WorldSession {
 
-    private readonly worldSocket: WorldSocket;
+    private _worldSocket: WorldSocket;
 
     private cmpLoop: Loop;
 
@@ -19,7 +19,7 @@ export default class WorldSession {
     public player: Unit;
 
     constructor(worldSocket: WorldSocket) {
-        this.worldSocket = worldSocket;
+        this._worldSocket = worldSocket;
 
         this.latency = -1;
     }
@@ -31,7 +31,7 @@ export default class WorldSession {
     }
 
     public sendPacket(worldPacket: WorldPacket): void {
-        this.worldSocket.sendPacket(worldPacket, !CLIENT_CMD_LOOP);
+        this._worldSocket.sendPacket(worldPacket, !CLIENT_CMD_LOOP);
     }
 
     public recvPacket(worldPacket: WorldPacket): void {
@@ -46,7 +46,7 @@ export default class WorldSession {
         this.cmpLoop = new Loop();
 
         this.cmpLoop.start(
-            () => this.worldSocket.update(),
+            () => this._worldSocket.update(),
             CLIENT_CMD_RATE < 0 ? SIMULATION_RATE : CLIENT_CMD_RATE
         );
     }
@@ -55,11 +55,13 @@ export default class WorldSession {
         this.pingInterval = setInterval(() => {
             this._pingStart = Date.now();
 
-            this.worldSocket.sendPacket([Opcode.CMSG_PING, this.latency], true);
+            this._worldSocket.sendPacket([Opcode.CMSG_PING, this.latency], true);
         }, PING_INTERVAL_MS) as unknown as number;
     }
 
     public destroy(): void {
+        this._worldSocket = null;
+
         this.cmpLoop.stop();
 
         clearInterval(this.pingInterval);
@@ -71,7 +73,11 @@ export default class WorldSession {
     }
 
     public get worldScene() {
-        return this.worldSocket.worldScene;
+        return this._worldSocket.worldScene;
+    }
+
+    public get worldSocket() {
+        return this._worldSocket;
     }
 
     public get pingStart() {

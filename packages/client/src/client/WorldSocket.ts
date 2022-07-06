@@ -3,21 +3,24 @@ import {Opcode, WorldPacket} from "@leela/common";
 import WorldScene from "../world/WorldScene";
 import {Socket} from "socket.io-client";
 import WorldClient from "./WorldClient";
+import * as timesync from "timesync";
 import {TimeSync} from "timesync";
+import {TIMESYNC_INTERVAL_MS} from "../config";
 
 export default class WorldSocket {
 
     public readonly worldScene: WorldScene;
-    private readonly socket: Socket
-    private readonly ts: TimeSync;
+    private readonly socket: Socket;
+
     private readonly bufferQueue: WorldPacket[];
+
+    private _ts: TimeSync;
 
     private worldSession: WorldSession;
 
     constructor(worldClient: WorldClient) {
         this.worldScene = worldClient.worldScene;
         this.socket = worldClient.socket;
-        this.ts = worldClient.ts;
 
         this.bufferQueue = [];
     }
@@ -30,7 +33,7 @@ export default class WorldSocket {
         this.sendPacket([Opcode.CMSG_AUTH], true);
     }
 
-    public sendPacket(worldPacket: WorldPacket, immediate) {
+    public sendPacket(worldPacket: WorldPacket, immediate: boolean) {
         if (immediate) {
             this.socket.send(worldPacket);
         } else {
@@ -45,7 +48,14 @@ export default class WorldSocket {
     }
 
     private initTimesync() {
-        this.socket.on("timesync", (data) => this.ts.receive(null, data));
+        this._ts = timesync.create({
+            server: this.socket,
+            interval: TIMESYNC_INTERVAL_MS
+        });
+
+        this._ts.send = sendTimesync;
+
+        this.socket.on("timesync", (data) => this._ts.receive(null, data));
     }
 
     private handleWorldPacket(worldPacket: WorldPacket) {
@@ -82,5 +92,23 @@ export default class WorldSocket {
         this.socket.removeAllListeners("message");
         this.socket.removeAllListeners("disconnect");
         this.socket.removeAllListeners("timesync");
+
+        this._ts.destroy();
+        this._ts = null;
     }
+
+    public get ts() {
+        return this._ts;
+    }
+}
+
+function sendTimesync(socket: Socket, data, timeout) {
+    return new Promise((resolve: (value: void) => void, reject) => {
+        const timeoutFn = setTimeout(reject, timeout);
+
+        socket.emit("timesync", data, function () {
+            clearTimeout(timeoutFn);
+            resolve();
+        });
+    });
 }

@@ -1,15 +1,15 @@
 import WorldScene from "../world/WorldScene";
 import {Opcode, UNIT_RUN_SPEED, UNIT_WALK_SPEED, Vec2} from "@leela/common";
 import {CLIENT_PREDICT} from "../config";
-import {predictPlayerPosition} from "./playerPrediction";
+import {predictPlayerPosition} from "./prediction";
 import Keys from "../world/Keys";
-import {getState} from "../entities/PlayerState";
+import {getPlayerState} from "./PlayerState";
 import WorldSession from "../client/WorldSession";
 
 
 const MOVE_INPUT_NONE = serializeMoveInput(0, 0);
 
-function playerControl(worldScene: WorldScene) {
+function movement(worldScene: WorldScene) {
     const worldSession = worldScene.worldSession;
 
     if (!worldSession) return;
@@ -30,7 +30,7 @@ function playerControl(worldScene: WorldScene) {
 
     const moveInput = serializeMoveInput(dir.x, dir.y);
 
-    const playerState = getState(player);
+    const playerState = getPlayerState(player);
 
     if (playerState.lastMoveInput == MOVE_INPUT_NONE && moveInput == MOVE_INPUT_NONE) return;
 
@@ -74,7 +74,7 @@ function switchWalkMode(worldSession: WorldSession) {
 
     if (!player) return;
 
-    const playerState = getState(player);
+    const playerState = getPlayerState(player);
 
     playerState.run = !playerState.run;
 
@@ -84,6 +84,6 @@ function switchWalkMode(worldSession: WorldSession) {
 }
 
 export {
-    playerControl,
+    movement,
     switchWalkMode
 }

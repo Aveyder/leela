@@ -1,13 +1,18 @@
 import WorldScene from "../world/WorldScene";
 import {CLIENT_PREDICT, ENTITY_EXTRAPOLATE, ENTITY_EXTRAPOLATE_MAX_MS, INTERPOLATE} from "../config";
-import {INTERPOLATE_MS, posInterpolator, TMP_VEC2, Vec2} from "@leela/common";
+import {INTERPOLATE_MS, TMP_VEC2, Vec2} from "@leela/common";
 import Unit, {isPlayer} from "../entities/Unit";
-import {UnitUpdate} from "../handlers/update";
+import {UnitUpdate} from "../entities/update";
+import {interpolate} from "../utils/vec2";
 
 function updateUnitPositions(worldScene: WorldScene) {
     if (!INTERPOLATE) return;
 
-    const ts = worldScene.worldClient.ts;
+    const worldSession = worldScene.worldSession;
+
+    if (!worldSession) return;
+
+    const ts = worldSession.worldSocket.ts;
 
     const serverNow = ts.now();
 
@@ -61,7 +66,7 @@ function interpolateUnitPosition(unit: Unit, serverNow: number) {
         if (lerpStartSnapshot && lerpEndSnapshot) {
             const progress = (lerpMoment - lerpStartSnapshot.timestamp) / (lerpEndSnapshot.timestamp - lerpStartSnapshot.timestamp);
 
-            lerpPos = posInterpolator(lerpStartSnapshot.state, lerpEndSnapshot.state, progress, TMP_VEC2);
+            lerpPos = interpolate(lerpStartSnapshot.state, lerpEndSnapshot.state, progress, TMP_VEC2);
         }
     }
 

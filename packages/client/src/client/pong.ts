@@ -1,4 +1,4 @@
-import WorldSession from "../client/WorldSession";
+import WorldSession from "./WorldSession";
 
 function handlePong(worldSession: WorldSession) {
     const pingStart = worldSession.pingStart;

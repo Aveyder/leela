@@ -1,12 +1,13 @@
 import WorldSession from "../client/WorldSession";
 import {Role, Type, Update, WorldPacket} from "@leela/common";
-import Unit, {addUnitToWorld, deleteUnitFromWorld, hasRole, isPlayer, Snapshot} from "../entities/Unit";
-import {reconcilePlayerPosition, resetPrediction} from "../movement/playerPrediction";
+import Unit, {addUnitToWorld, deleteUnitFromWorld, hasRole, isPlayer, Snapshot} from "./Unit";
+import {reconcilePlayerPosition, resetPrediction} from "../player/prediction";
 import {CLIENT_PREDICT, INTERPOLATE, INTERPOLATE_BUFFER_SIZE, INTERPOLATE_DROP_DUPLICATES} from "../config";
-import {posEquals} from "../movement/position";
-import {getState, initState} from "../entities/PlayerState";
-import Plant, {addPlantToWorld, deletePlantFromWorld} from "../entities/Plant";
-import {Item} from "../entities/Item";
+import {equals} from "../utils/vec2";
+import {getPlayerState, initPlayerState} from "../player/PlayerState";
+import Plant, {addPlantToWorld, deletePlantFromWorld} from "../plant/Plant";
+import Item from "./Item";
+import {initNpcState} from "../npc/NpcState";
 
 type ObjectUpdate = {
     update: Update,
@@ -240,7 +241,6 @@ function initUnit(worldSession: WorldSession, unitUpdateState: UnitUpdate) {
 
     unit.guid = unitUpdateState.guid;
     unit.typeId = unitUpdateState.typeId;
-    unit.roles = unitUpdateState.roles;
     unit.setPosition(unitUpdateState.x, unitUpdateState.y);
 
     if (isPlayer(unit)) {
@@ -248,12 +248,20 @@ function initUnit(worldSession: WorldSession, unitUpdateState: UnitUpdate) {
 
         worldSession.player = player;
 
-        initState(player).draw();
+        initPlayerState(player).draw();
 
         resetPrediction(unit);
     }
 
-    if (hasRole(unit, Role.VENDOR)) unit.setInteractive();
+    if (unit.typeId == Type.MOB) {
+        const npc = unit;
+
+        const npcState = initNpcState(npc);
+
+        npcState.roles = unitUpdateState.roles;
+
+        if (hasRole(npc, Role.VENDOR)) npc.setInteractive();
+    }
 
     addUnitToWorld(unit);
 
@@ -261,7 +269,7 @@ function initUnit(worldSession: WorldSession, unitUpdateState: UnitUpdate) {
 }
 
 function handleFullInventoryUpdate(player: Unit, playerUpdate: PlayerUpdate) {
-    const inventory = getState(player).inventory;
+    const inventory = getPlayerState(player).inventory;
 
     for(let slot = 0; slot < playerUpdate.inventory.length; slot++) {
         inventory.putItem(slot, playerUpdate.inventory[slot]);
@@ -275,7 +283,7 @@ function handlePositionUpdate(unit: Unit, unitUpdate: UnitUpdate, timestamp: num
         const player = unit;
         const playerUpdate = unitUpdate as PlayerUpdate;
 
-        const playerState = getState(player);
+        const playerState = getPlayerState(player);
 
         playerState.speed = playerUpdate.speed;
 
@@ -319,11 +327,11 @@ function deduplicateUnitSnapshots(snapshots: Snapshot[], unitUpdate: UnitUpdate)
     if (snapshots.length > 2) {
         const lastIndex = snapshots.length - 1;
         const last = snapshots[lastIndex];
-        if (!posEquals(unitUpdate, last.state)) {
+        if (!equals(unitUpdate, last.state)) {
             let count = 1;
             for(let i = lastIndex - 1; i >= 0; i--) {
                 const cur = snapshots[i];
-                if (posEquals(cur.state, last.state)) {
+                if (equals(cur.state, last.state)) {
                     if (count < INTERPOLATE_DROP_DUPLICATES) {
                         count++;
                     } else {

@@ -1,10 +1,10 @@
 import {Opcode} from "@leela/common";
 import WorldPacketHandler from "./WorldPacketHandler";
-import {handlePong} from "../../handlers/pong";
-import {handleJoin} from "../../handlers/join";
-import {handleDestroy, handleUpdate} from "../../handlers/update";
-import {handlePutItem} from "../../handlers/item";
-import {handleGatherFail, handleGatherSuccess} from "../../handlers/gather";
+import {handleJoin} from "../../player/join";
+import {handleDestroy, handleUpdate} from "../../entities/update";
+import {handlePutItem} from "../../inventory/putItem";
+import {handleGatherFail, handleGatherSuccess} from "../../plant/gather";
+import {handlePong} from "../pong";
 
 export default class OpcodeTable {
 

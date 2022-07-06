@@ -5,17 +5,17 @@ import WorldSession from "../client/WorldSession";
 import WorldClient from "../client/WorldClient";
 import Unit from "../entities/Unit";
 import Loop from "../Loop";
-import {playerControl, switchWalkMode} from "../movement/playerControl";
+import {movement, switchWalkMode} from "../player/movement";
 import {DEBUG_MODE, GAME_HEIGHT, GAME_WIDTH, TICK_CAP} from "../config";
-import {updatePlayerPosition} from "../movement/playerPrediction";
+import {updatePlayerPosition} from "../player/prediction";
 import DebugManager from "../debugging/DebugManager";
-import {updateUnitPositions} from "../movement/unitPositionInterpolation";
+import {updateUnitPositions} from "../movement/unit";
 import Depth from "./Depth";
-import Plant from "../entities/Plant";
+import Plant from "../plant/Plant";
 import Inventory from "../inventory/Inventory";
-import CastBar, {updateCastBar} from "../entities/CastBar";
+import CastBar, {updateCastBar} from "../plant/CastBar";
 import {initCursor, updateCursor} from "./cursor";
-import {getState} from "../entities/PlayerState";
+import {getPlayerState} from "../player/PlayerState";
 import Graphics = Phaser.GameObjects.Graphics;
 import Text = Phaser.GameObjects.Text;
 import Image = Phaser.GameObjects.Image;
@@ -115,7 +115,7 @@ export default class WorldScene extends Phaser.Scene {
     }
 
     public removeSession() {
-        getState(this._worldSession.player).destroy();
+        getPlayerState(this._worldSession.player).destroy();
 
         this._worldSession = null;
 
@@ -138,7 +138,7 @@ export default class WorldScene extends Phaser.Scene {
     public simulate(delta: number) {
         if (this.worldSession) this._tick = ++this._tick % TICK_CAP;
 
-        playerControl(this);
+        movement(this);
     }
 
     public showGame() {
@@ -266,7 +266,7 @@ export default class WorldScene extends Phaser.Scene {
 
             if (!player) return;
 
-            const inventory = getState(player).inventory;
+            const inventory = getPlayerState(player).inventory;
 
             inventory.visible = !inventory.visible;
         });

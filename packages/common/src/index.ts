@@ -1,12 +1,11 @@
-export * from "./constants/world";
 export * from "./entities/Role";
 export * from "./entities/Type";
-export * from "./movement/position";
 export {default as Body} from "./physics/Body";
 export * from "./physics/Body";
-export {default as TileMap} from "./physics/TileMap";
 export {default as PhysicsWorld} from "./physics/PhysicsWorld";
+export {default as TileMap} from "./physics/TileMap";
 export * from "./protocol/opcodes";
 export {default as WorldPacket} from "./protocol/WorldPacket";
 export * from "./utils/math";
+export * from "./world/constants";
 export * from "./config";

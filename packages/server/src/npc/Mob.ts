@@ -1,7 +1,7 @@
 import World from "../world/World";
-import {addUnitToWorld, Unit} from "./Unit";
+import {addUnitToWorld, Unit} from "../entities/Unit";
 import {Role, TILE_SIZE, Type, UNIT_BODY_HEIGHT, UNIT_BODY_WIDTH, UNIT_WALK_SPEED} from "@leela/common";
-import {Motion, PathMotion, Waypoint} from "../motion/motions";
+import {Motion, PathMotion, Waypoint} from "./motions";
 
 export default class Mob implements Unit {
     public guid: number;
@@ -29,6 +29,12 @@ export default class Mob implements Unit {
         this.height = UNIT_BODY_HEIGHT;
         this.bullet = false;
     }
+}
+
+function updateMobs(world: World, delta) {
+    Object.values(world.units)
+        .filter(unit => unit.typeId == Type.MOB)
+        .forEach((mob: Mob) => mob.motion?.update(delta));
 }
 
 function spawnCat(world: World) {
@@ -70,14 +76,8 @@ function spawnVendor(world: World) {
     addUnitToWorld(mob);
 }
 
-function updateMobs(world: World, delta) {
-    Object.values(world.units)
-        .filter(unit => unit.typeId == Type.MOB)
-        .forEach((mob: Mob) => mob.motion?.update(delta));
-}
-
 export {
+    updateMobs,
     spawnCat,
-    spawnVendor,
-    updateMobs
+    spawnVendor
 }

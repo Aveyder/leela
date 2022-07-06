@@ -1,12 +1,9 @@
 import {Opcode} from "@leela/common";
 import WorldPacketHandler from "./WorldPacketHandler";
-import {
-    handlePlayerJoin,
-    handlePlayerMove,
-    handlePlayerUpdateRateChange,
-    handleSwitchWalkMode
-} from "../../handlers/player";
-import {handleGatherPlant} from "../../handlers/gather";
+import {handleGatherPlant} from "../../plant/gather";
+import {handleUpdateRateChange} from "../updateRate";
+import {handlePlayerJoin} from "../../player/join";
+import {handlePlayerMove, handleSwitchWalkMode} from "../../player/movement";
 
 export default class OpcodeTable {
 
@@ -23,7 +20,7 @@ export default class OpcodeTable {
     }
 
     public init(): void {
-        this.defineHandler(Opcode.CMSG_UPDATE_RATE, handlePlayerUpdateRateChange);
+        this.defineHandler(Opcode.CMSG_UPDATE_RATE, handleUpdateRateChange);
         this.defineHandler(Opcode.MSG_JOIN, handlePlayerJoin);
         this.defineHandler(Opcode.CMSG_MOVE, handlePlayerMove);
         this.defineHandler(Opcode.CMSG_SWITCH_WALK, handleSwitchWalkMode);

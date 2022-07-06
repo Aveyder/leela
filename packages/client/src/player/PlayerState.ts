@@ -1,9 +1,9 @@
 import {Body, Vec2} from "@leela/common";
 import Inventory from "../inventory/Inventory";
 import WorldScene from "../world/WorldScene";
-import CastBar from "./CastBar";
-import Plant from "./Plant";
-import Unit from "./Unit";
+import CastBar from "../plant/CastBar";
+import Plant from "../plant/Plant";
+import Unit from "../entities/Unit";
 
 
 type Control = {dir: Vec2, tick: number};
@@ -79,7 +79,7 @@ export default class PlayerState {
     }
 }
 
-function initState(player: Unit) {
+function initPlayerState(player: Unit) {
     const playerState = new PlayerState(player.scene as WorldScene);
 
     player.setData(PLAYER_STATE_KEY, playerState);
@@ -87,12 +87,12 @@ function initState(player: Unit) {
     return playerState;
 }
 
-function getState(player: Unit) {
+function getPlayerState(player: Unit) {
     return player?.getData(PLAYER_STATE_KEY) as PlayerState;
 }
 
 export {
     Control,
-    initState,
-    getState
+    initPlayerState,
+    getPlayerState
 }

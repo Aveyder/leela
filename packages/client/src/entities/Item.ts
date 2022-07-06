@@ -1,4 +1,4 @@
-interface Item {
+export default interface Item {
     id: number;
     stack: number;
 }
@@ -36,6 +36,5 @@ const itemTexture: Record<number, TextureInfo> = {
 }
 
 export {
-    Item,
     itemTexture
 }

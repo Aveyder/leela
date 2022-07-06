@@ -1,7 +1,7 @@
 import Unit from "../entities/Unit";
-import {cloneBody, posInterpolator, SIMULATION_DELTA_MS, TMP_VEC2, Vec2} from "@leela/common";
+import {cloneBody, SIMULATION_DELTA_MS, TMP_VEC2, Vec2} from "@leela/common";
 import WorldScene from "../world/WorldScene";
-import {posDiff} from "./position";
+import {diff, interpolate} from "../utils/vec2";
 import {
     CLIENT_PREDICT,
     CLIENT_SMOOTH,
@@ -9,14 +9,14 @@ import {
     CLIENT_SMOOTH_POS_ERROR_THRESHOLD,
     CLIENT_SMOOTH_POS_MS
 } from "../config";
-import {getState} from "../entities/PlayerState";
-import {PlayerUpdate} from "../handlers/update";
+import {getPlayerState} from "./PlayerState";
+import {PlayerUpdate} from "../entities/update";
 
 
 function predictPlayerPosition(player: Unit, dir: Vec2) {
     const worldScene = player.scene as WorldScene;
 
-    const playerState = getState(player);
+    const playerState = getPlayerState(player);
 
     playerState.appliedControls.push({tick: worldScene.tick, dir});
 
@@ -53,7 +53,7 @@ function predictPlayerPosition(player: Unit, dir: Vec2) {
 
 
 function reconcilePlayerPosition(player: Unit, playerUpdate: PlayerUpdate, ack: number) {
-    const playerState = getState(player);
+    const playerState = getPlayerState(player);
 
     playerState.ackTick = ack;
 
@@ -88,7 +88,7 @@ function reconcilePlayerPosition(player: Unit, playerUpdate: PlayerUpdate, ack: 
 function updatePlayerPosition(player: Unit, delta: number) {
     if (!CLIENT_PREDICT || !player) return;
 
-    const playerState = getState(player);
+    const playerState = getPlayerState(player);
 
     const errorTimer = playerState.errorTimer;
 
@@ -102,19 +102,19 @@ function updatePlayerPosition(player: Unit, delta: number) {
 
     const lerpProgress = Math.min(1, (Date.now() - lerpStartTime) / Math.abs(lerpDuration));
 
-    if (lerpDuration != -1 || errorTimer != -1) posInterpolator(initialPos, targetPos, lerpProgress, player);
+    if (lerpDuration != -1 || errorTimer != -1) interpolate(initialPos, targetPos, lerpProgress, player);
     if (lerpProgress == 1 && errorTimer == -1) resetPrediction(player);
 }
 
 function refreshPredictionError(player: Unit) {
     if (!CLIENT_SMOOTH) return;
 
-    const playerState = getState(player);
+    const playerState = getPlayerState(player);
 
     const predicted = playerState.predictedBody;
     const reconciled = playerState.reconciledBody;
 
-    const error = posDiff(predicted, reconciled, TMP_VEC2);
+    const error = diff(predicted, reconciled, TMP_VEC2);
 
     if (withinSmoothPosErrorPrecision(error)) {
         playerState.errorTimer = -1;
@@ -135,7 +135,7 @@ function refreshPredictionError(player: Unit) {
 }
 
 function smoothPredictionError(player: Unit, delta: number) {
-    const playerState = getState(player);
+    const playerState = getPlayerState(player);
 
     if (playerState.errorTimer != -1) {
         const predicted = playerState.predictedBody;
@@ -146,9 +146,9 @@ function smoothPredictionError(player: Unit, delta: number) {
 
         const progress = Math.min(playerState.errorTimer / CLIENT_SMOOTH_POS_MS, 1);
 
-        posInterpolator(predicted, reconciled, progress, target);
+        interpolate(predicted, reconciled, progress, target);
 
-        const error = posDiff(target, reconciled);
+        const error = diff(target, reconciled);
 
         if (withinSmoothPosErrorPrecision(error)) {
             predicted.x = target.x;
@@ -170,7 +170,7 @@ function withinSmoothPosErrorThreshold(error: Vec2) {
 }
 
 function resetPrediction(player: Unit) {
-    const playerState = getState(player);
+    const playerState = getPlayerState(player);
 
     playerState.lerpStartTime = -1;
     playerState.lerpDuration = -1;
