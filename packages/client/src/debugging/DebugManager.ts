@@ -49,9 +49,9 @@ export default class DebugManager {
     }
 
     private updateDebugInfo() {
-        let latency = String(this.worldScene.worldSession?.latency);
+        const latency = this.worldScene.worldSession?.latency as number;
 
-        if (latency == undefined) latency = "?";
+        const displayLatency = (latency != undefined) ? String(latency) : "?";
 
         const player = this.worldScene.worldSession?.player;
         const playerState = getPlayerState(player);
@@ -60,13 +60,12 @@ export default class DebugManager {
         const ackTick = playerState ? playerState.ackTick : "?";
         const unack = playerState ? playerState.appliedControls.length : "?"
 
-        this.text.text = `ping: ${latency} ms
+        this.text.text = `ping: ${displayLatency} ms
 host: ${SERVER_HOST}
 tick: ${tick}
 ack: ${ackTick}
 unack: ${unack}`;
     }
-
 
     public destroy() {
         this.text.destroy();

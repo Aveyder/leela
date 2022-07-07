@@ -1,7 +1,7 @@
 import WorldScene from "./WorldScene";
 import Depth from "./Depth";
 
-function drawTiledMap(worldScene: WorldScene) {
+function initTiledMap(worldScene: WorldScene) {
     const tilemap = worldScene.add.tilemap("map");
 
     const baseTileset = tilemap.addTilesetImage("base", "base");
@@ -19,5 +19,5 @@ function drawTiledMap(worldScene: WorldScene) {
 }
 
 export {
-    drawTiledMap
+    initTiledMap
 }

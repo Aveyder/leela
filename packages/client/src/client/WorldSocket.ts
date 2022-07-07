@@ -82,9 +82,9 @@ export default class WorldSocket {
 
     private destroy() {
         if (this.worldSession) {
-            this.worldScene.removeSession();
             this.worldSession.destroy();
             this.worldSession = null;
+            this.worldScene.removeSession();
         }
 
         this.bufferQueue.length = 0;

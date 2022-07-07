@@ -1,5 +1,6 @@
 import World from "../world/World";
-import {Body, Role} from "@leela/common";
+import {Body, Role, Type} from "@leela/common";
+import Player from "../player/Player";
 
 interface Unit extends Object, Body {
     world: World;
@@ -27,7 +28,22 @@ function addUnitToWorld(unit: Unit) {
     physics.collideAndRespond(unit);
 }
 
+function deleteUnitFromWorld(unit: Unit) {
+    const world = unit.world;
+
+    if (unit.typeId == Type.PLAYER) {
+        const player = unit as Player;
+
+        const worldSession = player.worldSession;
+
+        worldSession.player = null;
+    }
+
+    delete world.units[unit.guid];
+}
+
 export {
     Unit,
-    addUnitToWorld
+    addUnitToWorld,
+    deleteUnitFromWorld
 }

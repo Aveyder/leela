@@ -4,7 +4,7 @@ import Unit, {addUnitToWorld, deleteUnitFromWorld, hasRole, isPlayer, Snapshot} 
 import {reconcilePlayerPosition, resetPrediction} from "../player/prediction";
 import {CLIENT_PREDICT, INTERPOLATE, INTERPOLATE_BUFFER_SIZE, INTERPOLATE_DROP_DUPLICATES} from "../config";
 import {equals} from "../utils/vec2";
-import {getPlayerState, initPlayerState} from "../player/PlayerState";
+import {getPlayerState, initPlayerState, removePlayerFromWorldSession} from "../player/PlayerState";
 import Plant, {addPlantToWorld, deletePlantFromWorld} from "../plant/Plant";
 import Item from "./Item";
 import {initNpcState} from "../npc/NpcState";
@@ -368,8 +368,8 @@ function handleUnitDestroy(worldSession: WorldSession, unit: Unit) {
     const worldScene = worldSession.worldScene;
 
     if (isPlayer(unit)) {
-        worldSession.playerGuid = null;
-        worldSession.player = null;
+        removePlayerFromWorldSession(worldSession);
+
         worldScene.gameMenu.showJoinMenu();
     }
 

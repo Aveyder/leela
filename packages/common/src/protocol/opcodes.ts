@@ -14,7 +14,8 @@ enum Opcode {
     CMSG_GATHER,
     SMSG_GATHER_SUCCESS,
     SMSG_GATHER_FAIL,
-    SMSG_PUT_GOLD
+    SMSG_PUT_GOLD,
+    CMSG_LEAVE
 }
 
 enum Update {

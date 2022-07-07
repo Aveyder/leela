@@ -4,6 +4,7 @@ import {handleGatherPlant} from "../../plant/gather";
 import {handleUpdateRateChange} from "../updateRate";
 import {handlePlayerJoin} from "../../player/join";
 import {handlePlayerMove, handleSwitchWalkMode} from "../../player/movement";
+import {handlePlayerLeave} from "../../player/leave";
 
 export default class OpcodeTable {
 
@@ -25,6 +26,7 @@ export default class OpcodeTable {
         this.defineHandler(Opcode.CMSG_MOVE, handlePlayerMove);
         this.defineHandler(Opcode.CMSG_SWITCH_WALK, handleSwitchWalkMode);
         this.defineHandler(Opcode.CMSG_GATHER, handleGatherPlant);
+        this.defineHandler(Opcode.CMSG_LEAVE, handlePlayerLeave);
     }
 
     private defineHandler(opcode: Opcode, handler: WorldPacketHandler) {

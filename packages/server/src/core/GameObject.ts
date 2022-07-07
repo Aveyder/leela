@@ -1,5 +1,6 @@
 import World from "../world/World";
 import {Opcode, Type} from "@leela/common";
+import {deleteUnitFromWorld, Unit} from "./Unit";
 
 export default interface GameObject {
     world: World;
@@ -13,7 +14,7 @@ function deleteObjectFromWorld(object: GameObject) {
     switch (object.typeId) {
         case Type.MOB:
         case Type.PLAYER:
-            delete object.world.units[object.guid];
+            deleteUnitFromWorld(object as Unit);
             break;
         case Type.PLANT:
             delete object.world.plants[object.guid];

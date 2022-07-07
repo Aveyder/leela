@@ -13,11 +13,11 @@ import {updateUnitPositions, updateUnitsDepth} from "../movement/unit";
 import Plant from "../plant/Plant";
 import {updateCastBar} from "../plant/CastBar";
 import {initCursor, updateCursor} from "./cursor";
-import {getPlayerState} from "../player/PlayerState";
-import {drawTiledMap} from "./map";
+import {initTiledMap} from "./map";
 import GameMenu, {initGameMenu} from "../gui/GameMenu";
 import {initPhysicsWorld} from "../physics/init";
 import {initHUD} from "../gui/hud";
+import {join} from "../player/join";
 import Image = Phaser.GameObjects.Image;
 
 
@@ -25,20 +25,21 @@ export default class WorldScene extends Phaser.Scene {
 
     private _gameMenu: GameMenu;
 
+    private _worldClient: WorldClient;
+
     private _cursor: Image;
 
     private _keys: Keys;
 
     public _phys: PhysicsWorld;
 
-    private debug: DebugManager;
-
     private _units: Record<number, Unit>;
     private _plants: Record<number, Plant>;
 
     public _tick: number;
 
-    private _worldClient: WorldClient;
+    private debug: DebugManager;
+
     private _worldSession: WorldSession;
 
     private simulationLoop: Loop;
@@ -53,19 +54,16 @@ export default class WorldScene extends Phaser.Scene {
     }
 
     public create(): void {
-        drawTiledMap(this);
-        initHUD(this);
-
         this._gameMenu = initGameMenu(this);
+
+        this._worldClient = new WorldClient(this);
+
+        initTiledMap(this);
+        initHUD(this);
 
         this._cursor = initCursor(this);
 
         this._keys = initKeys(this);
-
-        if (DEBUG_MODE) {
-            this.debug = new DebugManager(this);
-            this.debug.init();
-        }
 
         this._phys = initPhysicsWorld(this);
 
@@ -74,8 +72,12 @@ export default class WorldScene extends Phaser.Scene {
 
         this._tick = -1;
 
-        this._worldClient = new WorldClient(this);
-        this._worldClient.init();
+        if (DEBUG_MODE) {
+            this.debug = new DebugManager(this);
+            this.debug.init();
+
+            this.worldClient.connect();
+        }
     }
 
     public update(time: number, delta: number): void {
@@ -84,7 +86,7 @@ export default class WorldScene extends Phaser.Scene {
         updateUnitsDepth(this);
         updateCastBar(this, delta);
         updateCursor(this);
-        this.debug.update();
+        this.debug?.update();
     }
 
     public addSession(worldSession: WorldSession) {
@@ -94,11 +96,13 @@ export default class WorldScene extends Phaser.Scene {
         this.simulationLoop.start(delta => this.simulate(delta), SIMULATION_RATE);
 
         this._gameMenu.showJoinMenu();
+
+        if (DEBUG_MODE) {
+            join(worldSession);
+        }
     }
 
     public removeSession() {
-        getPlayerState(this._worldSession.player)?.destroy();
-
         Object.values(this._units).forEach(unit => unit.destroy());
         Object.values(this._plants).forEach(plant => plant.destroy());
 
@@ -125,6 +129,10 @@ export default class WorldScene extends Phaser.Scene {
         return this._gameMenu;
     }
 
+    public get worldClient() {
+        return this._worldClient;
+    }
+
     public get cursor() {
         return this._cursor;
     }
@@ -147,10 +155,6 @@ export default class WorldScene extends Phaser.Scene {
 
     public get tick() {
         return this._tick;
-    }
-
-    public get worldClient() {
-        return this._worldClient;
     }
 
     public get worldSession() {

@@ -5,6 +5,7 @@ import CastBar from "../plant/CastBar";
 import Plant from "../plant/Plant";
 import Unit from "../core/Unit";
 import {drawCastBar, drawInventory} from "../gui/hud";
+import WorldSession from "../client/WorldSession";
 
 
 type Control = {dir: Vec2, tick: number};
@@ -90,8 +91,16 @@ function getPlayerState(player: Unit) {
     return player?.getData(PLAYER_STATE_KEY) as PlayerState;
 }
 
+function removePlayerFromWorldSession(worldSession: WorldSession) {
+    getPlayerState(worldSession.player)?.destroy();
+
+    worldSession.playerGuid = null;
+    worldSession.player = null;
+}
+
 export {
     Control,
     initPlayerState,
-    getPlayerState
+    getPlayerState,
+    removePlayerFromWorldSession
 }

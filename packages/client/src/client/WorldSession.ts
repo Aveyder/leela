@@ -4,6 +4,7 @@ import WorldSocket from "./WorldSocket";
 import {CLIENT_CMD_LOOP, CLIENT_CMD_RATE, CLIENT_UPDATE_RATE, PING_INTERVAL_MS} from "../config";
 import Loop from "../utils/Loop";
 import Unit from "../core/Unit";
+import {removePlayerFromWorldSession} from "../player/PlayerState";
 
 export default class WorldSession {
 
@@ -68,8 +69,7 @@ export default class WorldSession {
         this._pingStart = null;
         this.latency = -1;
 
-        this.playerGuid = null;
-        this.player = null;
+        removePlayerFromWorldSession(this);
     }
 
     public get worldScene() {

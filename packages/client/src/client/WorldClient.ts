@@ -14,7 +14,9 @@ export default class WorldClient {
         this.worldScene = worldScene;
     }
 
-    public init(): void {
+    public connect(): void {
+        if (this._socket?.connected) return;
+
         this._socket = io(SERVER_URL, {
             parser: msgpack
         });
@@ -22,7 +24,15 @@ export default class WorldClient {
         this._socket.on("connect", () => {
             const worldSocket = new WorldSocket(this);
             worldSocket.init();
+
+            this.worldScene.gameMenu.showJoinMenu();
         });
+    }
+
+    public disconnect(): void {
+        this._socket.disconnect();
+
+        this._socket = null;
     }
 
     public get socket() {
