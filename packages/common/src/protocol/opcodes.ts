@@ -11,9 +11,10 @@ enum Opcode {
     CMSG_SWITCH_WALK,
     SMSG_PUT_ITEM,
     SMGS_FULL_BAG,
+    CMSG_GATHER,
     SMSG_GATHER_SUCCESS,
     SMSG_GATHER_FAIL,
-    CMSG_GATHER
+    SMSG_PUT_GOLD
 }
 
 enum Update {

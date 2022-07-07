@@ -69,10 +69,11 @@ function pushSerializedFullUnitUpdate(unit: Unit, unitUpdates: unknown[]) {
 
 function pushSerializedFullPlayerUpdate(player: Player, unitUpdates: unknown[]) {
     pushSerializedPositionPlayerUpdate(player, unitUpdates);
-    pushSerializedInventoryUpdate(player, unitUpdates);
+    pushSerializedFullInventoryUpdate(player, unitUpdates);
+    unitUpdates.push(player.gold);
 }
 
-function pushSerializedInventoryUpdate(player: Player, unitUpdates: unknown[]) {
+function pushSerializedFullInventoryUpdate(player: Player, unitUpdates: unknown[]) {
     const inventory = [];
     player.inventory.map(item => {
         if (item) {

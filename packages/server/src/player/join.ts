@@ -21,6 +21,7 @@ function handlePlayerJoin(worldSession: WorldSession) {
     player.vy = 0;
     player.tick = -1;
     player.speed = UNIT_RUN_SPEED;
+    player.gold = 0;
 
     worldSession.player = player;
 

@@ -41,7 +41,8 @@ interface PlayerUpdate extends UnitUpdate {
     vy: number,
     ackTick: number,
     speed: number,
-    inventory: Item[]
+    inventory: Item[],
+    gold: number
 }
 
 interface PlantUpdate extends ObjectUpdate {
@@ -85,7 +86,7 @@ function deserializeObjectUpdates(worldSession: WorldSession, input: unknown[]):
                 } else {
                     if (worldSession.playerGuid == guid) {
                         objectUpdate = deserializeFullPlayerUpdate(i + 1, input);
-                        i += 3;
+                        i += 4;
                     } else {
                         objectUpdate = deserializeFullUnitUpdate(i + 1, input);
                     }
@@ -133,6 +134,7 @@ function deserializeFullPlayerUpdate(index: number, serialized: unknown[]) {
     playerUpdate.ackTick = serialized[index + 8] as number;
     playerUpdate.speed = serialized[index + 9] as number;
     playerUpdate.inventory = deserializeInventoryUpdate(serialized[index + 10] as number[]);
+    playerUpdate.gold = serialized[index + 11] as number;
     return playerUpdate;
 }
 
@@ -274,6 +276,8 @@ function handleFullInventoryUpdate(player: Unit, playerUpdate: PlayerUpdate) {
     for(let slot = 0; slot < playerUpdate.inventory.length; slot++) {
         inventory.putItem(slot, playerUpdate.inventory[slot]);
     }
+
+    inventory.putGold(playerUpdate.gold);
 }
 
 function handlePositionUpdate(unit: Unit, unitUpdate: UnitUpdate, timestamp: number) {

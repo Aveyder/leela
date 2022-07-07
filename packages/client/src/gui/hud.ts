@@ -15,7 +15,7 @@ function drawCastBar(worldScene: WorldScene, castBar: CastBar) {
 }
 
 function drawInventory(worldScene: WorldScene, inventory: Inventory) {
-    inventory.setPosition(620, 580);
+    inventory.setPosition(620, 595);
     inventory.setDepth(Depth.HUD);
     inventory.visible = false;
 

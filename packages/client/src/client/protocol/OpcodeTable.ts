@@ -5,6 +5,7 @@ import {handleDestroy, handleUpdate} from "../../core/update";
 import {handlePutItem} from "../../inventory/putItem";
 import {handleGatherFail, handleGatherSuccess} from "../../plant/gather";
 import {handlePong} from "../pong";
+import {handlePutGold} from "../../inventory/putGold";
 
 export default class OpcodeTable {
 
@@ -28,6 +29,7 @@ export default class OpcodeTable {
         this.defineHandler(Opcode.SMSG_PUT_ITEM, handlePutItem);
         this.defineHandler(Opcode.SMSG_GATHER_FAIL, handleGatherFail);
         this.defineHandler(Opcode.SMSG_GATHER_SUCCESS, handleGatherSuccess);
+        this.defineHandler(Opcode.SMSG_PUT_GOLD, handlePutGold);
     }
 
     private defineHandler(opcode: Opcode, handler: WorldPacketHandler) {

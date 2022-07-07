@@ -1,35 +1,44 @@
 import Image = Phaser.GameObjects.Image;
 import Container = Phaser.GameObjects.Container;
 import Text = Phaser.GameObjects.Text;
+import Graphics = Phaser.GameObjects.Graphics;
 import {Scene} from "phaser";
-import {INVENTORY_SIZE} from "@leela/common";
-import Slot from "./Slot";
+import {INVENTORY_SIZE, TMP_VEC2} from "@leela/common";
 import Item, {itemTexture} from "../core/Item";
 
 export default class Inventory extends Container {
 
-    private readonly slots: Slot[];
-    private readonly itemIcons: Image[];
-    private readonly itemStackTexts: Text[];
+    private static readonly SLOT_SIZE = 32;
+    private static readonly SLOT_MARGIN = 4;
 
     private readonly _items: Item[];
+
+    private slots: Graphics;
+    private readonly itemIcons: Image[];
+    private readonly itemStackTexts: Text[];
+    private _gold: number;
+    private goldIcon: Image;
+    private goldText: Text;
 
     constructor(scene: Scene, x?: number, y?: number) {
         super(scene, x, y);
 
-        this.slots = [];
+        this.createSlots();
+
+        this._items = [];
         this.itemIcons = [];
         this.itemStackTexts = [];
 
-        this._items = [];
-
         for(let i = 0; i < INVENTORY_SIZE; i++) {
-            this.createSlot(i);
+            this._items.push(null);
             this.createItemIcon(i);
             this.createItemStackText(i);
-
-            this._items.push(null);
         }
+
+        this._gold = 0;
+        this.createGoldCounter();
+
+        this.drawSlots();
     }
 
     public putItem(slot: number, item: Item) {
@@ -45,10 +54,21 @@ export default class Inventory extends Container {
         }
 
         this.drawItems();
+        this.drawSlots();
     }
 
     public get items() {
         return this._items;
+    }
+
+    public putGold(amount: number) {
+        this._gold += amount;
+
+        this.goldText.text = String(this._gold);
+    }
+
+    public get gold() {
+        return this._gold;
     }
 
     private drawItems() {
@@ -73,32 +93,75 @@ export default class Inventory extends Container {
         }
     }
 
-    private createSlot(index: number) {
-        const slot = new Slot(this.scene);
-        slot.x = 0;
-        slot.y = 0 - index * (Slot.SIZE + 4);
-        this.slots.push(slot);
+    private drawSlots() {
+        this.slots.clear();
 
-        this.add(slot);
+        for(let i = 0; i < this._items.length; i++) {
+            const pos =  this.getSlotPosition(i);
+
+            const item = this._items[i];
+
+            this.slots.fillStyle(item ? 0x1E1E1E : 0x313131, 0.95);
+            this.slots.fillRect(pos.x - Inventory.SLOT_SIZE / 2, pos.y - Inventory.SLOT_SIZE / 2, Inventory.SLOT_SIZE, Inventory.SLOT_SIZE);
+
+            this.slots.lineStyle(1, 0x000000, 0.85);
+            this.slots.strokeRect(pos.x - Inventory.SLOT_SIZE / 2 + 1, pos.y - Inventory.SLOT_SIZE / 2 + 1, Inventory.SLOT_SIZE - 2, Inventory.SLOT_SIZE - 2);
+
+            this.slots.lineStyle(1, 0xEAEAEA);
+            this.slots.strokeRect(pos.x - Inventory.SLOT_SIZE / 2, pos.y - Inventory.SLOT_SIZE / 2, Inventory.SLOT_SIZE,  Inventory.SLOT_SIZE);
+        }
     }
 
     private createItemIcon(index: number) {
-        const itemIcon = new Image(this.scene, this.slots[index].x, this.slots[index].y, "");
+        const pos = this.getSlotPosition(index);
+
+        const itemIcon = new Image(this.scene, pos.x, pos.y, "");
         itemIcon.visible = false;
+
         this.itemIcons.push(itemIcon);
 
         this.add(itemIcon);
     }
 
     private createItemStackText(index: number) {
-        const itemStackText = new Text(this.scene, this.slots[index].x + Slot.SIZE / 3, this.slots[index].y + Slot.SIZE / 3, "", {
+        const pos = this.getSlotPosition(index);
+
+        const itemStackText = new Text(this.scene, pos.x + Inventory.SLOT_SIZE / 3 + 4, pos.y + Inventory.SLOT_SIZE / 3 - 2, "", {
             fontSize: "12px",
             backgroundColor: "rgba(0,0,0,0.5)"
         });
-        itemStackText.setOrigin(0.5, 0.5);
+        itemStackText.setOrigin(1, 0.5);
         itemStackText.visible = false;
+
         this.itemStackTexts.push(itemStackText);
 
         this.add(itemStackText);
+    }
+
+    private createGoldCounter() {
+        this.goldIcon = new Image(this.scene, Inventory.SLOT_SIZE / 2 - 4, 0, "rpg-items", 89);
+        this.goldText = new Text(this.scene, 4, 0, `${this._gold}`, {
+            fontSize: "12px",
+            backgroundColor: "rgba(0,0,0,0.5)"
+        });
+        this.goldText.setOrigin(1, 0.5);
+
+        this.add(this.goldIcon);
+        this.add(this.goldText);
+    }
+
+    private createSlots() {
+        this.slots = new Graphics(this.scene);
+
+        this.add(this.slots);
+    }
+
+    private getSlotPosition(index: number) {
+        const pos = TMP_VEC2;
+
+        pos.x = 0;
+        pos.y = 0 - index * (Inventory.SLOT_SIZE + Inventory.SLOT_MARGIN) - 25;
+
+        return pos;
     }
 }

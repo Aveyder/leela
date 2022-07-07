@@ -97,6 +97,8 @@ export default class WorldScene extends Phaser.Scene {
     }
 
     public removeSession() {
+        getPlayerState(this._worldSession.player)?.destroy();
+
         Object.values(this._units).forEach(unit => unit.destroy());
         Object.values(this._plants).forEach(plant => plant.destroy());
 
@@ -104,8 +106,6 @@ export default class WorldScene extends Phaser.Scene {
         this._plants = {};
 
         this._tick = -1;
-
-        getPlayerState(this._worldSession.player)?.destroy();
 
         this._worldSession = null;
 

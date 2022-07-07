@@ -24,6 +24,7 @@ export default class Player implements Unit {
     public readonly inventory: Item[];
     public gatheringPlant: Plant;
     public gatheringTimer: number;
+    public gold: number;
 
     private readonly _worldSession: WorldSession;
 
