@@ -22,6 +22,7 @@ function handleGatherFinish(worldSession: WorldSession, worldPacket: WorldPacket
     if (playerState.gatheringPlant?.guid == plantGuid) {
         playerState.gatheringPlant = null;
         playerState.castBar.status = status;
+        if (status == CastBarStatus.FAIL) playerState.castBar.description = "fail";
         playerState.castBar.hide();
     }
 }
@@ -39,6 +40,7 @@ function gatherPlant(player: Unit, plant: Plant) {
     castBar.status = CastBarStatus.IN_PROGRESS;
     castBar.totalTime = GATHER_DURATION;
     castBar.currentTime = 0;
+    castBar.description = "gathering";
 
     const worldSession = (player.scene as WorldScene).worldSession;
 

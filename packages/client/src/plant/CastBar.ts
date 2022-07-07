@@ -15,9 +15,8 @@ enum CastBarStatus {
 
 export default class CastBar extends Container {
 
-    private static readonly WIDTH = 60;
-    private static readonly HEIGHT = 5;
-    private static readonly BORDER = 0;
+    private static readonly WIDTH = 90;
+    private static readonly HEIGHT = 10;
 
     private readonly graphics: Graphics;
     private readonly text: Text;
@@ -33,10 +32,10 @@ export default class CastBar extends Container {
         super(scene);
 
         this.graphics = new Graphics(this.scene);
-        this.text = new Text(this.scene, 0, 0, "", {
-            fontSize: "8px"
+        this.text = new Text(this.scene, 0, -1, "", {
+            fontSize: "12px"
         });
-        this.text.setOrigin(0.5);
+        this.text.setOrigin(0.5, 0.5);
 
         this.add(this.graphics);
         this.add(this.text);
@@ -85,7 +84,7 @@ export default class CastBar extends Container {
         if (this._status == CastBarStatus.FAIL) borderColor = 0xFFFFFF;
         if (this._status == CastBarStatus.SUCCESS) borderColor = 0xFFFFFF;
 
-        this.graphics.lineStyle(2, borderColor);
+        this.graphics.lineStyle(4, borderColor);
         this.graphics.strokeRect(- CastBar.WIDTH / 2, - CastBar.HEIGHT / 2, CastBar.WIDTH, CastBar.HEIGHT);
 
         let backgroundColor;
@@ -99,20 +98,20 @@ export default class CastBar extends Container {
             const progress = Math.min(this.currentTime / this.totalTime, 1);
             this.graphics.fillStyle(0xD97F4D);
             this.graphics.fillRect(
-                -CastBar.WIDTH / 2 + CastBar.BORDER, -CastBar.HEIGHT / 2 + CastBar.BORDER,
-                (CastBar.WIDTH - CastBar.BORDER * 2) * progress, CastBar.HEIGHT - CastBar.BORDER * 2
+                -CastBar.WIDTH / 2, -CastBar.HEIGHT / 2,
+                (CastBar.WIDTH) * progress, CastBar.HEIGHT
             )
             this.graphics.fillStyle(0xFFFFFF);
-            this.graphics.fillRect((CastBar.WIDTH- CastBar.BORDER * 2) * progress - 3 - CastBar.WIDTH / 2, -CastBar.HEIGHT / 2 + CastBar.BORDER,
-                3, CastBar.HEIGHT - CastBar.BORDER * 2);
+            this.graphics.fillRect((CastBar.WIDTH) * progress - 3 - CastBar.WIDTH / 2, -CastBar.HEIGHT / 2,
+                3, CastBar.HEIGHT);
         }
     }
 
     private fillBackground(color: number) {
         this.graphics.fillStyle(color);
         this.graphics.fillRect(
-            - CastBar.WIDTH / 2 + CastBar.BORDER, - CastBar.HEIGHT / 2 + CastBar.BORDER,
-            CastBar.WIDTH - CastBar.BORDER * 2, CastBar.HEIGHT - CastBar.BORDER * 2
+            - CastBar.WIDTH / 2, - CastBar.HEIGHT / 2,
+            CastBar.WIDTH, CastBar.HEIGHT
         );
     }
 }
