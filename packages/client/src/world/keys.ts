@@ -15,7 +15,7 @@ type Keys = {
 };
 
 function initKeys(worldScene: WorldScene) {
-    const keys = worldScene.input.keyboard.addKeys("W,A,S,D,up,left,down,right,Z") as Keys;
+    const keys = worldScene.input.keyboard.addKeys("W,A,S,D,up,left,down,right,Z", false) as Keys;
 
     keys.Z.on("up", () => switchWalkMode(worldScene.worldSession));
 

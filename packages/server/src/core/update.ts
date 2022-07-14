@@ -60,6 +60,7 @@ function pushSerializedFullUnitUpdate(unit: Unit, unitUpdates: unknown[]) {
         unit.typeId,
         unit.roles,
         unit.skin,
+        unit.name,
         toFixed(unit.x, FRACTION_DIGITS),
         toFixed(unit.y, FRACTION_DIGITS),
         toFixed(unit.vx, FRACTION_DIGITS),

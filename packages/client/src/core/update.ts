@@ -1,6 +1,6 @@
 import WorldSession from "../client/WorldSession";
-import {Role, Type, Update, WorldPacket} from "@leela/common";
-import Unit, {addUnitToWorld, deleteUnitFromWorld, hasRole, isPlayer, Snapshot} from "./Unit";
+import {Type, UNIT_BODY_HEIGHT, UNIT_BODY_WIDTH, Update, WorldPacket} from "@leela/common";
+import Unit, {addUnitToWorld, deleteUnitFromWorld, isPlayer, Snapshot} from "./Unit";
 import {reconcilePlayerPosition, resetPrediction} from "../player/prediction";
 import {CLIENT_PREDICT, INTERPOLATE, INTERPOLATE_BUFFER_SIZE, INTERPOLATE_DROP_DUPLICATES} from "../config";
 import {equals} from "../utils/vec2";
@@ -8,6 +8,7 @@ import {getPlayerState, initPlayerState, removePlayerFromWorldSession} from "../
 import Plant, {addPlantToWorld, deletePlantFromWorld} from "../plant/Plant";
 import Item from "./Item";
 import {initNpcState} from "../npc/NpcState";
+import Rectangle = Phaser.Geom.Rectangle;
 
 type ObjectUpdate = {
     update: Update,
@@ -23,6 +24,7 @@ interface UnitUpdate extends ObjectUpdate {
     typeId: number,
     roles: number[],
     skin: number,
+    name: string,
     x: number,
     y: number,
     vx: number,
@@ -90,7 +92,7 @@ function deserializeObjectUpdates(worldSession: WorldSession, input: unknown[]):
                     } else {
                         objectUpdate = deserializeFullUnitUpdate(i + 1, input);
                     }
-                    i += 9;
+                    i += 10;
                 }
                 break;
             case Update.EMPTY:
@@ -131,10 +133,10 @@ function deserializeFullPlantUpdate(index: number, serialized: unknown[]) {
 
 function deserializeFullPlayerUpdate(index: number, serialized: unknown[]) {
     const playerUpdate = deserializeFullUnitUpdate(index, serialized) as PlayerUpdate;
-    playerUpdate.ackTick = serialized[index + 8] as number;
-    playerUpdate.speed = serialized[index + 9] as number;
-    playerUpdate.inventory = deserializeInventoryUpdate(serialized[index + 10] as number[]);
-    playerUpdate.gold = serialized[index + 11] as number;
+    playerUpdate.ackTick = serialized[index + 9] as number;
+    playerUpdate.speed = serialized[index + 10] as number;
+    playerUpdate.inventory = deserializeInventoryUpdate(serialized[index + 11] as number[]);
+    playerUpdate.gold = serialized[index + 12] as number;
     return playerUpdate;
 }
 
@@ -144,10 +146,11 @@ function deserializeFullUnitUpdate(index: number, serialized: unknown[]) {
         typeId: serialized[index + 1] as number,
         roles: serialized[index + 2] as number[],
         skin: serialized[index + 3] as number,
-        x: serialized[index + 4] as number,
-        y: serialized[index + 5] as number,
-        vx: serialized[index + 6] as number,
-        vy: serialized[index + 7] as number
+        name: serialized[index + 4] as string,
+        x: serialized[index + 5] as number,
+        y: serialized[index + 6] as number,
+        vx: serialized[index + 7] as number,
+        vy: serialized[index + 8] as number
     } as UnitUpdate;
 }
 
@@ -226,6 +229,7 @@ function handleUnitUpdate(worldSession: WorldSession, timestamp: number, unitUpd
         case Update.FULL:
             if (!unit) unit = initUnit(worldSession, unitUpdate);
             unit.skin = unitUpdate.skin;
+            unit.nameText.text = unitUpdate.name;
 
             if (isPlayer(unit)) handleFullInventoryUpdate(unit, unitUpdate as PlayerUpdate);
             break;
@@ -256,14 +260,12 @@ function initUnit(worldSession: WorldSession, unitUpdateState: UnitUpdate) {
     }
 
     if (unit.typeId == Type.MOB) {
-        const npc = unit;
-
-        const npcState = initNpcState(npc);
+        const npcState = initNpcState(unit);
 
         npcState.roles = unitUpdateState.roles;
-
-        if (hasRole(npc, Role.VENDOR)) npc.setInteractive();
     }
+
+    unit.setInteractive(new Rectangle(UNIT_BODY_WIDTH / 2, 0 , UNIT_BODY_WIDTH, UNIT_BODY_HEIGHT), Rectangle.Contains);
 
     addUnitToWorld(unit);
 

@@ -1,9 +1,9 @@
 import WorldSession from "../server/WorldSession";
 import Player from "./Player";
-import {Opcode, UNIT_RUN_SPEED} from "@leela/common";
+import {generateName, Opcode, UNIT_RUN_SPEED, WorldPacket} from "@leela/common";
 import {addUnitToWorld} from "../core/Unit";
 
-function handlePlayerJoin(worldSession: WorldSession) {
+function handlePlayerJoin(worldSession: WorldSession, worldPacket: WorldPacket) {
     // TODO: Manage this via required session status, drop such packets: STATUS_AUTH, STATUS_LOGON etc
     if (worldSession.player) return;
 
@@ -14,7 +14,8 @@ function handlePlayerJoin(worldSession: WorldSession) {
     const map = world.physics.map;
 
     player.guid = world.guid();
-    player.skin = Math.floor(Math.random() * 5);
+    player.skin = worldPacket[1] as number;
+    player.name = getValidName(worldPacket[2]);
     player.x = Math.random() * map.tilesWidth * map.tileSize;
     player.y = Math.random() * map.tilesHeight * map.tileSize;
     player.vx = 0;
@@ -28,6 +29,14 @@ function handlePlayerJoin(worldSession: WorldSession) {
     addUnitToWorld(player);
 
     worldSession.sendPacket([Opcode.MSG_JOIN, player.guid])
+}
+
+function getValidName(name: unknown) {
+    if (name && typeof name == "string" && name.length <= 20) {
+        return name;
+    } else {
+        return generateName();
+    }
 }
 
 export {

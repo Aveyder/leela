@@ -9,16 +9,15 @@ import {movement} from "../player/movement";
 import {DEBUG_MODE, TICK_CAP} from "../config";
 import {updatePlayerPosition} from "../player/prediction";
 import DebugManager from "../debugging/DebugManager";
-import {updateUnitPositions, updateUnitsDepth} from "../movement/unit";
+import {updateUnitPositions, updateUnits} from "../movement/unit";
 import Plant from "../plant/Plant";
 import {updateCastBar} from "../plant/CastBar";
-import {initCursor, updateCursor} from "./cursor";
+import Cursor from "./Cursor";
 import {initTiledMap} from "./map";
 import GameMenu, {initGameMenu} from "../gui/GameMenu";
 import {initPhysicsWorld} from "../physics/init";
 import {initHUD} from "../gui/hud";
 import {join} from "../player/join";
-import Image = Phaser.GameObjects.Image;
 
 
 export default class WorldScene extends Phaser.Scene {
@@ -27,7 +26,7 @@ export default class WorldScene extends Phaser.Scene {
 
     private _worldClient: WorldClient;
 
-    private _cursor: Image;
+    private _cursor: Cursor;
 
     private _keys: Keys;
 
@@ -61,7 +60,8 @@ export default class WorldScene extends Phaser.Scene {
         initTiledMap(this);
         initHUD(this);
 
-        this._cursor = initCursor(this);
+        this._cursor = new Cursor(this);
+        this._cursor.init();
 
         this._keys = initKeys(this);
 
@@ -83,9 +83,9 @@ export default class WorldScene extends Phaser.Scene {
     public update(time: number, delta: number): void {
         updatePlayerPosition(this.worldSession?.player, delta);
         updateUnitPositions(this);
-        updateUnitsDepth(this);
+        updateUnits(this);
         updateCastBar(this, delta);
-        updateCursor(this);
+        this.cursor.update();
         this.debug?.update();
     }
 
@@ -97,9 +97,7 @@ export default class WorldScene extends Phaser.Scene {
 
         this._gameMenu.showJoinMenu();
 
-        if (DEBUG_MODE) {
-            join(worldSession);
-        }
+        if (DEBUG_MODE) join(worldSession, this._gameMenu.selectedSkin, "");
     }
 
     public removeSession() {

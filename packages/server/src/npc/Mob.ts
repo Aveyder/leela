@@ -8,6 +8,7 @@ export default class Mob implements Unit {
     public typeId: number;
     public roles: Role[];
     public skin: number;
+    public name: string;
     public x: number;
     public y: number;
     public vx: number;
@@ -42,6 +43,7 @@ function spawnCat(world: World) {
 
     mob.guid = world.guid();
     mob.skin = 5;
+    mob.name = "Fluffy";
     mob.x = TILE_SIZE * 3 / 2 + TILE_SIZE * 15;
     mob.y = TILE_SIZE * 3 / 2;
     mob.vx = 0;
@@ -66,6 +68,7 @@ function spawnVendor(world: World) {
 
     mob.guid = world.guid();
     mob.skin = 6;
+    mob.name = "Patrick Sharp";
     mob.x = TILE_SIZE * 3 / 2 + TILE_SIZE * 16;
     mob.y = TILE_SIZE * 3 / 2;
     mob.vx = 0;

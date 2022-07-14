@@ -80,19 +80,19 @@ export default class CastBar extends Container {
 
         let borderColor;
 
-        if (this._status == CastBarStatus.IN_PROGRESS) borderColor = 0x31313180;
+        if (this._status == CastBarStatus.IN_PROGRESS) borderColor = 0x000000;
         if (this._status == CastBarStatus.FAIL) borderColor = 0xFFFFFF;
         if (this._status == CastBarStatus.SUCCESS) borderColor = 0xFFFFFF;
 
-        this.graphics.lineStyle(4, borderColor);
+        this.graphics.lineStyle(3, borderColor);
         this.graphics.strokeRect(- CastBar.WIDTH / 2, - CastBar.HEIGHT / 2, CastBar.WIDTH, CastBar.HEIGHT);
 
         let backgroundColor;
-        if (this._status == CastBarStatus.IN_PROGRESS) backgroundColor = 0x00000000;
+        if (this._status == CastBarStatus.IN_PROGRESS) backgroundColor = 0x000000;
         if (this._status == CastBarStatus.FAIL) backgroundColor = 0xCC3E3E;
         if (this._status == CastBarStatus.SUCCESS) backgroundColor = 0x8FD94C;
 
-        this.fillBackground(backgroundColor)
+        this.fillBackground(backgroundColor);
 
         if (this._status == CastBarStatus.IN_PROGRESS) {
             const progress = Math.min(this.currentTime / this.totalTime, 1);
@@ -108,7 +108,7 @@ export default class CastBar extends Container {
     }
 
     private fillBackground(color: number) {
-        this.graphics.fillStyle(color);
+        this.graphics.fillStyle(color, 0.8);
         this.graphics.fillRect(
             - CastBar.WIDTH / 2, - CastBar.HEIGHT / 2,
             CastBar.WIDTH, CastBar.HEIGHT

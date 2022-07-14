@@ -7,8 +7,8 @@ function handleJoin(worldSession: WorldSession, worldPacket: WorldPacket) {
     worldSession.worldScene.gameMenu.showInGameMenu();
 }
 
-function join(worldSession: WorldSession) {
-    worldSession.sendPacket([Opcode.MSG_JOIN]);
+function join(worldSession: WorldSession, skin: number, name: string) {
+    worldSession.sendPacket([Opcode.MSG_JOIN, skin, name]);
 }
 
 export {

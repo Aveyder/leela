@@ -1,16 +1,24 @@
 import Container = Phaser.GameObjects.Container;
 import Graphics = Phaser.GameObjects.Graphics;
 import Text = Phaser.GameObjects.Text;
+import Image = Phaser.GameObjects.Image;
+import DOMElement = Phaser.GameObjects.DOMElement;
 import WorldScene from "../world/WorldScene";
 import {GAME_HEIGHT, GAME_WIDTH} from "../config";
 import Depth from "../world/Depth";
-import {Opcode} from "@leela/common";
+import {generateName, Opcode} from "@leela/common";
 import {join} from "../player/join";
 
 export default class GameMenu extends Container {
 
     private shadeGraphics: Graphics;
     private joinButton: Text;
+    private _selectedSkin: number;
+    private prevSkinButton: Text;
+    private nextSkinButton: Text;
+    private skin: Image;
+    private nameInput: DOMElement;
+    private nameInputNode: HTMLInputElement;
     private connectButton: Text;
     private disconnectButton: Text;
     private disconnectedText: Text;
@@ -21,6 +29,8 @@ export default class GameMenu extends Container {
 
         this.drawShade();
         this.drawJoinButton();
+        this.drawSkinSelect();
+        this.drawNameInput();
         this.drawConnectButton();
         this.drawDisconnectButton();
         this.drawDisconnectedText();
@@ -30,15 +40,25 @@ export default class GameMenu extends Container {
     public showJoinMenu() {
         this.shadeGraphics.visible = true;
         this.joinButton.visible = true;
+        this.prevSkinButton.visible = true;
+        this.nextSkinButton.visible = true;
+        this.skin.visible = true;
+        this.nameInput.visible = true;
         this.connectButton.visible = false;
         this.disconnectButton.visible = true;
         this.disconnectedText.visible = false;
         this.leaveButton.visible = false;
+
+        this.nameInputNode.value = generateName();
     }
 
     public showDisconnectedMenu() {
         this.shadeGraphics.visible = true;
         this.joinButton.visible = false;
+        this.prevSkinButton.visible = false;
+        this.nextSkinButton.visible = false;
+        this.skin.visible = false;
+        this.nameInput.visible = false;
         this.connectButton.visible = true;
         this.disconnectButton.visible = false;
         this.disconnectedText.visible = true;
@@ -48,10 +68,18 @@ export default class GameMenu extends Container {
     public showInGameMenu() {
         this.shadeGraphics.visible = false;
         this.joinButton.visible = false;
+        this.prevSkinButton.visible = false;
+        this.nextSkinButton.visible = false;
+        this.skin.visible = false;
+        this.nameInput.visible = false;
         this.connectButton.visible = false;
         this.disconnectButton.visible = false;
         this.disconnectedText.visible = false;
         this.leaveButton.visible = true;
+    }
+
+    public get selectedSkin() {
+        return this._selectedSkin;
     }
 
     private drawShade() {
@@ -75,10 +103,68 @@ export default class GameMenu extends Container {
             .setPadding(10)
             .setInteractive()
             .on("pointerdown", () => {
-                join(worldScene.worldSession);
+                const name = (this.nameInput.node as HTMLInputElement).value;
+                join(worldScene.worldSession, this._selectedSkin, name);
             });
 
         this.add(this.joinButton);
+    }
+
+    private drawSkinSelect() {
+        const worldScene = this.scene as WorldScene;
+
+        const maxSkin = 4;
+
+        this._selectedSkin = Math.floor(Math.random() * (maxSkin + 1));
+
+        this.skin = worldScene.add.image(worldScene.cameras.main.centerX, worldScene.cameras.main.centerY - 70, `unit:${this._selectedSkin}`, 1);
+
+        this.prevSkinButton = worldScene.add.text(worldScene.cameras.main.centerX - 30, worldScene.cameras.main.centerY - 70, "<",  {
+            fontSize: "12px",
+            fontFamily: "Arial",
+            color: "#ffffff",
+            backgroundColor: "#000000"
+        })
+            .setOrigin(0.5, 0.5)
+            .setPadding(5)
+            .setInteractive()
+            .on("pointerdown", () => {
+                this._selectedSkin = this._selectedSkin == 0 ? maxSkin : this._selectedSkin - 1;
+
+                this.skin.setTexture(`unit:${this._selectedSkin}`, 1);
+            });
+
+        this.nextSkinButton = worldScene.add.text(worldScene.cameras.main.centerX + 30, worldScene.cameras.main.centerY - 70, ">",  {
+            fontSize: "12px",
+            fontFamily: "Arial",
+            color: "#ffffff",
+            backgroundColor: "#000000"
+        })
+            .setOrigin(0.5, 0.5)
+            .setPadding(5)
+            .setInteractive()
+            .on("pointerdown", () => {
+                this._selectedSkin = (this._selectedSkin + 1) % (maxSkin + 1);
+
+                this.skin.setTexture(`unit:${this._selectedSkin}`, 1);
+            });
+
+        this.add(this.skin);
+        this.add(this.prevSkinButton);
+        this.add(this.nextSkinButton);
+    }
+
+    private drawNameInput() {
+        const worldScene = this.scene as WorldScene;
+
+        this.nameInput = worldScene.add.dom(
+            worldScene.cameras.main.centerX + 32, worldScene.cameras.main.centerY - 35,
+            "input");
+
+        this.nameInputNode = this.nameInput.node as HTMLInputElement;
+
+        this.nameInputNode.style.width = "100px";
+        this.nameInputNode.style.textAlign = "center";
     }
 
     private drawConnectButton() {

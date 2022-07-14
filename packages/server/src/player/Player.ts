@@ -11,6 +11,7 @@ export default class Player implements Unit {
     public readonly typeId: number;
     public readonly roles: Role[];
     public skin: number;
+    public name: string;
     public x: number;
     public y: number;
     public vx: number;

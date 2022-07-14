@@ -1,4 +1,5 @@
 import Sprite = Phaser.GameObjects.Sprite;
+import Text = Phaser.GameObjects.Text;
 import {Scene} from "phaser";
 import {Role, UNIT_BODY_HEIGHT, UNIT_BODY_WIDTH} from "@leela/common";
 import PhysBody from "../physics/PhysBody";
@@ -21,6 +22,7 @@ export default class Unit extends Sprite {
     private _skin: number;
     public readonly snapshots: Snapshot[];
     public readonly physBody: PhysBody;
+    private _nameText: Text;
 
     constructor(scene: Scene, skin = 0, x?: number, y?: number) {
         super(scene, x, y, `unit:${skin}`);
@@ -36,6 +38,21 @@ export default class Unit extends Sprite {
         this.skin = skin;
 
         this.snapshots = [];
+
+        this.createNameText();
+    }
+
+    private createNameText() {
+        this._nameText = this.scene.add.text(0, 0, "", {
+            fontSize: "12px",
+            fontFamily: "Arial",
+            color: "#ffffff",
+            backgroundColor: "#000000"
+        }).setOrigin(0.5, 0.5)
+    }
+
+    public get nameText() {
+        return this._nameText;
     }
 
     public set skin(value: number) {
@@ -95,6 +112,20 @@ export default class Unit extends Sprite {
         }
 
         return dir;
+    }
+
+    public update() {
+        this.depth = this._nameText.depth = Depth.UNIT + this.y / 1000000;
+
+        this._nameText.x = this.x;
+        this._nameText.y = this.y - UNIT_BODY_HEIGHT / 2 - this._nameText.height;
+
+        this._nameText.visible = false;
+    }
+
+    public destroy(fromScene?: boolean) {
+        this._nameText.destroy(fromScene);
+        super.destroy(fromScene);
     }
 }
 

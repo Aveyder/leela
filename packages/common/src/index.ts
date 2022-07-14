@@ -7,5 +7,6 @@ export {default as TileMap} from "./physics/TileMap";
 export * from "./protocol/opcodes";
 export {default as WorldPacket} from "./protocol/WorldPacket";
 export * from "./utils/math";
+export * from "./utils/name";
 export * from "./world/constants";
 export * from "./config";

@@ -12,6 +12,9 @@ function boot() {
             width: GAME_WIDTH,
             height: GAME_HEIGHT
         },
+        dom: {
+            createContainer: true
+        },
         parent: document.querySelector(".game") as HTMLElement,
         scene: WorldScene
     });
