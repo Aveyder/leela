@@ -1,135 +1,142 @@
 import WorldSession from "../server/WorldSession";
-import {FRACTION_DIGITS, Opcode, toFixed, Update, WorldPacket} from "@leela/common";
+import {FRACTION_DIGITS, Opcode, toFixed, Type, UpdateOpcode, WorldPacket} from "@leela/common";
 import {Unit} from "./Unit";
-import {cloneObject} from "./GameObject";
+import GameObject, {cloneObject} from "./GameObject";
 import Plant from "../plant/Plant";
 import Player from "../player/Player";
+import Mob from "../npc/Mob";
 
 function sendUpdateToPlayer(worldSession: WorldSession) {
-    const units = worldSession.world.units;
-    const serializedUnitUpdates = [];
-    Object.values(units).forEach(unit => pushSerializedUnitUpdate(worldSession, unit, serializedUnitUpdates));
+    const gameObjectUpdates = [];
 
-    const plants = worldSession.world.plants;
-    const serializedPlantUpdates = [];
-    Object.values(plants).forEach(plant => pushSerializedPlantUpdate(worldSession, plant, serializedPlantUpdates));
+    Object.values(worldSession.world.gameObjects).forEach(gameObject => {
+        const guid = gameObject.guid;
+        const sessionGameObject = worldSession.gameObjects[guid];
 
-    if (serializedUnitUpdates.length) {
+        pushGameObjectUpdates(
+            guid,
+            gameObject,
+            sessionGameObject,
+            gameObjectUpdates,
+            worldSession
+        );
+
+        worldSession.gameObjects[guid] = cloneObject(gameObject, sessionGameObject) as Unit;
+    });
+
+    if (gameObjectUpdates.length) {
         const packet = [
             Opcode.SMSG_UPDATE,
             Date.now(),
-            ...serializedUnitUpdates,
-            ...serializedPlantUpdates
+            ...gameObjectUpdates
         ] as WorldPacket;
 
         worldSession.sendPacket(packet);
     }
 }
 
-function pushSerializedUnitUpdate(worldSession: WorldSession, unit: Unit, unitUpdates: unknown[]) {
-    const lastSentUnitUpdate = worldSession.lastSentUpdate[unit.guid] as Unit;
+function pushGameObjectUpdates(guid: number, gameObject: GameObject, sessionGameObject: GameObject,
+                              gameObjectUpdates: unknown[], worldSession: WorldSession) {
+    if (gameObject.static && sessionGameObject) return;
 
-    if (!lastSentUnitUpdate) {
-        pushSerializedFullUnitUpdate(unit, unitUpdates);
-        if (worldSession.player == unit) {
-            pushSerializedFullPlayerUpdate(unit as Player, unitUpdates);
-        }
-    } else {
-        if (lastSentUnitUpdate.skin != unit.skin) {
-            pushSerializedSkinUnitUpdate(unit, unitUpdates);
-        }
-        if (lastSentUnitUpdate.x != unit.x ||
-            lastSentUnitUpdate.y != unit.y ||
-            lastSentUnitUpdate.vx != unit.vx ||
-            lastSentUnitUpdate.vy != unit.vy) {
-            pushSerializedPositionUnitUpdate(unit, unitUpdates);
-            if (worldSession.player == unit) {
-                pushSerializedPositionPlayerUpdate(unit as Player, unitUpdates);
-            }
-        } else {
-            pushSerializedEmptyUnitUpdate(unit, unitUpdates);
-        }
+    switch (gameObject.typeId) {
+        case Type.MOB:
+            pushMobUpdates(guid, gameObject as Mob, sessionGameObject as Mob, gameObjectUpdates);
+            break;
+        case Type.PLAYER:
+            pushPlayerUpdates(guid, gameObject as Player, sessionGameObject as Player, gameObjectUpdates, worldSession);
+            break;
+        case Type.PLANT:
+            pushPlantUpdates(guid, gameObject as Plant, gameObjectUpdates);
+            break;
+    }
+}
+
+function pushMobUpdates(guid: number, mob: Mob, sessionMob: Mob,
+                       gameObjectUpdates: unknown[]) {
+    pushUnitUpdates(guid, mob as Unit, sessionMob as Unit, gameObjectUpdates);
+}
+
+function pushPlayerUpdates(guid: number, player: Player, sessionPlayer: Player,
+                          gameObjectUpdates: unknown[], worldSession: WorldSession) {
+    pushUnitUpdates(guid, player as Unit, sessionPlayer as Unit, gameObjectUpdates);
+
+    if (worldSession.player != player) return;
+
+    if (!sessionPlayer) {
+        gameObjectUpdates.push(UpdateOpcode.PLAYER_INV,
+            guid,
+            serializeInventory(player),
+            player.gold
+        );
     }
 
-    worldSession.lastSentUpdate[unit.guid] = cloneObject(unit, lastSentUnitUpdate) as Unit;
+    if (!sessionPlayer || hasPositionChanged(player, sessionPlayer)) {
+        gameObjectUpdates.push(UpdateOpcode.PLAYER_MOV,
+            guid,
+            player.tick,
+            player.speed
+        );
+    }
 }
 
-function pushSerializedFullUnitUpdate(unit: Unit, unitUpdates: unknown[]) {
-    unitUpdates.push(Update.FULL,
-        unit.guid,
-        unit.typeId,
-        unit.roles,
-        unit.skin,
-        unit.name,
-        toFixed(unit.x, FRACTION_DIGITS),
-        toFixed(unit.y, FRACTION_DIGITS),
-        toFixed(unit.vx, FRACTION_DIGITS),
-        toFixed(unit.vy, FRACTION_DIGITS)
-    );
-}
-
-function pushSerializedFullPlayerUpdate(player: Player, unitUpdates: unknown[]) {
-    pushSerializedPositionPlayerUpdate(player, unitUpdates);
-    pushSerializedFullInventoryUpdate(player, unitUpdates);
-    unitUpdates.push(player.gold);
-}
-
-function pushSerializedFullInventoryUpdate(player: Player, unitUpdates: unknown[]) {
+function serializeInventory(player: Player) {
     const inventory = [];
-    player.inventory.map(item => {
+    player.inventory.forEach(item => {
         if (item) {
             inventory.push(item.id, item.stack);
         } else {
             inventory.push(0);
         }
     });
-    unitUpdates.push(inventory);
+    return inventory;
 }
 
-function pushSerializedSkinUnitUpdate(unit: Unit, unitUpdates: unknown[]) {
-    unitUpdates.push(Update.UNIT_SKIN,
-        unit.guid,
-        unit.skin
-    );
-}
-
-function pushSerializedPositionUnitUpdate(unit: Unit, unitUpdates: unknown[]) {
-    unitUpdates.push(Update.UNIT_POSITION,
-        unit.guid,
-        toFixed(unit.x, FRACTION_DIGITS),
-        toFixed(unit.y, FRACTION_DIGITS),
-        toFixed(unit.vx, FRACTION_DIGITS),
-        toFixed(unit.vy, FRACTION_DIGITS)
-    );
-}
-
-function pushSerializedPositionPlayerUpdate(player: Player, unitUpdates: unknown[]) {
-    unitUpdates.push(
-        player.tick,
-        player.speed
-    );
-}
-
-function pushSerializedEmptyUnitUpdate(unit: Unit, unitUpdates: unknown[]) {
-    unitUpdates.push(Update.EMPTY,
-        unit.guid
-    );
-}
-
-function pushSerializedPlantUpdate(worldSession: WorldSession, plant: Plant, plantUpdates: unknown[]) {
-    const lastSentPlantUpdate = worldSession.lastSentUpdate[plant.guid] as Plant;
-
-    if (!lastSentPlantUpdate) {
-        plantUpdates.push(Update.FULL,
-            plant.guid,
-            plant.typeId,
-            toFixed(plant.x, FRACTION_DIGITS),
-            toFixed(plant.y, FRACTION_DIGITS),
-            plant.kind
-        )
+function pushUnitUpdates(guid: number, unit: Unit, sessionUnit: Unit,
+                          gameObjectUpdates: unknown[]) {
+    if (!sessionUnit) {
+        gameObjectUpdates.push(UpdateOpcode.UNIT_NEW,
+            guid,
+            unit.typeId,
+            unit.roles,
+            unit.name
+        );
     }
 
-    worldSession.lastSentUpdate[plant.guid] = cloneObject(plant, lastSentPlantUpdate) as Plant;
+    if (!sessionUnit || hasPositionChanged(unit, sessionUnit)) {
+        gameObjectUpdates.push(UpdateOpcode.UNIT_POS,
+            guid,
+            toFixed(unit.x, FRACTION_DIGITS),
+            toFixed(unit.y, FRACTION_DIGITS),
+            toFixed(unit.vx, FRACTION_DIGITS),
+            toFixed(unit.vy, FRACTION_DIGITS)
+        );
+    } else {
+        gameObjectUpdates.push(UpdateOpcode.UNIT_ACK, guid);
+    }
+
+    if (!sessionUnit || unit.skin != sessionUnit.skin) {
+        gameObjectUpdates.push(UpdateOpcode.UNIT_SKIN,
+            guid,
+            unit.skin
+        );
+    }
+}
+
+function hasPositionChanged(unitA: Unit, unitB: Unit) {
+    return unitA.x != unitB.x ||
+        unitA.y != unitB.y ||
+        unitA.vx != unitB.vx ||
+        unitA.vy != unitB.vy;
+}
+
+function pushPlantUpdates(guid: number, plant: Plant, gameObjectUpdates: unknown[]) {
+    gameObjectUpdates.push(UpdateOpcode.PLANT,
+        guid,
+        toFixed(plant.x, FRACTION_DIGITS),
+        toFixed(plant.y, FRACTION_DIGITS),
+        plant.kind
+    );
 }
 
 export {

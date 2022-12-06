@@ -1,29 +1,27 @@
 import World from "../world/World";
-import {Opcode, Type} from "@leela/common";
-import {deleteUnitFromWorld, Unit} from "./Unit";
+import {Opcode} from "@leela/common";
 
 export default interface GameObject {
     world: World;
     guid: number;
     typeId: number;
+    static: boolean;
 }
 
-function deleteObjectFromWorld(object: GameObject) {
-    const world = object.world;
+function _addObjectToWorld(object: GameObject) {
+    object.world.gameObjects[object.guid] = object;
+}
 
-    switch (object.typeId) {
-        case Type.MOB:
-        case Type.PLAYER:
-            deleteUnitFromWorld(object as Unit);
-            break;
-        case Type.PLANT:
-            delete object.world.plants[object.guid];
-            break;
-    }
+function _deleteObjectFromWorld(object: GameObject) {
+    const world = object.world;
+    const guid = object.guid;
+
+    delete world.gameObjects[guid];
 
     world.forEachSession(worldSession => {
-        delete worldSession.lastSentUpdate[object.guid];
-        worldSession.sendPacket([Opcode.SMSG_DESTROY, object.guid]);
+        delete worldSession.gameObjects[guid];
+
+        worldSession.sendPacket([Opcode.SMSG_DESTROY, guid]);
     });
 }
 
@@ -36,18 +34,12 @@ function cloneObject(object: GameObject, result?: GameObject) {
 }
 
 function isInWorld(object: GameObject) {
-    switch (object.typeId) {
-        case Type.MOB:
-        case Type.PLAYER:
-            return object.world.units[object.guid] != undefined;
-        case Type.PLANT:
-            return object.world.plants[object.guid] != undefined;
-    }
-    return false;
+    return object.world.gameObjects[object.guid] != undefined;
 }
 
 export {
-    deleteObjectFromWorld,
+    _addObjectToWorld,
+    _deleteObjectFromWorld,
     cloneObject,
     isInWorld
 }

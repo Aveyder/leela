@@ -1,12 +1,13 @@
 import World from "../world/World";
-import {addUnitToWorld, Unit} from "../core/Unit";
+import {_addUnitToWorld, _deleteUnitFromWorld, Unit} from "../core/Unit";
 import {Role, TILE_SIZE, Type, UNIT_BODY_HEIGHT, UNIT_BODY_WIDTH, UNIT_WALK_SPEED} from "@leela/common";
 import {Motion, PathMotion, Waypoint} from "./motions";
 
 export default class Mob implements Unit {
     public guid: number;
-    public typeId: number;
-    public roles: Role[];
+    public readonly typeId: number;
+    public readonly static: boolean;
+    public readonly roles: Role[];
     public skin: number;
     public name: string;
     public x: number;
@@ -25,17 +26,29 @@ export default class Mob implements Unit {
         this.world = world;
 
         this.typeId = Type.MOB;
+        this.static = false;
         this.roles = [];
         this.width = UNIT_BODY_WIDTH;
         this.height = UNIT_BODY_HEIGHT;
         this.bullet = false;
     }
+
+    public addToWorld() {
+        this.world.mobs[this.guid] = this;
+
+        _addUnitToWorld(this);
+    }
+
+    public deleteFromWorld() {
+        delete this.world.mobs[this.guid];
+
+        _deleteUnitFromWorld(this);
+    }
 }
 
 function updateMobs(world: World, delta) {
-    Object.values(world.units)
-        .filter(unit => unit.typeId == Type.MOB)
-        .forEach((mob: Mob) => mob.motion?.update(delta));
+    Object.values(world.mobs)
+        .forEach(mob => mob.motion?.update(delta));
 }
 
 function spawnCat(world: World) {
@@ -60,7 +73,7 @@ function spawnCat(world: World) {
 
     mob.motion = new PathMotion(mob, path as Waypoint[]);
 
-    addUnitToWorld(mob);
+    mob.addToWorld();
 }
 
 function spawnVendor(world: World) {
@@ -76,7 +89,7 @@ function spawnVendor(world: World) {
 
     mob.roles.push(Role.VENDOR);
 
-    addUnitToWorld(mob);
+    mob.addToWorld();
 }
 
 export {

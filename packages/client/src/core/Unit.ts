@@ -6,12 +6,17 @@ import PhysBody from "../physics/PhysBody";
 import WorldScene from "../world/WorldScene";
 import Depth from "../world/Depth";
 import {appear, hideAndDestroy} from "./GameObject";
-import {UnitUpdate} from "./update";
 import {getNpcState} from "../npc/NpcState";
 
+type SnapshotState = {
+    x: number,
+    y: number,
+    vx: number,
+    vy: number
+};
 
 type Snapshot = {
-    state: UnitUpdate,
+    state: SnapshotState,
     timestamp: number
 }
 
@@ -164,6 +169,7 @@ function hasRole(unit: Unit, role: Role) {
 }
 
 export {
+    SnapshotState,
     Snapshot,
     addUnitToWorld,
     deleteUnitFromWorld,

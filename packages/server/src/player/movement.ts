@@ -6,8 +6,6 @@ import {resetGathering} from "../plant/gather";
 function handlePlayerMove(worldSession: WorldSession, worldPacket: WorldPacket) {
     const player = worldSession.player;
 
-    if (!player) return;
-
     const tick = worldPacket[1] as number;
     const move = worldPacket[2] as number;
 
@@ -42,8 +40,6 @@ function deserializeMove(move: number): Vec2 {
 
 function handleSwitchWalkMode(worldSession: WorldSession) {
     const player = worldSession.player;
-
-    if (!player) return;
 
     player.run = !player.run;
 

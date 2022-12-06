@@ -10,7 +10,6 @@ import {
     CLIENT_SMOOTH_POS_MS
 } from "../config";
 import {getPlayerState} from "./PlayerState";
-import {PlayerUpdate} from "../core/update";
 
 
 function predictPlayerPosition(player: Unit, dir: Vec2) {
@@ -52,15 +51,15 @@ function predictPlayerPosition(player: Unit, dir: Vec2) {
 }
 
 
-function reconcilePlayerPosition(player: Unit, playerUpdate: PlayerUpdate, ack: number) {
+function reconcilePlayerPosition(player: Unit, playerUpdatePos: Vec2, ack: number) {
     const playerState = getPlayerState(player);
 
     playerState.ackTick = ack;
 
     const reconciledBody = playerState.reconciledBody;
 
-    reconciledBody.x = playerUpdate.x;
-    reconciledBody.y = playerUpdate.y;
+    reconciledBody.x = playerUpdatePos.x;
+    reconciledBody.y = playerUpdatePos.y;
 
     const physics = (player.scene as WorldScene).phys;
 

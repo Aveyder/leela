@@ -18,14 +18,28 @@ enum Opcode {
     CMSG_LEAVE
 }
 
-enum Update {
-    FULL,
-    EMPTY,
+enum UpdateOpcode {
+    UNIT_NEW,
+    UNIT_ACK,
     UNIT_SKIN,
-    UNIT_POSITION
+    UNIT_POS,
+    PLAYER_MOV,
+    PLAYER_INV,
+    PLANT
+}
+
+const updateDataSize: Record<UpdateOpcode, number> = {
+    [UpdateOpcode.UNIT_NEW]: 3,
+    [UpdateOpcode.UNIT_ACK]: 0,
+    [UpdateOpcode.UNIT_SKIN]: 1,
+    [UpdateOpcode.UNIT_POS]: 4,
+    [UpdateOpcode.PLAYER_MOV]: 2,
+    [UpdateOpcode.PLAYER_INV]: 2,
+    [UpdateOpcode.PLANT]: 3,
 }
 
 export {
     Opcode,
-    Update
+    UpdateOpcode,
+    updateDataSize
 };

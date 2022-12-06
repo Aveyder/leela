@@ -1,8 +1,7 @@
 import WorldScene from "../world/WorldScene";
 import {CLIENT_PREDICT, ENTITY_EXTRAPOLATE, ENTITY_EXTRAPOLATE_MAX_MS, INTERPOLATE} from "../config";
 import {INTERPOLATE_MS, TMP_VEC2, Vec2} from "@leela/common";
-import Unit, {isPlayer} from "../core/Unit";
-import {UnitUpdate} from "../core/update";
+import Unit, {isPlayer, SnapshotState} from "../core/Unit";
 import {interpolate} from "../utils/vec2";
 
 function updateUnitPositions(worldScene: WorldScene) {
@@ -28,7 +27,7 @@ function interpolateUnitPosition(unit: Unit, serverNow: number) {
 
     const lerpMoment = serverNow - INTERPOLATE_MS;
 
-    let lerpMomentState: UnitUpdate;
+    let lerpMomentState: SnapshotState;
     let lerpPos: Vec2;
 
     const firstSnapshot = snapshots[0];

@@ -5,13 +5,15 @@ import Player from "../player/Player";
 import Loop from "../utils/Loop";
 import {UPDATE_RATE} from "../config";
 import {sendUpdateToPlayer} from "../core/update";
-import GameObject, {deleteObjectFromWorld} from "../core/GameObject";
+import GameObject from "../core/GameObject";
+import SessionStatus from "./protocol/SessionStatus";
 
 export default class WorldSession {
 
     private worldSocket: WorldSocket;
     private readonly recvQueue: WorldPacket[];
-    public readonly lastSentUpdate: Record<number, GameObject>;
+    public readonly gameObjects: Record<number, GameObject>;
+    public status: SessionStatus;
 
     private updateLoop: Loop;
 
@@ -22,7 +24,8 @@ export default class WorldSession {
     constructor(worldSocket: WorldSocket) {
         this.worldSocket = worldSocket;
         this.recvQueue = [];
-        this.lastSentUpdate = {};
+        this.gameObjects = {};
+        this.status = SessionStatus.STATUS_AUTHED;
     }
 
     public init() {
@@ -49,7 +52,7 @@ export default class WorldSession {
         this.recvQueue.forEach(worldPacket => {
             const opcode = worldPacket[0] as Opcode;
 
-            const handler = OpcodeTable.INSTANCE.get(opcode);
+            const handler = OpcodeTable.INSTANCE.getHandler(opcode);
 
             handler(this, worldPacket, delta);
         });
@@ -70,10 +73,11 @@ export default class WorldSession {
     public destroy() {
         this.updateLoop?.stop();
 
-        if (this.player) deleteObjectFromWorld(this.player);
+        this.player?.deleteFromWorld();
 
         this.worldSocket = null;
         this.recvQueue.length = 0;
+        this.status = null;
     }
 
     private sendUpdateToPlayer() {

@@ -1,12 +1,8 @@
 import WorldSession from "../server/WorldSession";
 import Player from "./Player";
 import {generateName, Opcode, UNIT_RUN_SPEED, WorldPacket} from "@leela/common";
-import {addUnitToWorld} from "../core/Unit";
 
 function handlePlayerJoin(worldSession: WorldSession, worldPacket: WorldPacket) {
-    // TODO: Manage this via required session status, drop such packets: STATUS_AUTH, STATUS_LOGON etc
-    if (worldSession.player) return;
-
     const world = worldSession.world;
 
     const player = new Player(worldSession);
@@ -24,11 +20,9 @@ function handlePlayerJoin(worldSession: WorldSession, worldPacket: WorldPacket) 
     player.speed = UNIT_RUN_SPEED;
     player.gold = 0;
 
-    worldSession.player = player;
+    player.addToWorld();
 
-    addUnitToWorld(player);
-
-    worldSession.sendPacket([Opcode.MSG_JOIN, player.guid])
+    worldSession.sendPacket([Opcode.MSG_JOIN, player.guid]);
 }
 
 function getValidName(name: unknown) {

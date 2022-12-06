@@ -1,253 +1,65 @@
 import WorldSession from "../client/WorldSession";
-import {Type, UNIT_BODY_HEIGHT, UNIT_BODY_WIDTH, Update, WorldPacket} from "@leela/common";
-import Unit, {addUnitToWorld, deleteUnitFromWorld, isPlayer, Snapshot} from "./Unit";
+import {
+    Role,
+    Type,
+    UNIT_BODY_HEIGHT,
+    UNIT_BODY_WIDTH,
+    updateDataSize,
+    UpdateOpcode,
+    Vec2,
+    WorldPacket
+} from "@leela/common";
+import Unit, {addUnitToWorld, deleteUnitFromWorld, isPlayer, Snapshot, SnapshotState} from "./Unit";
 import {reconcilePlayerPosition, resetPrediction} from "../player/prediction";
 import {CLIENT_PREDICT, INTERPOLATE, INTERPOLATE_BUFFER_SIZE, INTERPOLATE_DROP_DUPLICATES} from "../config";
 import {equals} from "../utils/vec2";
 import {getPlayerState, initPlayerState, removePlayerFromWorldSession} from "../player/PlayerState";
 import Plant, {addPlantToWorld, deletePlantFromWorld} from "../plant/Plant";
-import Item from "./Item";
 import {initNpcState} from "../npc/NpcState";
 import Rectangle = Phaser.Geom.Rectangle;
 
-type ObjectUpdate = {
-    update: Update,
-    guid: number,
-    typeId: number,
-    x: number,
-    y: number
+const UPDATE_HEADERS_SIZE = 2;
+
+interface UpdateHandler {
+    (worldSession: WorldSession, timestamp: number, guid: number, data: unknown[]): void;
 }
 
-interface UnitUpdate extends ObjectUpdate {
-    update: Update,
-    guid: number,
-    typeId: number,
-    roles: number[],
-    skin: number,
-    name: string,
-    x: number,
-    y: number,
-    vx: number,
-    vy: number
-}
-
-interface PlayerUpdate extends UnitUpdate {
-    update: Update,
-    guid: number,
-    typeId: number,
-    roles: number[],
-    skin: number,
-    x: number,
-    y: number,
-    vx: number,
-    vy: number,
-    ackTick: number,
-    speed: number,
-    inventory: Item[],
-    gold: number
-}
-
-interface PlantUpdate extends ObjectUpdate {
-    update: Update,
-    guid: number,
-    typeId: number,
-    x: number,
-    y: number,
-    kind: number
-}
+const updateHandlers: Record<UpdateOpcode, UpdateHandler> = {
+    [UpdateOpcode.UNIT_NEW]: handleUnitNewUpdate,
+    [UpdateOpcode.UNIT_ACK]: handleUnitAckUpdate,
+    [UpdateOpcode.UNIT_SKIN]: handleUnitSkinUpdate,
+    [UpdateOpcode.UNIT_POS]: handleUnitPositionUpdate,
+    [UpdateOpcode.PLAYER_MOV]: handlePlayerMovementUpdate,
+    [UpdateOpcode.PLAYER_INV]: handlePlayerInventoryUpdate,
+    [UpdateOpcode.PLANT]: handlePlantUpdate,
+};
 
 function handleUpdate(worldSession: WorldSession, worldPacket: WorldPacket) {
     worldPacket.shift(); // opcode
     const timestamp = worldPacket.shift() as number;
 
-    const objectUpdates = deserializeObjectUpdates(worldSession, worldPacket);
+    for(let i = 0; i < worldPacket.length; ) {
+        const updateOpcode = worldPacket[i] as UpdateOpcode;
+        const updateHandler = updateHandlers[updateOpcode];
+        const dataSize = updateDataSize[updateOpcode];
 
-    objectUpdates.forEach(objectUpdate => {
-        if (objectUpdate.typeId == Type.PLANT) {
-            handlePlantUpdate(worldSession, objectUpdate as PlantUpdate);
-        } else {
-            handleUnitUpdate(worldSession, timestamp, objectUpdate as UnitUpdate);
-        }
-    });
-}
+        const guid = worldPacket[i + 1] as number;
 
-function deserializeObjectUpdates(worldSession: WorldSession, input: unknown[]): ObjectUpdate[] {
-    const objectUpdates = [];
+        const dataStart = i + UPDATE_HEADERS_SIZE;
 
-    for (let i = 0; i < input.length;) {
-        const update = input[i];
-        const guid = input[i + 1];
-        const typeId = input[i + 2];
+        updateHandler(worldSession, timestamp, guid, worldPacket.slice(dataStart, dataStart + dataSize));
 
-        let objectUpdate;
-        switch (update) {
-            case Update.FULL:
-                if (typeId == Type.PLANT) {
-                    objectUpdate = deserializeFullPlantUpdate(i + 1, input);
-                    i += 6;
-                } else {
-                    if (worldSession.playerGuid == guid) {
-                        objectUpdate = deserializeFullPlayerUpdate(i + 1, input);
-                        i += 4;
-                    } else {
-                        objectUpdate = deserializeFullUnitUpdate(i + 1, input);
-                    }
-                    i += 10;
-                }
-                break;
-            case Update.EMPTY:
-                objectUpdate = deserializeEmptyUnitUpdate(i + 1, input);
-                i += 2;
-                break;
-            case Update.UNIT_SKIN:
-                objectUpdate = deserializeSkinUnitUpdate(i + 1, input);
-                i += 3;
-                break;
-            case Update.UNIT_POSITION:
-                if (worldSession.playerGuid == guid) {
-                    objectUpdate = deserializePositionPlayerUpdate(i + 1, input);
-                    i += 2;
-                } else {
-                    objectUpdate = deserializePositionUnitUpdate(i + 1, input);
-                }
-                i += 6;
-                break;
-        }
-
-        objectUpdate.update = update;
-        objectUpdates.push(objectUpdate);
+        i += UPDATE_HEADERS_SIZE + dataSize;
     }
-
-    return objectUpdates;
 }
 
-function deserializeFullPlantUpdate(index: number, serialized: unknown[]) {
-    return {
-        guid: serialized[index] as number,
-        typeId: serialized[index + 1] as number,
-        x: serialized[index + 2] as number,
-        y: serialized[index + 3] as number,
-        kind: serialized[index + 4] as number,
-    } as PlantUpdate;
-}
-
-function deserializeFullPlayerUpdate(index: number, serialized: unknown[]) {
-    const playerUpdate = deserializeFullUnitUpdate(index, serialized) as PlayerUpdate;
-    playerUpdate.ackTick = serialized[index + 9] as number;
-    playerUpdate.speed = serialized[index + 10] as number;
-    playerUpdate.inventory = deserializeInventoryUpdate(serialized[index + 11] as number[]);
-    playerUpdate.gold = serialized[index + 12] as number;
-    return playerUpdate;
-}
-
-function deserializeFullUnitUpdate(index: number, serialized: unknown[]) {
-    return {
-        guid: serialized[index] as number,
-        typeId: serialized[index + 1] as number,
-        roles: serialized[index + 2] as number[],
-        skin: serialized[index + 3] as number,
-        name: serialized[index + 4] as string,
-        x: serialized[index + 5] as number,
-        y: serialized[index + 6] as number,
-        vx: serialized[index + 7] as number,
-        vy: serialized[index + 8] as number
-    } as UnitUpdate;
-}
-
-function deserializeInventoryUpdate(serialized: number[]) {
-    const inventory = [] as Item[];
-    for(let i = 0; i < serialized.length; i++) {
-        const id = serialized[i];
-        if (id) {
-            inventory.push({id, stack: serialized[i + 1]});
-            i += 1;
-        } else {
-            inventory.push(null);
-        }
-    }
-    return inventory;
-}
-
-function deserializeEmptyUnitUpdate(index: number, serialized: unknown[]) {
-    return {
-        guid: serialized[index] as number
-    } as UnitUpdate;
-}
-
-function deserializeSkinUnitUpdate(index: number, serialized: unknown[]) {
-    return {
-        guid: serialized[index] as number,
-        skin: serialized[index + 1] as number,
-    } as UnitUpdate;
-}
-
-function deserializePositionPlayerUpdate(index: number, serialized: unknown[]) {
-    const playerUpdate = deserializePositionUnitUpdate(index, serialized) as PlayerUpdate;
-    playerUpdate.ackTick = serialized[index + 5] as number;
-    playerUpdate.speed = serialized[index + 6] as number;
-    return playerUpdate;
-}
-
-function deserializePositionUnitUpdate(index: number, serialized: unknown[]) {
-    return {
-        guid: serialized[index] as number,
-        x: serialized[index + 1] as number,
-        y: serialized[index + 2] as number,
-        vx: serialized[index + 3] as number,
-        vy: serialized[index + 4] as number
-    } as UnitUpdate;
-}
-
-function handlePlantUpdate(worldSession: WorldSession, plantUpdate: PlantUpdate) {
-    const worldScene = worldSession.worldScene;
-
-    const plant = new Plant(worldScene, plantUpdate.kind, plantUpdate.x, plantUpdate.y);
-
-    plant.guid = plantUpdate.guid;
-    plant.typeId = plantUpdate.typeId;
-
-    plant.setInteractive();
-
-    addPlantToWorld(plant);
-}
-
-function handleUnitUpdate(worldSession: WorldSession, timestamp: number, unitUpdate: UnitUpdate) {
-    const worldScene = worldSession.worldScene;
-
-    let unit = worldScene.units[unitUpdate.guid] as Unit;
-
-    const update = unitUpdate.update;
-
-    switch (update) {
-        case Update.EMPTY:
-            cloneLastSnapshotState(unitUpdate, unit);
-            pushToUnitSnapshots(unit, unitUpdate, timestamp);
-            return;
-        case Update.UNIT_SKIN:
-            unit.skin = unitUpdate.skin;
-            return;
-        case Update.FULL:
-            if (!unit) unit = initUnit(worldSession, unitUpdate);
-            unit.skin = unitUpdate.skin;
-            unit.nameText.text = unitUpdate.name;
-
-            if (isPlayer(unit)) handleFullInventoryUpdate(unit, unitUpdate as PlayerUpdate);
-            break;
-        case Update.UNIT_POSITION:
-            break;
-    }
-
-    handlePositionUpdate(unit, unitUpdate, timestamp);
-}
-
-function initUnit(worldSession: WorldSession, unitUpdateState: UnitUpdate) {
+function handleUnitNewUpdate(worldSession: WorldSession, timestamp: number, guid: number, data: unknown[]) {
     const worldScene = worldSession.worldScene;
 
     const unit = new Unit(worldScene);
 
-    unit.guid = unitUpdateState.guid;
-    unit.typeId = unitUpdateState.typeId;
-    unit.setPosition(unitUpdateState.x, unitUpdateState.y);
+    unit.guid = guid;
+    unit.typeId = data[0] as Type;
 
     if (isPlayer(unit)) {
         const player = unit;
@@ -262,78 +74,128 @@ function initUnit(worldSession: WorldSession, unitUpdateState: UnitUpdate) {
     if (unit.typeId == Type.MOB) {
         const npcState = initNpcState(unit);
 
-        npcState.roles = unitUpdateState.roles;
+        npcState.roles = data[1] as Role[];
     }
 
     unit.setInteractive(new Rectangle(UNIT_BODY_WIDTH / 2, 0 , UNIT_BODY_WIDTH, UNIT_BODY_HEIGHT), Rectangle.Contains);
 
     addUnitToWorld(unit);
 
-    return unit;
+    unit.nameText.text = data[2] as string;
 }
 
-function handleFullInventoryUpdate(player: Unit, playerUpdate: PlayerUpdate) {
-    const inventory = getPlayerState(player).inventory;
+function handleUnitAckUpdate(worldSession: WorldSession, timestamp: number, guid: number) {
+    const worldScene = worldSession.worldScene;
 
-    for(let slot = 0; slot < playerUpdate.inventory.length; slot++) {
-        inventory.putItem(slot, playerUpdate.inventory[slot]);
-    }
+    const unit = worldScene.units[guid] as Unit;
 
-    inventory.putGold(playerUpdate.gold);
+    const lastSnapshotState = lastSnapshot(unit).state;
+
+    pushToUnitSnapshots(unit, {
+        x: lastSnapshotState.x, y: lastSnapshotState.y, vx: lastSnapshotState.vx, vy: lastSnapshotState.vy
+    }, timestamp);
 }
 
-function handlePositionUpdate(unit: Unit, unitUpdate: UnitUpdate, timestamp: number) {
-    pushToUnitSnapshots(unit, unitUpdate, timestamp);
+function handleUnitSkinUpdate(worldSession: WorldSession, timestamp: number, guid: number, data: unknown[]) {
+    const worldScene = worldSession.worldScene;
 
-    if (isPlayer(unit)) {
-        const player = unit;
-        const playerUpdate = unitUpdate as PlayerUpdate;
+    const unit = worldScene.units[guid] as Unit;
 
-        const playerState = getPlayerState(player);
+    unit.skin = data[0] as number;
+}
 
-        playerState.speed = playerUpdate.speed;
+function handleUnitPositionUpdate(worldSession: WorldSession, timestamp: number, guid: number, data: unknown[]) {
+    const worldScene = worldSession.worldScene;
 
-        if (CLIENT_PREDICT) reconcilePlayerPosition(player, playerUpdate, playerUpdate.ackTick);
-    }
+    const unit = worldScene.units[guid] as Unit;
+
+    const x = data[0] as number;
+    const y = data[1] as number;
+    const vx = data[2] as number;
+    const vy = data[3] as number;
+
+    pushToUnitSnapshots(unit, { x, y, vx, vy }, timestamp);
 
     if (!INTERPOLATE) {
-        unit.setPosition(unitUpdate.x, unitUpdate.y);
-        unit.setDir(unitUpdate.vx, unitUpdate.vy);
+        unit.setPosition(x, y);
+        unit.setDir(vx, vy);
     }
 }
 
-function cloneLastSnapshotState(unitUpdate: UnitUpdate, unit: Unit) {
-    const snapshots = unit.snapshots;
+function handlePlayerMovementUpdate(worldSession: WorldSession, timestamp: number, guid: number, data: unknown[]) {
+    const player = worldSession.player;
 
-    const lastSnapshotState = snapshots[snapshots.length - 1].state;
+    const playerState = getPlayerState(player);
 
-    unitUpdate.x = lastSnapshotState.x;
-    unitUpdate.y = lastSnapshotState.y;
-    unitUpdate.vx = lastSnapshotState.vx;
-    unitUpdate.vy = lastSnapshotState.vy;
+    const ackTick = data[0] as number;
+
+    playerState.speed = data[1] as number;
+
+    const lastSnapshotPos = lastSnapshot(player).state;
+
+    if (CLIENT_PREDICT) reconcilePlayerPosition(player, lastSnapshotPos, ackTick);
 }
 
-function pushToUnitSnapshots(unit: Unit, unitUpdate: UnitUpdate, timestamp: number) {
+function lastSnapshot(unit: Unit) {
+    const snapshots = unit.snapshots;
+
+    return snapshots[snapshots.length - 1];
+}
+
+function handlePlayerInventoryUpdate(worldSession: WorldSession, timestamp: number, guid: number, data: unknown[]) {
+    const player = worldSession.player;
+
+    const inventory = getPlayerState(player).inventory;
+
+    const inventoryState = data[0] as number[];
+    const gold = data[1] as number;
+
+    for(let i = 0, slot = 0; i < inventoryState.length; i++, slot++) {
+        const id = inventoryState[i];
+        inventory.putItem(slot, id ? {id, stack: inventoryState[++i]} : null);
+    }
+
+    inventory.putGold(gold);
+}
+
+function handlePlantUpdate(worldSession: WorldSession, timestamp: number, guid: number, data: unknown[]) {
+    const worldScene = worldSession.worldScene;
+
+    const x = data[0] as number;
+    const y = data[1] as number;
+    const kind = data[2] as number;
+
+    const plant = new Plant(worldScene, kind, x, y);
+
+    plant.guid = guid;
+    plant.typeId = Type.PLANT;
+
+    plant.setInteractive();
+
+    addPlantToWorld(plant);
+}
+
+function pushToUnitSnapshots(unit: Unit, state: SnapshotState, timestamp: number) {
     const snapshots = unit.snapshots;
 
     trimStateBuffer(snapshots);
 
     if (INTERPOLATE_DROP_DUPLICATES) {
-        deduplicateUnitSnapshots(snapshots, unitUpdate);
+        deduplicateUnitSnapshots(snapshots, state);
     }
 
-    snapshots.push({state: unitUpdate, timestamp});
+    snapshots.push({state, timestamp});
 }
 
 function trimStateBuffer(snapshots: Snapshot[]) {
     if (snapshots.length > INTERPOLATE_BUFFER_SIZE) snapshots.splice(0, 1);
 }
 
-function deduplicateUnitSnapshots(snapshots: Snapshot[], unitUpdate: UnitUpdate) {
+function deduplicateUnitSnapshots(snapshots: Snapshot[], pos: Vec2) {
     if (snapshots.length > 2) {
         const lastIndex = snapshots.length - 1;
         const last = snapshots[lastIndex];
-        if (!equals(unitUpdate, last.state)) {
+        if (!equals(pos, last.state)) {
             let count = 1;
             for(let i = lastIndex - 1; i >= 0; i--) {
                 const cur = snapshots[i];
@@ -379,8 +241,6 @@ function handleUnitDestroy(worldSession: WorldSession, unit: Unit) {
 }
 
 export {
-    UnitUpdate,
-    PlayerUpdate,
     handleUpdate,
     handleDestroy
 }

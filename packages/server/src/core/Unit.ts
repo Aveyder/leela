@@ -1,11 +1,12 @@
 import World from "../world/World";
-import {Body, Role, Type} from "@leela/common";
-import Player from "../player/Player";
+import {Body, Role} from "@leela/common";
+import GameObject, {_addObjectToWorld, _deleteObjectFromWorld} from "./GameObject";
 
-interface Unit extends Object, Body {
+interface Unit extends GameObject, Body {
     world: World;
     guid: number;
     typeId: number;
+    static: boolean;
     roles: Role[];
     skin: number;
     x: number;
@@ -19,32 +20,23 @@ interface Unit extends Object, Body {
     name: string;
 }
 
-function addUnitToWorld(unit: Unit) {
+function _addUnitToWorld(unit: Unit) {
     const world = unit.world;
-    const guid = unit.guid;
-    const physics = world.physics;
 
-    world.units[guid] = unit;
+    world.units[unit.guid] = unit;
+    world.physics.collideAndRespond(unit);
 
-    physics.collideAndRespond(unit);
+    _addObjectToWorld(unit);
 }
 
-function deleteUnitFromWorld(unit: Unit) {
-    const world = unit.world;
+function _deleteUnitFromWorld(unit: Unit) {
+    delete unit.world.units[unit.guid];
 
-    if (unit.typeId == Type.PLAYER) {
-        const player = unit as Player;
-
-        const worldSession = player.worldSession;
-
-        worldSession.player = null;
-    }
-
-    delete world.units[unit.guid];
+    _deleteObjectFromWorld(unit);
 }
 
 export {
     Unit,
-    addUnitToWorld,
-    deleteUnitFromWorld
+    _addUnitToWorld,
+    _deleteUnitFromWorld
 }

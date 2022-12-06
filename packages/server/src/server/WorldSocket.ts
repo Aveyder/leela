@@ -80,9 +80,9 @@ export default class WorldSocket {
 
         if (!this.worldSession) return true;
 
-        const handler = OpcodeTable.INSTANCE.get(opcode);
+        const sessionStatus = OpcodeTable.INSTANCE.getSessionStatus(opcode);
 
-        if (!handler) return true;
+        if (this.worldSession.status != sessionStatus) return true;
 
         this.worldSession.queuePacket(worldPacket);
 

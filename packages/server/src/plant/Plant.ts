@@ -1,10 +1,11 @@
-import GameObject from "../core/GameObject";
+import GameObject, {_addObjectToWorld, _deleteObjectFromWorld} from "../core/GameObject";
 import World from "../world/World";
 import {Type} from "@leela/common";
 
 export default class Plant implements GameObject {
     public guid: number;
-    public typeId: number;
+    public readonly typeId: number;
+    public readonly static: boolean;
     public x: number;
     public y: number;
     public kind: number;
@@ -15,7 +16,19 @@ export default class Plant implements GameObject {
         this.world = world;
 
         this.typeId = Type.PLANT;
+        this.static = true;
+    }
 
+    public addToWorld() {
+        this.world.plants[this.guid] = this;
+
+        _addObjectToWorld(this);
+    }
+
+    public deleteFromWorld() {
+        delete this.world.plants[this.guid];
+
+        _deleteObjectFromWorld(this);
     }
 }
 
@@ -37,19 +50,11 @@ function updatePlants(world: World) {
         plant.y = (Math.random() * (map.tilesHeight - 4) + 2) * map.tileSize;
         plant.kind = Math.floor(Math.random() * 4);
 
-        addPlantToWorld(plant);
+        plant.addToWorld();
     }
-}
-
-function addPlantToWorld(plant: Plant) {
-    const world = plant.world;
-    const guid = plant.guid;
-
-    world.plants[guid] = plant;
 }
 
 export {
     plantToItem,
-    updatePlants,
-    addPlantToWorld
+    updatePlants
 }

@@ -1,14 +1,16 @@
 import WorldSession from "../server/WorldSession";
-import {Unit} from "../core/Unit";
+import {_addUnitToWorld, _deleteUnitFromWorld, Unit} from "../core/Unit";
 import {INVENTORY_SIZE, Role, Type, UNIT_BODY_HEIGHT, UNIT_BODY_WIDTH} from "@leela/common";
 import Plant from "../plant/Plant";
 import Item from "../core/Item";
 import World from "../world/World";
 import {resetGathering, updateGathering} from "../plant/gather";
+import SessionStatus from "../server/protocol/SessionStatus";
 
 export default class Player implements Unit {
     public guid: number;
     public readonly typeId: number;
+    public readonly static: boolean;
     public readonly roles: Role[];
     public skin: number;
     public name: string;
@@ -33,6 +35,7 @@ export default class Player implements Unit {
         this._worldSession = worldSession;
 
         this.typeId = Type.PLAYER;
+        this.static = false;
         this.roles = null;
         this.width = UNIT_BODY_WIDTH;
         this.height = UNIT_BODY_HEIGHT;
@@ -50,12 +53,29 @@ export default class Player implements Unit {
     public get world() {
         return this._worldSession.world;
     }
+
+    public addToWorld() {
+        this.worldSession.status = SessionStatus.STATUS_IN_GAME;
+        this.worldSession.player = this;
+
+        this.world.players[this.guid] = this;
+
+        _addUnitToWorld(this);
+    }
+
+    public deleteFromWorld() {
+        this.worldSession.status = SessionStatus.STATUS_AUTHED;
+        this.worldSession.player = null;
+
+        delete this.world.players[this.guid];
+
+        _deleteUnitFromWorld(this);
+    }
 }
 
 function updatePlayers(world: World, delta: number) {
-    Object.values(world.units)
-        .filter(unit => unit.typeId == Type.PLAYER)
-        .forEach((player: Player) => updatePlayer(player, delta));
+    Object.values(world.players)
+        .forEach(player => updatePlayer(player, delta));
 }
 
 function updatePlayer(player: Player, delta: number) {

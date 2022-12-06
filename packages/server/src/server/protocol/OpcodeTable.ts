@@ -5,6 +5,7 @@ import {handleUpdateRateChange} from "../updateRate";
 import {handlePlayerJoin} from "../../player/join";
 import {handlePlayerMove, handleSwitchWalkMode} from "../../player/movement";
 import {handlePlayerLeave} from "../../player/leave";
+import SessionStatus from "./SessionStatus";
 
 export default class OpcodeTable {
 
@@ -14,26 +15,30 @@ export default class OpcodeTable {
         OpcodeTable.INSTANCE.init();
     }
 
-    private readonly handlers: WorldPacketHandler[];
+    private readonly table: [SessionStatus, WorldPacketHandler][];
 
     constructor() {
-        this.handlers = [];
+        this.table = [];
     }
 
     public init(): void {
-        this.defineHandler(Opcode.CMSG_UPDATE_RATE, handleUpdateRateChange);
-        this.defineHandler(Opcode.MSG_JOIN, handlePlayerJoin);
-        this.defineHandler(Opcode.CMSG_MOVE, handlePlayerMove);
-        this.defineHandler(Opcode.CMSG_SWITCH_WALK, handleSwitchWalkMode);
-        this.defineHandler(Opcode.CMSG_GATHER, handleGatherPlant);
-        this.defineHandler(Opcode.CMSG_LEAVE, handlePlayerLeave);
+        this.defineHandler(Opcode.CMSG_UPDATE_RATE, SessionStatus.STATUS_AUTHED, handleUpdateRateChange);
+        this.defineHandler(Opcode.MSG_JOIN, SessionStatus.STATUS_AUTHED, handlePlayerJoin);
+        this.defineHandler(Opcode.CMSG_MOVE, SessionStatus.STATUS_IN_GAME, handlePlayerMove);
+        this.defineHandler(Opcode.CMSG_SWITCH_WALK, SessionStatus.STATUS_IN_GAME, handleSwitchWalkMode);
+        this.defineHandler(Opcode.CMSG_GATHER, SessionStatus.STATUS_IN_GAME, handleGatherPlant);
+        this.defineHandler(Opcode.CMSG_LEAVE, SessionStatus.STATUS_IN_GAME, handlePlayerLeave);
     }
 
-    private defineHandler(opcode: Opcode, handler: WorldPacketHandler) {
-        this.handlers[opcode] = handler;
+    private defineHandler(opcode: Opcode, sessionStatus: SessionStatus, handler: WorldPacketHandler) {
+        this.table[opcode] = [sessionStatus, handler];
     }
 
-    public get(opcode: Opcode): WorldPacketHandler {
-        return this.handlers[opcode];
+    public getSessionStatus(opcode: Opcode): SessionStatus {
+        return this.table[opcode][0];
+    }
+
+    public getHandler(opcode: Opcode): WorldPacketHandler {
+        return this.table[opcode][1];
     }
 }

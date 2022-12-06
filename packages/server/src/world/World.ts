@@ -1,10 +1,11 @@
 import WorldSession from "../server/WorldSession";
 import {PhysicsWorld} from "@leela/common";
 import {Unit} from "../core/Unit";
-import {spawnCat, spawnVendor, updateMobs} from "../npc/Mob";
+import Mob, {spawnCat, spawnVendor, updateMobs} from "../npc/Mob";
 import * as map from "@leela/common/map/map.json";
 import Plant, {updatePlants} from "../plant/Plant";
-import {updatePlayers} from "../player/Player";
+import Player, {updatePlayers} from "../player/Player";
+import GameObject from "../core/GameObject";
 
 export default class World {
 
@@ -14,7 +15,10 @@ export default class World {
 
     private _stopped: boolean;
 
+    public readonly gameObjects: Record<number, GameObject>;
     public readonly units: Record<number, Unit>;
+    public readonly players: Record<number, Player>;
+    public readonly mobs: Record<number, Mob>;
     public readonly plants: Record<number, Plant>;
 
     private _physics: PhysicsWorld;
@@ -26,7 +30,10 @@ export default class World {
 
         this._stopped = false;
 
+        this.gameObjects = {};
         this.units = {};
+        this.players = {};
+        this.mobs = {};
         this.plants = {};
     }
 
@@ -68,6 +75,7 @@ export default class World {
 
     public update(delta: number): void {
         this.updateSessions(delta);
+
         updateMobs(this, delta);
         updatePlayers(this, delta);
         updatePlants(this);

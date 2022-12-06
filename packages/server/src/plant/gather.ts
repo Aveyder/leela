@@ -1,14 +1,12 @@
 import WorldSession from "../server/WorldSession";
 import {GATHER_DURATION, Opcode, WorldPacket} from "@leela/common";
-import {deleteObjectFromWorld, isInWorld} from "../core/GameObject";
+import {isInWorld} from "../core/GameObject";
 import {plantToItem} from "./Plant";
 import Player from "../player/Player";
 import {putItemToInventory} from "../inventory/putItem";
 
 function handleGatherPlant(worldSession: WorldSession, worldPacket: WorldPacket) {
     const player = worldSession.player;
-
-    if (!player) return;
 
     const plantGuid = worldPacket[1] as number;
 
@@ -45,7 +43,7 @@ function updateGathering(player: Player, delta: number) {
             const leftStack = putItemToInventory(player, plantToItem[gatheringPlant.kind], 1);
 
             if (leftStack == 0) {
-                deleteObjectFromWorld(gatheringPlant);
+                gatheringPlant.deleteFromWorld();
                 worldSession.sendPacket([Opcode.SMSG_GATHER_SUCCESS, gatheringPlant.guid]);
             } else {
                 worldSession.sendPacket([Opcode.SMSG_GATHER_FAIL, gatheringPlant.guid]);
