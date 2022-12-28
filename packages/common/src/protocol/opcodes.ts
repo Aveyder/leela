@@ -23,7 +23,8 @@ enum UpdateOpcode {
     UNIT_ACK,
     UNIT_SKIN,
     UNIT_POS,
-    PLAYER_MOV,
+    PLAYER_ACK,
+    PLAYER_SPEED,
     PLAYER_INV,
     PLANT
 }
@@ -33,7 +34,8 @@ const updateDataSize: Record<UpdateOpcode, number> = {
     [UpdateOpcode.UNIT_ACK]: 0,
     [UpdateOpcode.UNIT_SKIN]: 1,
     [UpdateOpcode.UNIT_POS]: 4,
-    [UpdateOpcode.PLAYER_MOV]: 2,
+    [UpdateOpcode.PLAYER_ACK]: 1,
+    [UpdateOpcode.PLAYER_SPEED]: 1,
     [UpdateOpcode.PLAYER_INV]: 2,
     [UpdateOpcode.PLANT]: 3,
 }

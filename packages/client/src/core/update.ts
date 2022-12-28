@@ -29,7 +29,8 @@ const updateHandlers: Record<UpdateOpcode, UpdateHandler> = {
     [UpdateOpcode.UNIT_ACK]: handleUnitAckUpdate,
     [UpdateOpcode.UNIT_SKIN]: handleUnitSkinUpdate,
     [UpdateOpcode.UNIT_POS]: handleUnitPositionUpdate,
-    [UpdateOpcode.PLAYER_MOV]: handlePlayerMovementUpdate,
+    [UpdateOpcode.PLAYER_ACK]: handlePlayerAckUpdate,
+    [UpdateOpcode.PLAYER_SPEED]: handlePlayerSpeedUpdate,
     [UpdateOpcode.PLAYER_INV]: handlePlayerInventoryUpdate,
     [UpdateOpcode.PLANT]: handlePlantUpdate,
 };
@@ -122,18 +123,24 @@ function handleUnitPositionUpdate(worldSession: WorldSession, timestamp: number,
     }
 }
 
-function handlePlayerMovementUpdate(worldSession: WorldSession, timestamp: number, guid: number, data: unknown[]) {
+function handlePlayerAckUpdate(worldSession: WorldSession, timestamp: number, guid: number, data: unknown[]) {
+    if (CLIENT_PREDICT) {
+        const player = worldSession.player;
+
+        const ackTick = data[0] as number;
+
+        const lastSnapshotPos = lastSnapshot(player).state;
+
+        reconcilePlayerPosition(player, lastSnapshotPos, ackTick);
+    }
+}
+
+function handlePlayerSpeedUpdate(worldSession: WorldSession, timestamp: number, guid: number, data: unknown[]) {
     const player = worldSession.player;
 
     const playerState = getPlayerState(player);
 
-    const ackTick = data[0] as number;
-
-    playerState.speed = data[1] as number;
-
-    const lastSnapshotPos = lastSnapshot(player).state;
-
-    if (CLIENT_PREDICT) reconcilePlayerPosition(player, lastSnapshotPos, ackTick);
+    playerState.speed = data[0] as number;
 }
 
 function lastSnapshot(unit: Unit) {

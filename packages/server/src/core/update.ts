@@ -71,11 +71,17 @@ function pushPlayerUpdates(guid: number, player: Player, sessionPlayer: Player,
         );
     }
 
-    if (!sessionPlayer || hasPositionChanged(player, sessionPlayer)) {
-        gameObjectUpdates.push(UpdateOpcode.PLAYER_MOV,
+    if (sessionPlayer?.speed != player.speed) {
+        gameObjectUpdates.push(UpdateOpcode.PLAYER_SPEED,
             guid,
-            player.tick,
             player.speed
+        );
+    }
+
+    if (sessionPlayer?.tick != player.tick) {
+        gameObjectUpdates.push(UpdateOpcode.PLAYER_ACK,
+            guid,
+            player.tick
         );
     }
 }
@@ -115,7 +121,7 @@ function pushUnitUpdates(guid: number, unit: Unit, sessionUnit: Unit,
         gameObjectUpdates.push(UpdateOpcode.UNIT_ACK, guid);
     }
 
-    if (!sessionUnit || unit.skin != sessionUnit.skin) {
+    if (sessionUnit?.skin != unit.skin) {
         gameObjectUpdates.push(UpdateOpcode.UNIT_SKIN,
             guid,
             unit.skin
