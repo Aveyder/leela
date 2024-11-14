@@ -1,0 +1,12 @@
+html, body {
+    background: black;
+    margin: 0;
+    padding: 0;
+}
+
+.game {
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    margin: 0 auto;
+}
