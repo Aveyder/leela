@@ -12,6 +12,10 @@ module.exports = {
         index: "./src/client.ts"
     },
     devServer: {
+        open: false,
+        port: 9000,
+        host: "0.0.0.0",
+        hot: true,
         static: {
             directory: DIST_PATH
         }

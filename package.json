@@ -4,7 +4,7 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "dev:client": "cross-env NODE_ENV=development webpack server --open --host 0.0.0.0 --port 9000 --hot",
+    "dev:client": "cross-env NODE_ENV=development webpack serve",
     "dev:server": "tsc-watch -b --onSuccess \"cross-env ENV_DIR=\"./src/config\" NODE_ENV=development node dist/server/server.js\"",
     "build:client": "cross-env NODE_ENV=development webpack",
     "build:server": "tsc -b",
