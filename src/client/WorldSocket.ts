@@ -12,28 +12,25 @@ import { Codec } from "../protocol/_Codec";
 export default class WorldSocket {
 
     public readonly scene: null | WorldScene;
-    public readonly socket: null | Socket;
+    public readonly io: null | Socket;
     public readonly config: WorldClientConfig;
 
     private readonly bufferQueue: WorldPacket[];
 
     private _ts: null | TimeSync;
-
-    private session: null | WorldSession;
+    private _session: null | WorldSession;
 
     constructor(client: WorldClient) {
         this.scene = client.scene;
-        this.socket = client.socket!;
+        this.io = client.io!;
         this.config = client.config;
 
         this.bufferQueue = [];
 
         this._ts = this.initTimesync();
+        this._session = null;
 
-        this.session = null;
-
-        this.socket.on("message", (packet: WorldPacket) => this.handlePacket(packet));
-        this.socket.on("disconnect", () => this.destroy());
+        this.io.on("message", (packet: WorldPacket) => this.handlePacket(packet));
 
         this.sendPacket([Opcode.CMSG_AUTH], true);
     }
@@ -44,7 +41,7 @@ export default class WorldSocket {
 
     public sendPacket(packet: WorldPacket, immediate: boolean) {
         if (immediate) {
-            this.socket!.send(packet);
+            this.io!.send(packet);
         } else {
             this.bufferQueue.push(packet);
         }
@@ -53,19 +50,19 @@ export default class WorldSocket {
     public sendBufferedPackets() {
         if (this.bufferQueue.length === 0) return;
 
-        this.bufferQueue.forEach(packet => this.socket!.send(packet));
+        this.bufferQueue.forEach(packet => this.io!.send(packet));
         this.bufferQueue.length = 0;
     }
 
     private initTimesync() {
         const ts = timesync.create({
-            server: this.socket!,
+            server: this.io!,
             interval: this.config.timesyncIntervalMs
         });
 
         ts.send = sendTimesync;
 
-        this.socket!.on("timesync", (data) => ts.receive(null, data));
+        this.io!.on("timesync", (data) => ts.receive(null, data));
 
         return ts;
     }
@@ -73,7 +70,7 @@ export default class WorldSocket {
     private handlePacket(packet: WorldPacket) {
         const opcode = packet[0];
 
-        if (!this.session) {
+        if (!this._session) {
             switch (opcode) {
                 case Opcode.SMSG_AUTH_SUCCESS:
                     this.createSession();
@@ -82,27 +79,26 @@ export default class WorldSocket {
             return;
         }
 
-        this.session.recvPacket(packet);
+        this._session.recvPacket(packet);
     }
 
     private createSession() {
-        this.session = new WorldSession(this);
+        this._session = new WorldSession(this);
 
-        this.scene!.addSession(this.session);
+        this.scene!.addSession(this._session);
     }
 
-    private destroy() {
-        if (this.session) {
-            this.session.destroy();
-            this.session = null;
+    public destroy() {
+        if (this._session) {
+            this._session.destroy();
             this.scene!.removeSession();
+            this._session = null;
         }
 
         this.bufferQueue.length = 0;
 
-        this.socket!.removeAllListeners("message");
-        this.socket!.removeAllListeners("disconnect");
-        this.socket!.removeAllListeners("timesync");
+        this.io!.removeAllListeners("message");
+        this.io!.removeAllListeners("timesync");
 
         this._ts!.destroy();
         this._ts = null;

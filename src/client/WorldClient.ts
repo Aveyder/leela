@@ -9,16 +9,18 @@ export default class WorldClient {
     public readonly scene: WorldScene;
     public readonly config: WorldClientConfig;
 
-    private _socket: null | Socket;
+    private _io: null | Socket;
+    private _socket: null | WorldSocket;
 
     constructor(scene: WorldScene) {
         this.scene = scene;
         this.config = scene.config;
+        this._io = null;
         this._socket = null;
     }
 
     public connect(): void {
-        if (this._socket?.connected) return;
+        if (this._io?.connected) return;
 
         const opts = {} as Partial<ManagerOptions & SocketOptions>;
 
@@ -26,17 +28,29 @@ export default class WorldClient {
             opts.parser = msgpack;
         }
 
-        this._socket = io(this.config.serverUrl, opts);
+        this._io = io(this.config.serverUrl, opts);
 
-        this._socket.on("connect", () => {
-            console.log(new WorldSocket(this));
+        this._io.on("connect", () => {
+            this._socket = new WorldSocket(this);
+
+            this._io!.on("disconnect", () => {
+                this._socket!.destroy();
+
+                this._io!.removeAllListeners("disconnect");
+            });
+
+            console.log(this._socket);
         });
     }
 
     public disconnect(): void {
-        this._socket?.disconnect();
+        this._io?.disconnect();
 
-        this._socket = null;
+        this._io = null;
+    }
+
+    public get io() {
+        return this._io;
     }
 
     public get socket() {

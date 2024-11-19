@@ -10,22 +10,23 @@ import { Codec } from "../protocol/_Codec";
 export default class WorldSocket {
 
     public readonly server: WorldServer;
-    public readonly socket: Socket;
+    public readonly io: Socket;
     public readonly id: string;
     private readonly bufferQueue: WorldPacket[];
 
     public session: null | WorldSession;
 
-    constructor(server: WorldServer, socket: Socket) {
+    constructor(server: WorldServer, io: Socket) {
         this.server = server;
-        this.socket = socket;
-        this.id = socket.id;
+        this.io = io;
+        this.id = io.id;
         this.bufferQueue = [];
         this.session = null;
 
-        this.initTimesync(this.socket);
-        this.socket.on("message", (packet: WorldPacket) => this.handlePacket(packet));
-        this.socket.on("disconnect", () => this.destroy());
+        this.initTimesync(this.io);
+        this.io.on("message", (packet: WorldPacket) => this.handlePacket(packet));
+
+        console.log(`socket created: ${this.id}`);
     }
 
     public sendObject<T>(opcode: Opcode, object: T, immediate: boolean) {
@@ -34,7 +35,7 @@ export default class WorldSocket {
 
     public sendPacket(packet: WorldPacket, immediate: boolean) {
         if (immediate) {
-            this.socket.send(packet);
+            this.io.send(packet);
         } else {
             this.bufferQueue.push(packet);
         }
@@ -43,7 +44,7 @@ export default class WorldSocket {
     public sendBufferedPackets() {
         if (this.bufferQueue.length === 0) return;
 
-        this.bufferQueue.forEach(packet => this.socket.send(packet));
+        this.bufferQueue.forEach(packet => this.io.send(packet));
         this.bufferQueue.length = 0;
     }
 
@@ -59,7 +60,7 @@ export default class WorldSocket {
     private handlePacket(packet: WorldPacket) {
         const accepted = this.doHandlePacket(packet);
 
-        if (!accepted) this.socket.disconnect();
+        if (!accepted) this.io.disconnect();
     }
 
     private doHandlePacket(packet: WorldPacket) {
@@ -103,17 +104,16 @@ export default class WorldSocket {
         this.server.world.addSession(this.session);
     }
 
-    private destroy() {
+    public destroy() {
         if (this.session) {
-            this.server.world.removeSession(this.session);
             this.session.destroy();
+            this.server.world.removeSession(this.session);
             this.session = null;
         }
 
         this.bufferQueue.length = 0;
 
-        this.socket.removeAllListeners("message");
-        this.socket.removeAllListeners("disconnect");
-        this.socket.removeAllListeners("timesync");
+        this.io.removeAllListeners("message");
+        this.io.removeAllListeners("timesync");
     }
 }

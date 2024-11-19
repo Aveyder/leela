@@ -10,10 +10,11 @@ import World from "./world/World";
 export default class WorldServer {
 
     public readonly config: WorldServerConfig;
-    public readonly world: World;
     public readonly express: Express;
     public readonly http: http.Server;
     public readonly io: io.Server;
+    public readonly world: World;
+    public readonly sockets: Record<string, WorldSocket>;
 
     constructor(config: WorldServerConfig) {
         this.config = config;
@@ -23,6 +24,8 @@ export default class WorldServer {
         this.io = this.initIOServer();
 
         this.world = new World(this);
+
+        this.sockets = {};
 
         this.initWorldSocketManagement();
     }
@@ -64,10 +67,18 @@ export default class WorldServer {
     }
 
     private initWorldSocketManagement() {
-        this.io.on("connection", socket => {
-            console.log(`user connected: ${socket.id}`);
+        this.io.on("connection", io => {
+            const socket =  new WorldSocket(this, io)
 
-            new WorldSocket(this, socket);
+            this.sockets[socket.id] = socket;
+
+            io.on("disconnect", () => {
+                socket.destroy();
+
+                io.removeAllListeners("disconnect");
+
+                delete this.sockets[socket.id];
+            });
         });
     }
 }
