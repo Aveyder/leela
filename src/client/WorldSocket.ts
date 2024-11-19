@@ -7,7 +7,7 @@ import WorldScene from "./world/WorldScene";
 import WorldPacket from "../protocol/WorldPacket";
 import { Opcode } from "../protocol/Opcode";
 import WorldClientConfig from "./WorldClientConfig";
-import { Codec } from "../map/_Codec";
+import { Codec } from "../protocol/_Codec";
 
 export default class WorldSocket {
 

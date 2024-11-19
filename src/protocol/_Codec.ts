@@ -1,7 +1,6 @@
-import WorldPacket, { WorldPacketData } from "../protocol/WorldPacket";
-import { Opcode } from "../protocol/Opcode";
+import WorldPacket, { WorldPacketData } from "./WorldPacket";
+import { Opcode } from "./Opcode";
 import { Vec2 } from "../utils/math";
-import worldPacket from "../protocol/WorldPacket";
 
 export interface _Codec<T> {
   encode(object: T): WorldPacketData;

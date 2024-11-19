@@ -10,7 +10,7 @@ import { WorldSessionStatus } from "./WorldSessionStatus";
 
 export default class WorldSession {
 
-    public socket: null | WorldSocket;
+    public socket: WorldSocket;
     public readonly server: WorldServer;
     private readonly config: WorldServerConfig;
 
@@ -65,7 +65,6 @@ export default class WorldSession {
     public destroy() {
         this.updateLoop?.stop();
 
-        this.socket = null;
         this.recvQueue.length = 0;
         this.status = null;
     }

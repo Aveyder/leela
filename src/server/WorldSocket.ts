@@ -1,17 +1,17 @@
 import {Socket} from "socket.io";
 import WorldSession from "./WorldSession";
-import World from "./world/World";
 import { Opcode } from "../protocol/Opcode";
 import WorldPacket from "../protocol/WorldPacket";
 import OpcodeTable from "./OpcodeTable";
 import WorldServer from "./WorldServer";
-import { Codec } from "../map/_Codec";
+import { Codec } from "../protocol/_Codec";
 
 
 export default class WorldSocket {
 
     public readonly server: WorldServer;
     public readonly socket: Socket;
+    public readonly id: string;
     private readonly bufferQueue: WorldPacket[];
 
     public session: null | WorldSession;
@@ -19,6 +19,7 @@ export default class WorldSocket {
     constructor(server: WorldServer, socket: Socket) {
         this.server = server;
         this.socket = socket;
+        this.id = socket.id;
         this.bufferQueue = [];
         this.session = null;
 
@@ -56,9 +57,9 @@ export default class WorldSocket {
     }
 
     private handleWorldPacket(worldPacket: WorldPacket) {
-        const offensive = this.doHandleWorldPacket(worldPacket);
+        const accepted = this.doHandleWorldPacket(worldPacket);
 
-        if (offensive) this.socket.disconnect();
+        if (!accepted) this.socket.disconnect();
     }
 
     private doHandleWorldPacket(worldPacket: WorldPacket) {
@@ -71,29 +72,29 @@ export default class WorldSocket {
 
                     this.sendPacket([Opcode.SMSG_PONG], true);
 
-                    return false;
+                    return true;
                 }
-                return true;
+                return false;
             case Opcode.CMSG_AUTH:
                 if (!this.session) {
                     this.createWorldSession();
 
                     this.sendPacket([Opcode.SMSG_AUTH_SUCCESS], true);
 
-                    return false;
+                    return true;
                 }
-                return true;
+                return false;
         }
 
-        if (!this.session) return true;
+        if (!this.session) return false;
 
         const sessionStatus = OpcodeTable.getWorldSessionStatus(opcode);
 
-        if (this.session.status != sessionStatus) return true;
+        if (this.session.status != sessionStatus) return false;
 
         this.session.queuePacket(worldPacket);
 
-        return false;
+        return true;
     }
 
     private createWorldSession() {

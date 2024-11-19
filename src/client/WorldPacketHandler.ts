@@ -1,6 +1,6 @@
 import WorldSession from "./WorldSession";
 import WorldPacket from "../protocol/WorldPacket";
-import { Codec } from "../map/_Codec";
+import { Codec } from "../protocol/_Codec";
 
 export default interface WorldPacketHandler {
     (worldSession: WorldSession, worldPacket: WorldPacket): void;
