@@ -1,5 +1,5 @@
 import {Game} from "phaser";
-import "./assets/styles.css";
+import "../assets/styles.css";
 import WorldScene from "./world/WorldScene";
 
 function main() {

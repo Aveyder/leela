@@ -12,4 +12,3 @@ export class Tileset {
         imageKey: "grass"
     };
 }
-

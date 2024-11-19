@@ -10,7 +10,7 @@ declare module "timesync" {
     sync();
 
     send(to: string | Socket, data: unknown, timeout: number): Promise<void>;
-    receive(from: string, data: unknown);
+    receive(from: null | string, data: unknown);
   };
 
   type TimeSyncCreateOptions = {

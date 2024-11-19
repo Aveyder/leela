@@ -9,7 +9,7 @@ module.exports = {
     mode: process.env.NODE_ENV === "production" ? "production" : "development",
     devtool: "eval-source-map",
     entry: {
-        index: "./src/client.ts"
+        index: "./src/client/client.ts"
     },
     devServer: {
         open: false,
@@ -51,9 +51,6 @@ module.exports = {
         extensions: [".ts", ".tsx", ".js"]
     },
     plugins: [
-        new Dotenv({
-            path: path.resolve(__dirname, "src", "config", `.env`)
-        }),
         new Dotenv({
             path: path.resolve(__dirname, "src", "config", `.${process.env.NODE_ENV}.env`)
         }),

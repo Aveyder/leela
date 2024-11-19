@@ -1,9 +1,9 @@
 import { Scene } from "phaser";
-import caltheraJson from "../assets/map/calthera.json";
-import basePng from "../assets/map/tilesets/base.png";
-import grassPng from "../assets/map/tilesets/grass.png";
-import { Tileset } from "./Tileset";
-import { Tilemap } from "./Tilemap";
+import caltheraJson from "../../assets/map/calthera.json";
+import basePng from "../../assets/map/tilesets/base.png";
+import grassPng from "../../assets/map/tilesets/grass.png";
+import { Tileset } from "../../map/Tileset";
+import { Tilemap } from "../../map/Tilemap";
 
 export default function preload(scene: Scene) {
   const load = scene.load;

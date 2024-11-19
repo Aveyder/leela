@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev:client": "cross-env NODE_ENV=development webpack serve",
-    "dev:server": "tsc-watch -b --onSuccess \"cross-env ENV_DIR=\"./src/config\" NODE_ENV=development node dist/server/server.js\"",
+    "dev:server": "tsc-watch -b --onSuccess \"cross-env ENV_DIR=\"./src/config\" NODE_ENV=development node dist/server/server/server.js\"",
     "build:client": "cross-env NODE_ENV=development webpack",
     "build:server": "tsc -b",
     "lint": "eslint src/**/*.ts",
@@ -48,6 +48,7 @@
     "express": "^4.21.1",
     "phaser": "^3.86.0",
     "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "socket.io-msgpack-parser": "^3.0.2",
     "timesync": "^1.0.11"
   }
