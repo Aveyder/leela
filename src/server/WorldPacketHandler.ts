@@ -10,7 +10,7 @@ export interface ObjectHandler<T> {
     (session: WorldSession, object: T, delta: number): void;
 }
 
-export function worldPacketHandler<T>(objectHandler: ObjectHandler<T>): WorldPacketHandler {
+export function objectHandler<T>(objectHandler: ObjectHandler<T>): WorldPacketHandler {
     return (session: WorldSession, packet: WorldPacket, delta) => {
         objectHandler(session, Codec.decode(packet), delta);
     }

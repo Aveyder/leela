@@ -1,4 +1,4 @@
-import WorldPacketHandler, { worldPacketHandler } from "./WorldPacketHandler";
+import WorldPacketHandler, { objectHandler } from "./WorldPacketHandler";
 import { Opcode } from "../protocol/Opcode";
 import { WorldSessionStatus } from "./WorldSessionStatus";
 import { handleUpdateRateChange } from "./updateRate";
@@ -11,7 +11,7 @@ export default class OpcodeTable {
 
   static {
     this.TABLE[Opcode.CMSG_UPDATE_RATE] = [WorldSessionStatus.STATUS_AUTHED, handleUpdateRateChange];
-    this.TABLE[Opcode.CMSG_MOVE] = [WorldSessionStatus.STATUS_AUTHED, worldPacketHandler<Vec2>((session: WorldSession, object: Vec2) => {
+    this.TABLE[Opcode.CMSG_MOVE] = [WorldSessionStatus.STATUS_AUTHED, objectHandler<Vec2>((session: WorldSession, object: Vec2) => {
       console.log(`move x: ${object.x}, y: ${object.y}`);
     })];
   }
