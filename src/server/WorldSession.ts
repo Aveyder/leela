@@ -6,7 +6,7 @@ import OpcodeTable from "./OpcodeTable";
 import { Opcode } from "../protocol/Opcode";
 import WorldServer from "./WorldServer";
 import { WorldSessionStatus } from "./WorldSessionStatus";
-
+import Codec from "../protocol/Codec";
 
 export default class WorldSession {
 
@@ -36,6 +36,10 @@ export default class WorldSession {
         this.recvQueue.push(packet);
     }
 
+    public sendObject<T>(opcode: Opcode, object: T) {
+        this.sendPacket(Codec.encode(opcode, object));
+    }
+
     public sendPacket(packet: WorldPacket): void {
         this.socket!.sendPacket(packet, false);
     }
@@ -58,7 +62,7 @@ export default class WorldSession {
             this.updateLoop?.stop();
 
             this.updateLoop = new Loop();
-            this.updateLoop.start(delta => this.sendUpdate(), tickrate);
+            this.updateLoop.start(delta => this.sendUpdate(delta), tickrate);
         }
     }
 
@@ -69,8 +73,8 @@ export default class WorldSession {
         this.status = null;
     }
 
-    private sendUpdate() {
-        // collect update
+    private sendUpdate(delta: number): void {
+        this.server.world.collectSessionUpdate(this, delta);
 
         this.socket!.sendBufferedPackets();
     }

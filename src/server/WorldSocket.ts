@@ -4,8 +4,6 @@ import { Opcode } from "../protocol/Opcode";
 import WorldPacket from "../protocol/WorldPacket";
 import OpcodeTable from "./OpcodeTable";
 import WorldServer from "./WorldServer";
-import { Codec } from "../protocol/_Codec";
-
 
 export default class WorldSocket {
 
@@ -27,10 +25,6 @@ export default class WorldSocket {
         this.io.on("message", (packet: WorldPacket) => this.handlePacket(packet));
 
         console.log(`socket created: ${this.id}`);
-    }
-
-    public sendObject<T>(opcode: Opcode, object: T, immediate: boolean) {
-        this.sendPacket(Codec.encode(opcode, object), immediate);
     }
 
     public sendPacket(packet: WorldPacket, immediate: boolean) {

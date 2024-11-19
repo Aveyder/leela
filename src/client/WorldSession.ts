@@ -4,6 +4,7 @@ import { Opcode } from "../protocol/Opcode";
 import WorldClientConfig from "./WorldClientConfig";
 import WorldPacket from "../protocol/WorldPacket";
 import OpcodeTable from "./OpcodeTable";
+import Codec from "../protocol/Codec";
 
 export default class WorldSession {
 
@@ -28,6 +29,10 @@ export default class WorldSession {
 
     this.cmdLoop = this.initCmdLoop();
     this.pingInterval = this.startPing();
+  }
+
+  public sendObject<T>(opcode: Opcode, object: T) {
+    this.sendPacket(Codec.encode(opcode, object));
   }
 
   public sendPacket(packet: WorldPacket): void {

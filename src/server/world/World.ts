@@ -30,14 +30,18 @@ export default class World {
     }
 
     public update(delta: number): void {
-        this.updateSessions(delta);
+        this.applyClientUpdates(delta);
     }
 
-    private updateSessions(delta: number) {
+    private applyClientUpdates(delta: number) {
         this.forEachSession(session => session.handleQueuedPackets(delta));
     }
 
     public forEachSession(callback: (session: WorldSession) => void) {
         Object.values(this.sessions).forEach(session => callback(session));
+    }
+
+    public collectSessionUpdate(session: WorldSession, delta: number): void {
+
     }
 }

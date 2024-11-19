@@ -1,13 +1,15 @@
 import WorldPacket, { WorldPacketData } from "./WorldPacket";
 import { Opcode } from "./Opcode";
 import { Vec2 } from "../utils/math";
+import WorldSession from "../client/WorldSession";
+import WorldPacketHandler, { ObjectHandler } from "../client/WorldPacketHandler";
 
-export interface _Codec<T> {
+interface codec<T> {
   encode(object: T): WorldPacketData;
   decode(packet: WorldPacket) :T;
 }
 
-class MoveCodec implements _Codec<Vec2> {
+class MoveCodec implements codec<Vec2> {
   encode(dir: Vec2): WorldPacketData {
     return [(1 + dir.x) * 3 + (1 + dir.y)];
   }
@@ -29,10 +31,10 @@ class MoveCodec implements _Codec<Vec2> {
 }
 
 type CodecMapping = {
-  [key in Opcode]?: _Codec<unknown>;
+  [key in Opcode]?: codec<unknown>;
 };
 
-export class Codec {
+export default class Codec {
   private static readonly _codecs: CodecMapping = {
     [Opcode.CMSG_MOVE]: new MoveCodec()
   }
@@ -58,7 +60,7 @@ export class Codec {
     }
   }
 
-  public static getCodec<T>(opcode: Opcode): _Codec<T> {
-    return this._codecs[opcode] as _Codec<T>;
+  public static getCodec<T>(opcode: Opcode): codec<T> {
+    return this._codecs[opcode] as codec<T>;
   }
 }

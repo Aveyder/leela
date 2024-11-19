@@ -7,7 +7,6 @@ import WorldScene from "./world/WorldScene";
 import WorldPacket from "../protocol/WorldPacket";
 import { Opcode } from "../protocol/Opcode";
 import WorldClientConfig from "./WorldClientConfig";
-import { Codec } from "../protocol/_Codec";
 
 export default class WorldSocket {
 
@@ -33,10 +32,6 @@ export default class WorldSocket {
         this.io.on("message", (packet: WorldPacket) => this.handlePacket(packet));
 
         this.sendPacket([Opcode.CMSG_AUTH], true);
-    }
-
-    public sendObject<T>(opcode: Opcode, object: T, immediate: boolean) {
-        this.sendPacket(Codec.encode(opcode, object), immediate);
     }
 
     public sendPacket(packet: WorldPacket, immediate: boolean) {
