@@ -16,7 +16,7 @@ export default class OpcodeTable {
     })];
   }
 
-  public static getWorldSessionStatus(opcode: Opcode): WorldSessionStatus {
+  public static getSessionStatus(opcode: Opcode): WorldSessionStatus {
     return this.TABLE[opcode][0];
   }
 

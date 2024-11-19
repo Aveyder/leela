@@ -30,16 +30,16 @@ export default class WorldSession {
     this.pingInterval = this.startPing();
   }
 
-  public sendPacket(worldPacket: WorldPacket): void {
-    this._socket!.sendPacket(worldPacket, !this.config.clientCmdLoop);
+  public sendPacket(packet: WorldPacket): void {
+    this._socket!.sendPacket(packet, !this.config.clientCmdLoop);
   }
 
-  public recvPacket(worldPacket: WorldPacket): void {
-    const opcode = worldPacket[0] as Opcode;
+  public recvPacket(packet: WorldPacket): void {
+    const opcode = packet[0] as Opcode;
 
     const handler = OpcodeTable.getHandler(opcode);
 
-    handler(this, worldPacket);
+    handler(this, packet);
   }
 
   private initCmdLoop() {

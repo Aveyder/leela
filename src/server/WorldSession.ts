@@ -32,21 +32,21 @@ export default class WorldSession {
         this.resetUpdateLoop(this.config.serverUpdateRate);
     }
 
-    public queuePacket(worldPacket: WorldPacket): void {
-        this.recvQueue.push(worldPacket);
+    public queuePacket(packet: WorldPacket): void {
+        this.recvQueue.push(packet);
     }
 
-    public sendPacket(worldPacket: WorldPacket): void {
-        this.socket!.sendPacket(worldPacket, false);
+    public sendPacket(packet: WorldPacket): void {
+        this.socket!.sendPacket(packet, false);
     }
 
-    public update(delta: number): void {
-        this.recvQueue.forEach(worldPacket => {
-            const opcode = worldPacket[0] as Opcode;
+    public handleQueuedPackets(delta: number): void {
+        this.recvQueue.forEach(packet => {
+            const opcode = packet[0] as Opcode;
 
             const handler = OpcodeTable.getHandler(opcode);
 
-            handler(this, worldPacket, delta);
+            handler(this, packet, delta);
         });
         this.recvQueue.length = 0;
     }

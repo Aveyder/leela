@@ -34,7 +34,7 @@ export default class World {
     }
 
     private updateSessions(delta: number) {
-        this.forEachSession(session => session.update(delta));
+        this.forEachSession(session => session.handleQueuedPackets(delta));
     }
 
     public forEachSession(callback: (session: WorldSession) => void) {

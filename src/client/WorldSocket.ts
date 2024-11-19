@@ -32,7 +32,7 @@ export default class WorldSocket {
 
         this.session = null;
 
-        this.socket.on("message", (worldPacket: WorldPacket) => this.handleWorldPacket(worldPacket));
+        this.socket.on("message", (packet: WorldPacket) => this.handlePacket(packet));
         this.socket.on("disconnect", () => this.destroy());
 
         this.sendPacket([Opcode.CMSG_AUTH], true);
@@ -42,18 +42,18 @@ export default class WorldSocket {
         this.sendPacket(Codec.encode(opcode, object), immediate);
     }
 
-    public sendPacket(worldPacket: WorldPacket, immediate: boolean) {
+    public sendPacket(packet: WorldPacket, immediate: boolean) {
         if (immediate) {
-            this.socket!.send(worldPacket);
+            this.socket!.send(packet);
         } else {
-            this.bufferQueue.push(worldPacket);
+            this.bufferQueue.push(packet);
         }
     }
 
     public sendBufferedPackets() {
         if (this.bufferQueue.length === 0) return;
 
-        this.bufferQueue.forEach(worldPacket => this.socket!.send(worldPacket));
+        this.bufferQueue.forEach(packet => this.socket!.send(packet));
         this.bufferQueue.length = 0;
     }
 
@@ -70,22 +70,22 @@ export default class WorldSocket {
         return ts;
     }
 
-    private handleWorldPacket(worldPacket: WorldPacket) {
-        const opcode = worldPacket[0];
+    private handlePacket(packet: WorldPacket) {
+        const opcode = packet[0];
 
         if (!this.session) {
             switch (opcode) {
                 case Opcode.SMSG_AUTH_SUCCESS:
-                    this.createWorldSession();
+                    this.createSession();
                     break;
             }
             return;
         }
 
-        this.session.recvPacket(worldPacket);
+        this.session.recvPacket(packet);
     }
 
-    private createWorldSession() {
+    private createSession() {
         this.session = new WorldSession(this);
 
         this.scene!.addSession(this.session);

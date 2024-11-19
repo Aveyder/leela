@@ -3,15 +3,15 @@ import WorldPacket from "../protocol/WorldPacket";
 import { Codec } from "../protocol/_Codec";
 
 export default interface WorldPacketHandler {
-    (worldSession: WorldSession, worldPacket: WorldPacket): void;
+    (session: WorldSession, packet: WorldPacket): void;
 }
 
 export interface ObjectHandler<T> {
-    (worldSession: WorldSession, object: T): void;
+    (session: WorldSession, object: T): void;
 }
 
 export function worldPacketHandler<T>(objectHandler: ObjectHandler<T>): WorldPacketHandler {
-    return (worldSession: WorldSession, worldPacket: WorldPacket) => {
-        objectHandler(worldSession, Codec.decode(worldPacket));
+    return (session: WorldSession, packet: WorldPacket) => {
+        objectHandler(session, Codec.decode(packet));
     }
 }

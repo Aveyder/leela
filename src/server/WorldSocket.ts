@@ -24,7 +24,7 @@ export default class WorldSocket {
         this.session = null;
 
         this.initTimesync(this.socket);
-        this.socket.on("message", (worldPacket: WorldPacket) => this.handleWorldPacket(worldPacket));
+        this.socket.on("message", (packet: WorldPacket) => this.handlePacket(packet));
         this.socket.on("disconnect", () => this.destroy());
     }
 
@@ -32,43 +32,43 @@ export default class WorldSocket {
         this.sendPacket(Codec.encode(opcode, object), immediate);
     }
 
-    public sendPacket(worldPacket: WorldPacket, immediate: boolean) {
+    public sendPacket(packet: WorldPacket, immediate: boolean) {
         if (immediate) {
-            this.socket.send(worldPacket);
+            this.socket.send(packet);
         } else {
-            this.bufferQueue.push(worldPacket);
+            this.bufferQueue.push(packet);
         }
     }
 
     public sendBufferedPackets() {
         if (this.bufferQueue.length === 0) return;
 
-        this.bufferQueue.forEach(worldPacket => this.socket.send(worldPacket));
+        this.bufferQueue.forEach(packet => this.socket.send(packet));
         this.bufferQueue.length = 0;
     }
 
     private initTimesync(socket: Socket) {
         socket.on("timesync", (data) => {
             socket.emit("timesync", {
-                id: data && "id" in data ? data.id : null,
+                id: data.id,
                 result: Date.now()
             });
         });
     }
 
-    private handleWorldPacket(worldPacket: WorldPacket) {
-        const accepted = this.doHandleWorldPacket(worldPacket);
+    private handlePacket(packet: WorldPacket) {
+        const accepted = this.doHandlePacket(packet);
 
         if (!accepted) this.socket.disconnect();
     }
 
-    private doHandleWorldPacket(worldPacket: WorldPacket) {
-        const opcode = worldPacket[0];
+    private doHandlePacket(packet: WorldPacket) {
+        const opcode = packet[0];
 
         switch (opcode) {
             case Opcode.CMSG_PING:
                 if (this.session) {
-                    this.session.latency = worldPacket[1] as number;
+                    this.session.latency = packet[1] as number;
 
                     this.sendPacket([Opcode.SMSG_PONG], true);
 
@@ -77,7 +77,7 @@ export default class WorldSocket {
                 return false;
             case Opcode.CMSG_AUTH:
                 if (!this.session) {
-                    this.createWorldSession();
+                    this.createSession();
 
                     this.sendPacket([Opcode.SMSG_AUTH_SUCCESS], true);
 
@@ -88,16 +88,16 @@ export default class WorldSocket {
 
         if (!this.session) return false;
 
-        const sessionStatus = OpcodeTable.getWorldSessionStatus(opcode);
+        const sessionStatus = OpcodeTable.getSessionStatus(opcode);
 
         if (this.session.status != sessionStatus) return false;
 
-        this.session.queuePacket(worldPacket);
+        this.session.queuePacket(packet);
 
         return true;
     }
 
-    private createWorldSession() {
+    private createSession() {
         this.session = new WorldSession(this);
 
         this.server.world.addSession(this.session);
