@@ -2,6 +2,7 @@ import WorldServer from "../WorldServer";
 import WorldSession from "../WorldSession";
 import Loop from "../utils/Loop";
 import WorldServerConfig from "../WorldServerConfig";
+import GameObjectManager from "./GameObjectManager";
 
 export default class World {
 
@@ -9,24 +10,28 @@ export default class World {
     public readonly config: WorldServerConfig;
     public readonly loop: Loop;
 
-    public readonly sessions: Record<string, WorldSession>;
+    public readonly sessions: Map<string, WorldSession>;
+
+    public readonly objects: GameObjectManager;
 
     constructor(server: WorldServer) {
         this.server = server;
         this.config = server.config;
         this.loop = new Loop();
 
-        this.sessions = {};
+        this.sessions = new Map();
+
+        this.objects = new GameObjectManager();
 
         this.loop.start(delta => this.update(delta), this.config.simulationRate);
     }
 
     public addSession(session: WorldSession): void {
-        this.sessions[session.socket.id] = session;
+        this.sessions.set(session.socket.id, session);
     }
 
     public removeSession(session: WorldSession): void {
-        delete this.sessions[session.socket.id];
+        this.sessions.delete(session.socket.id);
     }
 
     public update(delta: number): void {

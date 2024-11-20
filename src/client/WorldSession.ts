@@ -12,10 +12,12 @@ export default class WorldSession {
   public readonly config: WorldClientConfig;
 
   private cmdLoop: Loop;
+  private simulationLoop: Loop;
 
   private _pingStart: null | number;
   private pingInterval: number;
   public latency: number;
+  private _tick: number;
 
   constructor(socket: WorldSocket) {
     this._socket = socket;
@@ -25,9 +27,12 @@ export default class WorldSession {
 
     this.latency = -1;
 
+    this._tick = -1;
+
     this.sendPacket([Opcode.CMSG_UPDATE_RATE, this.config.clientUpdateRate]);
 
     this.cmdLoop = this.initCmdLoop();
+    this.simulationLoop = this.initSimulationLoop();
     this.pingInterval = this.startPing();
   }
 
@@ -58,6 +63,22 @@ export default class WorldSession {
     return cmdLoop;
   }
 
+  private initSimulationLoop() {
+    const simulationLoop= new Loop();
+
+    simulationLoop.start(
+      (delta: number) => this.simulate(delta),
+      this.config.simulationRate
+    );
+
+    return simulationLoop;
+  }
+
+  private simulate(delta: number): void {
+    this._tick = ++this._tick % this.config.tickCap;
+    this._socket!.scene.simulate(delta);
+  }
+
   private startPing() {
     return setInterval(() => {
       this._pingStart = Date.now();
@@ -70,6 +91,7 @@ export default class WorldSession {
     this._socket = null;
 
     this.cmdLoop.stop();
+    this.simulationLoop.stop();
 
     clearInterval(this.pingInterval);
     this._pingStart = null;
@@ -84,6 +106,10 @@ export default class WorldSession {
 
   public get socket() {
     return this._socket;
+  }
+
+  public get tick(): number {
+    return this._tick;
   }
 
   public get pingStart() {

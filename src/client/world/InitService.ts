@@ -1,8 +1,9 @@
 import WorldScene from "./WorldScene";
 import { Keys } from "./Keys";
-import { Tilemap } from "../../map/Tilemap";
-import { Tileset } from "../../map/Tileset";
-import { Layer } from "../../map/Layer";
+import { Tilemap } from "../../resource/map/Tilemap";
+import { Tileset } from "../../resource/map/Tileset";
+import { Layer } from "../../resource/map/Layer";
+import { Image } from "../../resource/Image";
 
 export default class InitService {
 
@@ -21,20 +22,20 @@ export default class InitService {
   }
 
   private initTilemap(): void {
-    const tilemap = this.scene.add.tilemap(Tilemap.CALTHERA.tilemapKey);
+    const tilemap = this.scene.add.tilemap(Tilemap.CALTHERA.jsonKey);
 
-    tilemap.addTilesetImage(Tileset.BASE.name, Tileset.BASE.imageKey);
+    tilemap.addTilesetImage(Tileset.BASE, Image.TILESET_BASE);
 
-    const groundLayer = tilemap.createLayer(Layer.GROUND.name, [Tileset.BASE.name])!;
+    const groundLayer = tilemap.createLayer(Layer.GROUND.name, [Tileset.BASE])!;
     groundLayer.depth = Layer.GROUND.zIndex;
 
-    const terrainLayer = tilemap.createLayer(Layer.TERRAIN.name, [Tileset.BASE.name])!;
+    const terrainLayer = tilemap.createLayer(Layer.TERRAIN.name, [Tileset.BASE])!;
     terrainLayer.depth = Layer.TERRAIN.zIndex;
 
-    const buildingInteriorLayer = tilemap.createLayer(Layer.BUILDING_INTERIOR.name, [Tileset.BASE.name])!;
+    const buildingInteriorLayer = tilemap.createLayer(Layer.BUILDING_INTERIOR.name, [Tileset.BASE])!;
     buildingInteriorLayer.depth = Layer.BUILDING_INTERIOR.zIndex;
 
-    const foregroundLayer = tilemap.createLayer(Layer.FOREGROUND.name, [Tileset.BASE.name])!;
+    const foregroundLayer = tilemap.createLayer(Layer.FOREGROUND.name, [Tileset.BASE])!;
     foregroundLayer.depth = Layer.FOREGROUND.zIndex;
   }
 

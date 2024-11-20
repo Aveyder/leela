@@ -7,6 +7,7 @@ export default class WorldClientConfig {
   public readonly simulationRate!: number;
   public readonly pingIntervalMs!: number;
   public readonly msgpackEnabled!: boolean;
+  public readonly tickCap!: number;
 
   public static fromEnv(): WorldClientConfig {
     return {
@@ -18,6 +19,7 @@ export default class WorldClientConfig {
       simulationRate: Number(process.env.SIMULATION_RATE)!,
       pingIntervalMs: Number(process.env.PING_INTERVAL_MS)!,
       msgpackEnabled: process.env.MSGPACK_ENABLED === 'true',
+      tickCap: Number(process.env.TICK_CAP)!,
     };
   }
 }

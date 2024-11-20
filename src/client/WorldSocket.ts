@@ -10,7 +10,7 @@ import WorldClientConfig from "./WorldClientConfig";
 
 export default class WorldSocket {
 
-    public readonly scene: null | WorldScene;
+    public readonly scene: WorldScene;
     public readonly io: null | Socket;
     public readonly config: WorldClientConfig;
 
