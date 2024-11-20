@@ -1,23 +1,22 @@
 import { Keys } from "../world/Keys";
 import { Vec2 } from "../../utils/math";
 import WorldSceneComponent from "./WorldSceneComponent";
-import Sprite = Phaser.GameObjects.Sprite;
-import SpriteComponent from "./SpriteComponent";
+import MovementComponent from "./MovementComponent";
 
 export default class ControlComponent extends WorldSceneComponent {
   private keys!: Keys;
-  private sprite!: Sprite;
+  private movement!: MovementComponent;
 
   public start(): void {
     this.keys = this.scene.keys;
-    this.sprite = this.gameObject.getComponent(SpriteComponent).sprite;
+    this.movement = this.gameObject.getComponent(MovementComponent);
   }
 
   public control(): void {
     const dir = this.getVec2Keys();
 
-    this.gameObject.x = this.sprite.x += dir.x * .5;
-    this.gameObject.y = this.sprite.y += dir.y * .5;
+    this.movement.vx = dir.x;
+    this.movement.vy = dir.y;
   }
 
   public getVec2Keys(): Vec2 {

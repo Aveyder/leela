@@ -8,7 +8,7 @@ import SpriteComponent from "./SpriteComponent";
 export default class ModelComponent extends Component {
 
   private sprite!: Sprite;
-  private _model!: Model;
+  private _model: Model = MODELS[0];
 
   constructor() {
     super();
@@ -20,7 +20,7 @@ export default class ModelComponent extends Component {
 
   public start() {
     this.sprite = this.gameObject.getComponent(SpriteComponent).sprite;
-    this.setModel(MODELS[0]);
+    this.setModel(this._model);
   }
 
   public setModel(model: Model): void {
@@ -29,5 +29,13 @@ export default class ModelComponent extends Component {
     this.sprite.setTexture(model.imageKey);
     this.sprite.setFrame(1);
     this.sprite.play(model.anim.down);
+  }
+
+  public walk(): void {
+
+  }
+
+  public stay(): void {
+
   }
 }

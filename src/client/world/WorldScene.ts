@@ -6,16 +6,20 @@ import { Keys } from "./Keys";
 import InitService from "./InitService";
 import GameObject from "../../core/GameObject";
 import SpriteComponent from "../component/SpriteComponent";
-import { MODELS } from "../../resource/Model";
+import { Model, MODELS } from "../../resource/Model";
 import ModelComponent from "../component/ModelComponent";
 import WorldSceneGameObject from "../component/WorldSceneGameObject";
 import ControlComponent from "../component/ControlComponent";
+import MovementComponent from "../component/MovementComponent";
 
 export default class WorldScene extends Phaser.Scene {
+
+  private guid: number = 0;
 
   private _config!: WorldClientConfig;
   private _client!: WorldClient;
   private _keys!: Keys;
+  private _gameObjects!: Map<number, GameObject>;
 
   private _session: null | WorldSession;
 
@@ -40,20 +44,31 @@ export default class WorldScene extends Phaser.Scene {
     const init = new InitService(this);
 
     this._keys = init.keys;
+    this._gameObjects = new Map();
 
-    const player = new WorldSceneGameObject(this, -1);
-    const spriteComponent = new SpriteComponent();
-    const modelComponent = new ModelComponent();
     this._control = new ControlComponent();
-    player.addComponent(spriteComponent);
-    player.addComponent(modelComponent);
-    player.addComponent(this._control);
-    const sprite = spriteComponent.sprite;
-    sprite.setPosition(100, 100);
+    const char1 = this.createChar(100, 100, MODELS[0]);
+    const char2 = this.createChar(100, 200, MODELS[5]);
+
+    char1.addComponent(this._control);
+
+    const swap = () => {
+      if (char1.getComponent(ControlComponent)) {
+        char1.removeComponent(ControlComponent);
+        char2.addComponent(this._control!);
+      } else {
+        char2.removeComponent(ControlComponent);
+        char1.addComponent(this._control!);
+      }
+    }
+
+    console.log(swap);
   }
 
   public update(time: number, delta: number): void {
-    this._control?.control();
+    for(const gameObject of this._gameObjects.values()) {
+      gameObject.update(delta);
+    }
   }
 
   public addSession(session: WorldSession) {
@@ -61,7 +76,7 @@ export default class WorldScene extends Phaser.Scene {
   }
 
   public simulate(delta: number): void {
-    // this._control?.control();
+    this._control?.control();
   }
 
   public removeSession() {
@@ -80,7 +95,29 @@ export default class WorldScene extends Phaser.Scene {
     return this._keys;
   }
 
+  public get gameObjects(): Map<number, GameObject> {
+    return this._gameObjects;
+  }
+
   public get session(): null | WorldSession {
     return this._session;
+  }
+
+  private createChar(x: number, y: number, model: Model) {
+    const char = new WorldSceneGameObject(this, this.guid++);
+
+    const spriteComponent = new SpriteComponent();
+    const modelComponent = new ModelComponent();
+
+    char.addComponent(spriteComponent);
+    char.addComponent(modelComponent);
+    char.addComponent(new MovementComponent());
+
+    modelComponent.setModel(model);
+
+    const sprite = spriteComponent.sprite;
+    sprite.setPosition(x, y);
+
+    return char;
   }
 }

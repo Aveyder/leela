@@ -11,6 +11,8 @@ export default class WorldSceneGameObject extends GameObject {
     super(guid);
 
     this.scene = scene;
+
+    this.scene.gameObjects.set(this.guid, this);
   }
 
   addComponent<T extends Component>(component: T) {
@@ -19,5 +21,11 @@ export default class WorldSceneGameObject extends GameObject {
     }
 
     super.addComponent(component);
+  }
+
+  destroy() {
+    super.destroy();
+
+    this.scene.gameObjects.delete(this.guid);
   }
 }
