@@ -50,19 +50,7 @@ export default class WorldScene extends Phaser.Scene {
     const char1 = this.createChar(100, 100, MODELS[0]);
     const char2 = this.createChar(100, 200, MODELS[5]);
 
-    char1.addComponent(this._control);
-
-    const swap = () => {
-      if (char1.getComponent(ControlComponent)) {
-        char1.removeComponent(ControlComponent);
-        char2.addComponent(this._control!);
-      } else {
-        char2.removeComponent(ControlComponent);
-        char1.addComponent(this._control!);
-      }
-    }
-
-    console.log(swap);
+    char2.addComponent(this._control);
   }
 
   public update(time: number, delta: number): void {
@@ -76,7 +64,7 @@ export default class WorldScene extends Phaser.Scene {
   }
 
   public simulate(delta: number): void {
-    this._control?.control();
+    this._control?.applyControl();
   }
 
   public removeSession() {

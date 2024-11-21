@@ -5,18 +5,24 @@ import MovementComponent from "./MovementComponent";
 
 export default class ControlComponent extends WorldSceneComponent {
   private keys!: Keys;
-  private movement!: MovementComponent;
+  private movement: null | MovementComponent = null;
 
   public start(): void {
     this.keys = this.scene.keys;
     this.movement = this.gameObject.getComponent(MovementComponent);
   }
 
-  public control(): void {
+  public destroy(): void {
+    this.movement = null;
+  }
+
+  public applyControl(): void {
+    if (!this.movement) return;
+
     const dir = this.getVec2Keys();
 
-    this.movement.vx = dir.x;
-    this.movement.vy = dir.y;
+    this.movement.dx = dir.x;
+    this.movement.dy = dir.y;
   }
 
   public getVec2Keys(): Vec2 {
