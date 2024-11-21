@@ -11,6 +11,8 @@ export default class WorldSession {
   private _socket: null | WorldSocket;
   public readonly config: WorldClientConfig;
 
+  private readonly opcodeTable: OpcodeTable;
+
   private cmdLoop: Loop;
   private simulationLoop: Loop;
 
@@ -22,6 +24,8 @@ export default class WorldSession {
   constructor(socket: WorldSocket) {
     this._socket = socket;
     this.config = socket.config;
+
+    this.opcodeTable = new OpcodeTable(this._socket.scene);
 
     this._pingStart = null;
 
@@ -47,9 +51,9 @@ export default class WorldSession {
   public recvPacket(packet: WorldPacket): void {
     const opcode = packet[0] as Opcode;
 
-    const handler = OpcodeTable.getHandler(opcode);
+    const handler = this.opcodeTable.getHandler(opcode);
 
-    handler(this, packet);
+    handler.handle(this, packet);
   }
 
   private initCmdLoop() {

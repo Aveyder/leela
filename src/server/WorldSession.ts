@@ -2,7 +2,6 @@ import WorldSocket from "./WorldSocket";
 import WorldPacket from "../protocol/WorldPacket";
 import Loop from "./utils/Loop";
 import WorldServerConfig from "./WorldServerConfig";
-import OpcodeTable from "./OpcodeTable";
 import { Opcode } from "../protocol/Opcode";
 import WorldServer from "./WorldServer";
 import { WorldSessionStatus } from "./WorldSessionStatus";
@@ -48,9 +47,9 @@ export default class WorldSession {
         this.recvQueue.forEach(packet => {
             const opcode = packet[0] as Opcode;
 
-            const handler = OpcodeTable.getHandler(opcode);
+            const handler = this.socket.opcodeTable.getHandler(opcode);
 
-            handler(this, packet, delta);
+            handler.handle(this, packet, delta);
         });
         this.recvQueue.length = 0;
     }

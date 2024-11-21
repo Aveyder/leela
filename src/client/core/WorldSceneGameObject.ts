@@ -12,7 +12,7 @@ export default class WorldSceneGameObject extends GameObject {
 
     this.scene = scene;
 
-    this.scene.gameObjects.set(this.guid, this);
+    this.scene.objects.add(this);
   }
 
   addComponent<T extends Component>(component: T) {
@@ -26,6 +26,6 @@ export default class WorldSceneGameObject extends GameObject {
   destroy() {
     super.destroy();
 
-    this.scene.gameObjects.delete(this.guid);
+    this.scene.objects.delete(this);
   }
 }

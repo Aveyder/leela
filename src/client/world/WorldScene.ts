@@ -4,13 +4,13 @@ import WorldClient from "../WorldClient";
 import WorldSession from "../WorldSession";
 import { Keys } from "./Keys";
 import InitService from "./InitService";
-import GameObject from "../../core/GameObject";
-import SpriteComponent from "../component/SpriteComponent";
+import SpriteComponent from "../core/SpriteComponent";
 import { Model, MODELS } from "../../resource/Model";
-import ModelComponent from "../component/ModelComponent";
-import WorldSceneGameObject from "../component/WorldSceneGameObject";
-import ControlComponent from "../component/ControlComponent";
-import MovementComponent from "../component/MovementComponent";
+import ModelComponent from "../core/ModelComponent";
+import WorldSceneGameObject from "../core/WorldSceneGameObject";
+import ControlComponent from "../core/ControlComponent";
+import MovementComponent from "../core/MovementComponent";
+import GameObjectManager from "../../core/GameObjectManager";
 
 export default class WorldScene extends Phaser.Scene {
 
@@ -19,7 +19,7 @@ export default class WorldScene extends Phaser.Scene {
   private _config!: WorldClientConfig;
   private _client!: WorldClient;
   private _keys!: Keys;
-  private _gameObjects!: Map<number, GameObject>;
+  private _objects!: GameObjectManager;
 
   private _session: null | WorldSession;
 
@@ -44,7 +44,7 @@ export default class WorldScene extends Phaser.Scene {
     const init = new InitService(this);
 
     this._keys = init.keys;
-    this._gameObjects = new Map();
+    this._objects = new GameObjectManager();
 
     this._control = new ControlComponent();
     const char1 = this.createChar(100, 100, MODELS[0]);
@@ -54,9 +54,7 @@ export default class WorldScene extends Phaser.Scene {
   }
 
   public update(time: number, delta: number): void {
-    for(const gameObject of this._gameObjects.values()) {
-      gameObject.update(delta);
-    }
+    this._objects.update(delta);
   }
 
   public addSession(session: WorldSession) {
@@ -83,8 +81,8 @@ export default class WorldScene extends Phaser.Scene {
     return this._keys;
   }
 
-  public get gameObjects(): Map<number, GameObject> {
-    return this._gameObjects;
+  public get objects(): GameObjectManager {
+    return this._objects;
   }
 
   public get session(): null | WorldSession {

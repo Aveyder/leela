@@ -1,17 +1,41 @@
 import WorldSession from "./WorldSession";
 import WorldPacket from "../protocol/WorldPacket";
 import Codec from "../protocol/Codec";
+import { Constructor } from "../utils/Constructor";
+import WorldScene from "./world/WorldScene";
 
-export default interface WorldPacketHandler {
-    (session: WorldSession, packet: WorldPacket): void;
+export default abstract class WorldPacketHandler {
+    private readonly scene: WorldScene;
+
+    public constructor(world: WorldScene) {
+        this.scene = world;
+    }
+
+    public abstract handle(session: WorldSession, packet: WorldPacket): void;
 }
 
-export interface ObjectHandler<T> {
-    (session: WorldSession, object: T): void;
+export abstract class ObjectHandler<T> extends WorldPacketHandler {
+
+    public handle = (session: WorldSession, packet: WorldPacket): void => {
+        this.handleObject(session, Codec.decode(packet));
+    }
+
+    public abstract handleObject(session: WorldSession, object: T): void;
 }
 
-export function objectHandler<T>(objectHandler: ObjectHandler<T>): WorldPacketHandler {
-    return (session: WorldSession, packet: WorldPacket) => {
-        objectHandler(session, Codec.decode(packet));
+export class WorldPacketHandlerFactory {
+    private readonly scene: WorldScene;
+
+    constructor(world: WorldScene) {
+        this.scene = world;
+    }
+
+    public handler<T extends WorldPacketHandler>(constructor: Constructor<T>): T {
+        return new constructor(this.scene);
+    }
+}
+
+export class NOOPHandler extends WorldPacketHandler {
+    public handle(session: WorldSession, packet: WorldPacket): void {
     }
 }

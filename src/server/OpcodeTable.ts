@@ -1,26 +1,28 @@
-import WorldPacketHandler, { objectHandler } from "./WorldPacketHandler";
+import WorldPacketHandler, { WorldPacketHandlerFactory } from "./WorldPacketHandler";
 import { Opcode } from "../protocol/Opcode";
 import { WorldSessionStatus } from "./WorldSessionStatus";
-import { handleUpdateRateChange } from "./updateRate";
-import WorldSession from "./WorldSession";
-import { Vec2 } from "../utils/math";
+import UpdateRateHandler from "./handler/UpdateRateHandler";
+import World from "./world/World";
 
 export default class OpcodeTable {
 
-  private static readonly TABLE: [WorldSessionStatus, WorldPacketHandler][] = [];
+  private readonly _table: [WorldSessionStatus, WorldPacketHandler][] = [];
 
-  static {
-    this.TABLE[Opcode.CMSG_UPDATE_RATE] = [WorldSessionStatus.STATUS_AUTHED, handleUpdateRateChange];
-    this.TABLE[Opcode.CMSG_MOVE] = [WorldSessionStatus.STATUS_AUTHED, objectHandler<Vec2>((session: WorldSession, object: Vec2) => {
-      console.log(`move x: ${object.x}, y: ${object.y}`);
-    })];
+  constructor(world: World) {
+    const _ = new WorldPacketHandlerFactory(world);
+
+    this.define(Opcode.CMSG_UPDATE_RATE, WorldSessionStatus.STATUS_AUTHED, _.handler(UpdateRateHandler));
   }
 
-  public static getSessionStatus(opcode: Opcode): WorldSessionStatus {
-    return this.TABLE[opcode][0];
+  private define(opcode: Opcode, sessionStatus: WorldSessionStatus, handler: WorldPacketHandler) {
+    this._table[opcode] = [sessionStatus, handler];
   }
 
-  public static getHandler(opcode: Opcode): WorldPacketHandler {
-    return this.TABLE[opcode][1];
+  public getSessionStatus(opcode: Opcode): WorldSessionStatus {
+    return this._table[opcode][0];
+  }
+
+  public getHandler(opcode: Opcode): WorldPacketHandler {
+    return this._table[opcode][1];
   }
 }

@@ -1,4 +1,4 @@
-import {Socket} from "socket.io";
+import { Socket } from "socket.io";
 import WorldSession from "./WorldSession";
 import { Opcode } from "../protocol/Opcode";
 import WorldPacket from "../protocol/WorldPacket";
@@ -7,17 +7,20 @@ import WorldServer from "./WorldServer";
 
 export default class WorldSocket {
 
+    public readonly id: string;
+
     public readonly server: WorldServer;
     public readonly io: Socket;
-    public readonly id: string;
+    public readonly opcodeTable: OpcodeTable;
     private readonly bufferQueue: WorldPacket[];
-
     public session: null | WorldSession;
 
     constructor(server: WorldServer, io: Socket) {
+        this.id = io.id;
+
         this.server = server;
         this.io = io;
-        this.id = io.id;
+        this.opcodeTable = new OpcodeTable(server.world);
         this.bufferQueue = [];
         this.session = null;
 
@@ -83,7 +86,7 @@ export default class WorldSocket {
 
         if (!this.session) return false;
 
-        const sessionStatus = OpcodeTable.getSessionStatus(opcode);
+        const sessionStatus = this.opcodeTable.getSessionStatus(opcode);
 
         if (this.session.status != sessionStatus) return false;
 

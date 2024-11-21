@@ -2,7 +2,7 @@ import WorldServer from "../WorldServer";
 import WorldSession from "../WorldSession";
 import Loop from "../utils/Loop";
 import WorldServerConfig from "../WorldServerConfig";
-import GameObjectManager from "./GameObjectManager";
+import GameObjectManager from "../../core/GameObjectManager";
 
 export default class World {
 
@@ -36,6 +36,8 @@ export default class World {
 
     public update(delta: number): void {
         this.applyClientUpdates(delta);
+
+        this.objects.update(delta);
     }
 
     private applyClientUpdates(delta: number) {

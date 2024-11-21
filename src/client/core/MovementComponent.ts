@@ -1,7 +1,7 @@
 import WorldSceneComponent from "./WorldSceneComponent";
 import SpriteComponent from "./SpriteComponent";
-import Sprite = Phaser.GameObjects.Sprite;
 import ModelComponent from "./ModelComponent";
+import Sprite = Phaser.GameObjects.Sprite;
 
 export default class MovementComponent extends WorldSceneComponent {
 
@@ -34,7 +34,6 @@ export default class MovementComponent extends WorldSceneComponent {
   }
 
   public update(delta: number): void {
-    // maybe assing vx/vy & dx/dy in Control... cause vx/vy & dx/dy will be assigned by server
     this.vx = this.dx * this.speed;
     this.vy = this.dy * this.speed;
 
