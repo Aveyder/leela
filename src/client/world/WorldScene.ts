@@ -13,6 +13,7 @@ import MovementComponent from "../core/MovementComponent";
 import GameObjectManager from "../../core/GameObjectManager";
 import { Opcode } from "../../protocol/Opcode";
 import Join from "../../entity/Join";
+import { Constructor } from "../../utils/Constructor";
 
 export default class WorldScene extends Phaser.Scene {
 
@@ -92,8 +93,6 @@ export default class WorldScene extends Phaser.Scene {
     const gameObject = new WorldSceneGameObject(this);
 
     gameObject.guid = guid;
-
-    this._objects.add(gameObject);
 
     return gameObject;
   }

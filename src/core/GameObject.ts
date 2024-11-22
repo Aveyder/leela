@@ -13,10 +13,11 @@ export default class GameObject {
   public active: boolean;
   public flags: number;
 
+  // optimize indexing for postUpdate
   private components: Map<Function, Component> = new Map();
 
-  constructor() {
-    this.guid = -1;
+  constructor(guid: number = -1) {
+    this.guid = guid;
     this.type = GameObjectType.None;
     this.x = 0;
     this.y = 0;
@@ -38,6 +39,10 @@ export default class GameObject {
     this.components.set(componentClass, component);
 
     component.start();
+  }
+
+  public addComponents<T extends Component>(components: T[]): void {
+    components.forEach(component => this.addComponent(component));
   }
 
   public getComponent<T extends Component>(componentClass: Constructor<T>): T {

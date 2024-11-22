@@ -13,6 +13,11 @@ export default class SpriteComponent extends WorldSceneComponent {
     this._sprite = this.scene.add.sprite(0, 0, Image.PLACEHOLDER);
   }
 
+  update(delta: number) {
+    this._sprite.x = this.gameObject.x;
+    this._sprite.y = this.gameObject.y;
+  }
+
   public destroy(): void {
     this.sprite.destroy();
   }

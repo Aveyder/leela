@@ -21,6 +21,7 @@ export default class ModelComponent extends Component {
 
   public start() {
     this.sprite = this.gameObject.getComponent(SpriteComponent).sprite;
+
     this.setModel(this._model);
   }
 

@@ -13,7 +13,6 @@ export default class MovementComponent extends WorldSceneComponent {
 
   public speed: number = 150;
 
-  private sprite!: Sprite;
   private modelComponent: null | ModelComponent;
 
   constructor() {
@@ -29,7 +28,6 @@ export default class MovementComponent extends WorldSceneComponent {
     this.vx = 0;
     this.vy = 0;
 
-    this.sprite = this.gameObject.getComponent(SpriteComponent).sprite;
     this.modelComponent = this.gameObject.getComponent(ModelComponent);
   }
 
@@ -37,8 +35,8 @@ export default class MovementComponent extends WorldSceneComponent {
     this.vx = this.dx * this.speed;
     this.vy = this.dy * this.speed;
 
-    this.gameObject.x = this.sprite.x += this.vx * delta / 1000;
-    this.gameObject.y = this.sprite.y += this.vy * delta / 1000;
+    this.gameObject.x += this.vx * delta / 1000;
+    this.gameObject.y += this.vy * delta / 1000;
 
     if (!this.modelComponent) return;
 
