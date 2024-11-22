@@ -4,7 +4,7 @@ import WorldClient from "../WorldClient";
 import WorldSession from "../WorldSession";
 import { Keys } from "./Keys";
 import InitService from "./InitService";
-import { Model, MODELS } from "../../resource/ModelDescriptor";
+import { Model } from "../../resource/ModelDescriptor";
 import ControlComponent from "../core/ControlComponent";
 import GameObjectManager from "../../core/GameObjectManager";
 import { Opcode } from "../../protocol/Opcode";

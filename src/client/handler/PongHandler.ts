@@ -1,6 +1,5 @@
 import WorldSession from "../WorldSession";
 import WorldPacketHandler from "../WorldPacketHandler";
-import WorldPacket from "../../protocol/WorldPacket";
 
 export default class PongHandler extends WorldPacketHandler {
 

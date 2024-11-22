@@ -1,8 +1,8 @@
 import WorldSession from "./WorldSession";
-import {Socket} from "socket.io-client";
+import { Socket } from "socket.io-client";
 import WorldClient from "./WorldClient";
 import * as timesync from "timesync";
-import {TimeSync} from "timesync";
+import { TimeSync } from "timesync";
 import WorldScene from "./world/WorldScene";
 import WorldPacket from "../protocol/WorldPacket";
 import { Opcode } from "../protocol/Opcode";

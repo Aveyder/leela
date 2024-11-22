@@ -1,4 +1,4 @@
-import WorldPacketHandler, { NOOPHandler, WorldPacketHandlerFactory } from "./WorldPacketHandler";
+import WorldPacketHandler, { WorldPacketHandlerFactory } from "./WorldPacketHandler";
 import { Opcode } from "../protocol/Opcode";
 import PongHandler from "./handler/PongHandler";
 import WorldScene from "./world/WorldScene";
