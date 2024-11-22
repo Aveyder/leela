@@ -1,21 +1,21 @@
 import Component from "../../core/Component";
-import { Model, MODELS } from "../../resource/Model";
+import { Model, ModelDescriptor, MODELS } from "../../resource/ModelDescriptor";
 import SpriteComponent from "./phaser/SpriteComponent";
 import Sprite = Phaser.GameObjects.Sprite;
 
 export default class ModelComponent extends Component {
 
   private sprite!: Sprite | null;
-  private _model: Model = MODELS[0];
+  private _model: ModelDescriptor;
 
   constructor() {
     super();
 
     this.sprite = null;
-    this._model = MODELS[0];
+    this._model = Model.UNIT_0;
   }
 
-  public get model(): Model {
+  public get model(): ModelDescriptor {
     return this._model;
   }
 
@@ -29,7 +29,7 @@ export default class ModelComponent extends Component {
     this.sprite = null;
   }
 
-  public setModel(model: Model): void {
+  public setModel(model: ModelDescriptor): void {
     this._model = model;
 
     if (!this.sprite) return;

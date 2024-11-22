@@ -3,7 +3,7 @@ import basePng from "../../assets/map/tilesets/base.png";
 import grassPng from "../../assets/map/tilesets/grass.png";
 import { Tilemap } from "../../resource/map/Tilemap";
 import WorldScene from "./WorldScene";
-import { Model, MODELS, ModelType } from "../../resource/Model";
+import { ModelDescriptor, MODELS, ModelType } from "../../resource/ModelDescriptor";
 import { Image } from "../../resource/Image";
 import LoaderPlugin = Phaser.Loader.LoaderPlugin;
 import AnimationManager = Phaser.Animations.AnimationManager;
@@ -40,7 +40,7 @@ export default class PreloadService {
     }
   }
 
-  private loadCharModel(model: Model): void {
+  private loadCharModel(model: ModelDescriptor): void {
     const unitUri = require(`../../assets/model/${model.asset}`);
     this.load.spritesheet(model.imageKey, unitUri.default, {frameWidth: 32, frameHeight: 32});
   }
@@ -69,7 +69,7 @@ export default class PreloadService {
     }
   }
 
-  private createCharAnim(model: Model): void {
+  private createCharAnim(model: ModelDescriptor): void {
     const charAnimConfig = {
       repeat: -1,
       frameRate: 8,
