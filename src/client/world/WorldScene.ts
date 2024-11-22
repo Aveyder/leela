@@ -11,6 +11,8 @@ import WorldSceneGameObject from "../core/WorldSceneGameObject";
 import ControlComponent from "../core/ControlComponent";
 import MovementComponent from "../core/MovementComponent";
 import GameObjectManager from "../../core/GameObjectManager";
+import { Opcode } from "../../protocol/Opcode";
+import Join from "../../entity/Join";
 
 export default class WorldScene extends Phaser.Scene {
 
@@ -22,8 +24,6 @@ export default class WorldScene extends Phaser.Scene {
   private _objects!: GameObjectManager;
 
   private _session: null | WorldSession;
-
-  private _control?: ControlComponent;
 
   constructor() {
     super("world");
@@ -45,12 +45,6 @@ export default class WorldScene extends Phaser.Scene {
 
     this._keys = init.keys;
     this._objects = new GameObjectManager();
-
-    this._control = new ControlComponent();
-    const char1 = this.createChar(100, 100, MODELS[0]);
-    const char2 = this.createChar(100, 200, MODELS[5]);
-
-    char2.addComponent(this._control);
   }
 
   public update(time: number, delta: number): void {
@@ -59,10 +53,15 @@ export default class WorldScene extends Phaser.Scene {
 
   public addSession(session: WorldSession) {
     this._session = session;
+
+    this._session.sendObject<Join>(Opcode.MSG_JOIN, {
+      modelId: MODELS[2].id,
+      name: "Kinsinar"
+    });
   }
 
   public simulate(delta: number): void {
-    this._control?.applyControl();
+        this.session?.state.player?.getComponent(ControlComponent).applyControl();
   }
 
   public removeSession() {
@@ -89,21 +88,13 @@ export default class WorldScene extends Phaser.Scene {
     return this._session;
   }
 
-  private createChar(x: number, y: number, model: Model) {
-    const char = new WorldSceneGameObject(this, this.guid++);
+  public createObject(guid: number = -1): WorldSceneGameObject {
+    const gameObject = new WorldSceneGameObject(this);
 
-    const spriteComponent = new SpriteComponent();
-    const modelComponent = new ModelComponent();
+    gameObject.guid = guid;
 
-    char.addComponent(spriteComponent);
-    char.addComponent(modelComponent);
-    char.addComponent(new MovementComponent());
+    this._objects.add(gameObject);
 
-    modelComponent.setModel(model);
-
-    const sprite = spriteComponent.sprite;
-    sprite.setPosition(x, y);
-
-    return char;
+    return gameObject;
   }
 }

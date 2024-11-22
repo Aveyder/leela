@@ -5,6 +5,7 @@ import WorldClientConfig from "./WorldClientConfig";
 import WorldPacket from "../protocol/WorldPacket";
 import OpcodeTable from "./OpcodeTable";
 import Codec from "../protocol/Codec";
+import WorldSessionState from "./WorldSessionState";
 
 export default class WorldSession {
 
@@ -16,8 +17,11 @@ export default class WorldSession {
   private cmdLoop: Loop;
   private simulationLoop: Loop;
 
+  public readonly state: WorldSessionState;
+
+  private readonly pingInterval: number;
+
   private _pingStart: null | number;
-  private pingInterval: number;
   public latency: number;
   private _tick: number;
 
@@ -27,16 +31,17 @@ export default class WorldSession {
 
     this.opcodeTable = new OpcodeTable(this._socket.scene);
 
+    this.state = new WorldSessionState(this);
+
     this._pingStart = null;
-
     this.latency = -1;
-
     this._tick = -1;
 
     this.sendPacket([Opcode.CMSG_UPDATE_RATE, this.config.clientUpdateRate]);
 
     this.cmdLoop = this.initCmdLoop();
     this.simulationLoop = this.initSimulationLoop();
+
     this.pingInterval = this.startPing();
   }
 
@@ -92,6 +97,8 @@ export default class WorldSession {
   }
 
   public destroy(): void {
+    this.state.destroy();
+
     this._socket = null;
 
     this.cmdLoop.stop();
@@ -100,8 +107,6 @@ export default class WorldSession {
     clearInterval(this.pingInterval);
     this._pingStart = null;
     this.latency = -1;
-
-    // removePlayerFromWorldSession(this);
   }
 
   public get scene() {

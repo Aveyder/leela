@@ -5,7 +5,7 @@ import { Constructor } from "../utils/Constructor";
 import WorldScene from "./world/WorldScene";
 
 export default abstract class WorldPacketHandler {
-    private readonly scene: WorldScene;
+    protected readonly scene: WorldScene;
 
     public constructor(world: WorldScene) {
         this.scene = world;

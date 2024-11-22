@@ -2,9 +2,12 @@ import GameObject from "./GameObject";
 
 export default class GameObjectManager {
 
+  private guid: number;
+
   public readonly gameObjects: Map<number, GameObject>;
 
   constructor() {
+    this.guid = 0;
     this.gameObjects = new Map<number, GameObject>();
   }
 
@@ -21,6 +24,10 @@ export default class GameObjectManager {
   }
 
   public add(gameObject: GameObject): void {
+    if (gameObject.guid === -1) {
+      gameObject.guid = this.guid++;
+    }
+
     this.gameObjects.set(gameObject.guid, gameObject);
   }
 

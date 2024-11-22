@@ -3,6 +3,7 @@ import WorldSession from "../WorldSession";
 import Loop from "../utils/Loop";
 import WorldServerConfig from "../WorldServerConfig";
 import GameObjectManager from "../../core/GameObjectManager";
+import WorldGameObject from "../core/WorldGameObject";
 
 export default class World {
 
@@ -45,10 +46,20 @@ export default class World {
     }
 
     public forEachSession(callback: (session: WorldSession) => void) {
-        Object.values(this.sessions).forEach(session => callback(session));
+        for(const session of this.sessions.values()) {
+            callback(session);
+        }
     }
 
     public collectSessionUpdate(session: WorldSession, delta: number): void {
 
+    }
+
+    public createObject(): WorldGameObject {
+        const gameObject = new WorldGameObject(this);
+
+        this.objects.add(gameObject);
+
+        return gameObject;
     }
 }

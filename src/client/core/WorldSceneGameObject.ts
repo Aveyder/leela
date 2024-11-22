@@ -7,8 +7,8 @@ export default class WorldSceneGameObject extends GameObject {
 
   private readonly scene: WorldScene;
 
-  constructor(scene: WorldScene, guid: number) {
-    super(guid);
+  constructor(scene: WorldScene) {
+    super();
 
     this.scene = scene;
 

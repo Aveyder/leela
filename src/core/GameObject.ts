@@ -15,8 +15,8 @@ export default class GameObject {
 
   private components: Map<Function, Component> = new Map();
 
-  constructor(guid: number) {
-    this.guid = guid;
+  constructor() {
+    this.guid = -1;
     this.type = GameObjectType.None;
     this.x = 0;
     this.y = 0;

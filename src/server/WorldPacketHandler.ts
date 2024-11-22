@@ -5,7 +5,7 @@ import World from "./world/World";
 import { Constructor } from "../utils/Constructor";
 
 export default abstract class WorldPacketHandler {
-    private readonly world: World;
+    protected readonly world: World;
 
     public constructor(world: World) {
         this.world = world;

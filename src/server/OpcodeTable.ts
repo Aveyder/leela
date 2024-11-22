@@ -3,6 +3,7 @@ import { Opcode } from "../protocol/Opcode";
 import { WorldSessionStatus } from "./WorldSessionStatus";
 import UpdateRateHandler from "./handler/UpdateRateHandler";
 import World from "./world/World";
+import JoinHandler from "./handler/JoinHandler";
 
 export default class OpcodeTable {
 
@@ -12,6 +13,7 @@ export default class OpcodeTable {
     const _ = new WorldPacketHandlerFactory(world);
 
     this.define(Opcode.CMSG_UPDATE_RATE, WorldSessionStatus.STATUS_AUTHED, _.handler(UpdateRateHandler));
+    this.define(Opcode.MSG_JOIN, WorldSessionStatus.STATUS_AUTHED, _.handler(JoinHandler));
   }
 
   private define(opcode: Opcode, sessionStatus: WorldSessionStatus, handler: WorldPacketHandler) {

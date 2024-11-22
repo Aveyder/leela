@@ -7,10 +7,10 @@ export default class WorldGameObject extends GameObject {
 
   private readonly world: World;
 
-  constructor(scene: World, guid: number) {
-    super(guid);
+  constructor(world: World) {
+    super();
 
-    this.world = scene;
+    this.world = world;
 
     this.world.objects.add(this);
   }
