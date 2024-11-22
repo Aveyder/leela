@@ -11,8 +11,6 @@ export default class WorldGameObject extends GameObject {
     super();
 
     this.world = world;
-
-    this.world.objects.add(this);
   }
 
   addComponent<T extends Component>(component: T) {
@@ -21,11 +19,5 @@ export default class WorldGameObject extends GameObject {
     }
 
     super.addComponent(component);
-  }
-
-  destroy() {
-    super.destroy();
-
-    this.world.objects.delete(this);
   }
 }

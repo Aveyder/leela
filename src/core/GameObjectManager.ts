@@ -11,6 +11,16 @@ export default class GameObjectManager {
     this.gameObjects = new Map<number, GameObject>();
   }
 
+  public add(gameObject: GameObject): void {
+    if (gameObject.guid === -1) {
+      gameObject.guid = this.guid++;
+    }
+
+    gameObject.init();
+
+    this.gameObjects.set(gameObject.guid, gameObject);
+  }
+
   public update(delta: number): void {
     for(const gameObject of this.gameObjects.values()) {
       gameObject.update(delta);
@@ -19,19 +29,13 @@ export default class GameObjectManager {
 
   public destroy(): void {
     for(const gameObject of this.gameObjects.values()) {
-      gameObject.destroy();
+      this.delete(gameObject);
     }
-  }
-
-  public add(gameObject: GameObject): void {
-    if (gameObject.guid === -1) {
-      gameObject.guid = this.guid++;
-    }
-
-    this.gameObjects.set(gameObject.guid, gameObject);
   }
 
   public delete(gameObject: GameObject): void {
+    gameObject.destroy();
+
     this.gameObjects.delete(gameObject.guid);
   }
 }

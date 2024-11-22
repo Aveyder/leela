@@ -1,9 +1,10 @@
 import { Keys } from "../world/Keys";
 import { Vec2 } from "../../utils/math";
-import WorldSceneComponent from "./WorldSceneComponent";
+import SceneComponent from "./phaser/SceneComponent";
 import MovementComponent from "./MovementComponent";
+import WorldScene from "../world/WorldScene";
 
-export default class ControlComponent extends WorldSceneComponent {
+export default class ControlComponent extends SceneComponent<WorldScene> {
   private keys!: Keys;
   private movement: null | MovementComponent = null;
 

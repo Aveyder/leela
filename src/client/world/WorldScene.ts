@@ -4,16 +4,11 @@ import WorldClient from "../WorldClient";
 import WorldSession from "../WorldSession";
 import { Keys } from "./Keys";
 import InitService from "./InitService";
-import SpriteComponent from "../core/SpriteComponent";
-import { Model, MODELS } from "../../resource/Model";
-import ModelComponent from "../core/ModelComponent";
-import WorldSceneGameObject from "../core/WorldSceneGameObject";
+import { MODELS } from "../../resource/Model";
 import ControlComponent from "../core/ControlComponent";
-import MovementComponent from "../core/MovementComponent";
 import GameObjectManager from "../../core/GameObjectManager";
 import { Opcode } from "../../protocol/Opcode";
 import Join from "../../entity/Join";
-import { Constructor } from "../../utils/Constructor";
 
 export default class WorldScene extends Phaser.Scene {
 
@@ -87,13 +82,5 @@ export default class WorldScene extends Phaser.Scene {
 
   public get session(): null | WorldSession {
     return this._session;
-  }
-
-  public createObject(guid: number = -1): WorldSceneGameObject {
-    const gameObject = new WorldSceneGameObject(this);
-
-    gameObject.guid = guid;
-
-    return gameObject;
   }
 }
