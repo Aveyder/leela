@@ -12,7 +12,7 @@ export default class JoinHandler extends WorldPacketHandler {
 
         const player = new Player(this.scene, guid);
 
-        player.getComponent(ModelComponent).setModel(Model.UNIT_4);
+        player.getComponent(ModelComponent).setModel(Model.UNIT_5);
 
         player.x = 100;
         player.y = 100;

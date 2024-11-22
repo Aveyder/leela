@@ -17,6 +17,7 @@ export default class GameObjectManager {
     }
 
     gameObject.init();
+    gameObject.start();
 
     this.gameObjects.set(gameObject.guid, gameObject);
   }

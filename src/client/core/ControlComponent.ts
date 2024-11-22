@@ -6,20 +6,14 @@ import WorldScene from "../world/WorldScene";
 
 export default class ControlComponent extends SceneComponent<WorldScene> {
   private keys!: Keys;
-  private movement: null | MovementComponent = null;
+  private movement!: MovementComponent;
 
   public start(): void {
     this.keys = this.scene.keys;
     this.movement = this.gameObject.getComponent(MovementComponent);
   }
 
-  public destroy(): void {
-    this.movement = null;
-  }
-
   public applyControl(): void {
-    if (!this.movement) return;
-
     const dir = this.getVec2Keys();
 
     this.movement.dx = dir.x;

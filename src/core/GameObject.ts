@@ -9,8 +9,6 @@ export default class GameObject {
   public visible: boolean;
   public active: boolean;
 
-  private initialized: boolean;
-
   private components: Map<Function, Component> = new Map();
 
   constructor(guid: number = -1) {
@@ -20,8 +18,6 @@ export default class GameObject {
     this.isStatic = true;
     this.visible = true;
     this.active = true;
-
-    this.initialized = false;
   };
 
   public addComponents<T extends Component>(components: T[]): void {
@@ -55,15 +51,11 @@ export default class GameObject {
   }
 
   public init(): void {
-    if (this.initialized) return;
-
     this.forEachComponent(component => component.init());
-
-    this.initialized = true;
   }
 
   public start(): void {
-
+    this.forEachComponent(component => component.start());
   }
 
   public update(delta: number): void {
@@ -75,8 +67,6 @@ export default class GameObject {
 
   public destroy(): void {
     this.forEachComponent(component => component.destroy());
-
-    this.initialized = false;
   }
 
   private forEachComponent(callback: (component: Component) => void): void {

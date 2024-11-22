@@ -2,16 +2,17 @@ import Component from "../../core/Component";
 import { Model, ModelDescriptor, MODELS } from "../../resource/ModelDescriptor";
 import SpriteComponent from "./phaser/SpriteComponent";
 import Sprite = Phaser.GameObjects.Sprite;
+import MovementComponent from "./MovementComponent";
 
 export default class ModelComponent extends Component {
 
-  private sprite!: Sprite | null;
+  private sprite!: Sprite;
+  private movement!: MovementComponent;
   private _model: ModelDescriptor;
 
   constructor() {
     super();
 
-    this.sprite = null;
     this._model = Model.UNIT_0;
   }
 
@@ -19,14 +20,21 @@ export default class ModelComponent extends Component {
     return this._model;
   }
 
-  public start() {
+  public start(): void {
     this.sprite = this.gameObject.getComponent(SpriteComponent).sprite;
+    this.movement = this.gameObject.getComponent(MovementComponent);
 
     this.setModel(this._model);
   }
 
-  public destroy() {
-    this.sprite = null;
+  public lateUpdate(delta: number): void {
+    const dx = this.movement.dx;
+    const dy = this.movement.dy;
+    if (dx === 0 && dy === 0) {
+      this.stay();
+    } else {
+      this.walk(dx, dy);
+    }
   }
 
   public setModel(model: ModelDescriptor): void {
@@ -39,12 +47,12 @@ export default class ModelComponent extends Component {
     this.sprite.play(model.anim.down);
   }
 
-  public stay(): void {
+  private stay(): void {
     this.sprite!.anims.pause();
     this.sprite!.setFrame(1);
   }
 
-  public walk(dx: number, dy: number): void {
+  private walk(dx: number, dy: number): void {
     const walkAnim = this.getWalkAnim(dx, dy);
 
     const sprite = this.sprite!;
