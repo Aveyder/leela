@@ -5,7 +5,6 @@ import WorldSession from "../WorldSession";
 import { Keys } from "./Keys";
 import InitService from "./InitService";
 import { Model } from "../../resource/Model";
-import ControlComponent from "../core/ControlComponent";
 import GameObjectManager from "../../core/GameObjectManager";
 import { Opcode } from "../../protocol/Opcode";
 import Join from "../../entity/Join";
@@ -52,7 +51,7 @@ export default class WorldScene extends Phaser.Scene {
     this._session = session;
 
     this._session.sendObject<Join>(Opcode.MSG_JOIN, {
-      model: Model.UNIT_3,
+      model: Model.UNIT_4,
       name: "Kinsinar"
     });
   }

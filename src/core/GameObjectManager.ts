@@ -17,21 +17,16 @@ export default class GameObjectManager {
     }
 
     gameObject.init();
-    gameObject.start();
 
     this.gameObjects.set(gameObject.guid, gameObject);
   }
 
   public update(delta: number): void {
-    for(const gameObject of this.gameObjects.values()) {
-      gameObject.update(delta);
-    }
+    this.forEachGameObject((gameObject: GameObject) => gameObject.update(delta));
   }
 
   public destroy(): void {
-    for(const gameObject of this.gameObjects.values()) {
-      this.delete(gameObject);
-    }
+    this.forEachGameObject((gameObject: GameObject) => this.delete(gameObject));
 
     this.guid = 0;
   }
@@ -40,5 +35,11 @@ export default class GameObjectManager {
     gameObject.destroy();
 
     this.gameObjects.delete(gameObject.guid);
+  }
+
+  private forEachGameObject(callback: (gameObject: GameObject) => void): void {
+    for(const gameObject of this.gameObjects.values()) {
+      callback(gameObject);
+    }
   }
 }

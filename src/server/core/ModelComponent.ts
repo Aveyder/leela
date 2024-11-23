@@ -11,7 +11,7 @@ export default class ModelComponent extends Component {
     this._model = Model.UNIT_0;
   }
 
-  public get model(): Model {
+  public get model(): ModelDescriptor {
     return this._model;
   }
 

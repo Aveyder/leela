@@ -30,7 +30,5 @@ export default class MovementComponent extends Component {
 
     this.gameObject.x += this.vx * delta;
     this.gameObject.y += this.vy * delta;
-
-    console.log(`x: ${this.gameObject.x}, y: ${this.gameObject.y}`);
   }
 }

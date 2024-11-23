@@ -45,7 +45,7 @@ export default class WorldSession {
     this.pingInterval = this.startPing();
   }
 
-  public sendObject<T>(opcode: Opcode, object: T) {
+  public sendObject<T>(opcode: Opcode, object: T): void {
     this.sendPacket(Codec.encode(opcode, object));
   }
 
@@ -61,7 +61,7 @@ export default class WorldSession {
     handler.handle(this, packet);
   }
 
-  private initCmdLoop() {
+  private initCmdLoop(): Loop {
     const cmdLoop= new Loop();
 
     cmdLoop.start(
@@ -72,7 +72,7 @@ export default class WorldSession {
     return cmdLoop;
   }
 
-  private initSimulationLoop() {
+  private initSimulationLoop(): Loop {
     const simulationLoop= new Loop();
 
     simulationLoop.start(
@@ -89,7 +89,7 @@ export default class WorldSession {
     this.scope.simulate(delta);
   }
 
-  private startPing() {
+  private startPing(): number {
     return setInterval(() => {
       this._pingStart = Date.now();
 
@@ -118,7 +118,7 @@ export default class WorldSession {
     return this._socket;
   }
 
-  public get tick(): number {
+  public get tick() {
     return this._tick;
   }
 

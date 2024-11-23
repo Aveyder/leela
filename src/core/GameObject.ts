@@ -1,7 +1,8 @@
 import Component from "./Component";
 import { Constructor } from "../utils/Constructor";
+import GameObjectSpec from "../entity/GameObjectSpec";
 
-export default class GameObject {
+export default class GameObject implements GameObjectSpec {
   public guid: number;
   public x: number;
   public y: number;
@@ -40,6 +41,10 @@ export default class GameObject {
     return this.components.get(componentClass) as T;
   }
 
+  public getComponents(){
+    return this.components.values();
+  }
+
   public removeComponent<T extends Component>(componentClass: Constructor<T>): void {
     const component = this.getComponent(componentClass);
 
@@ -52,9 +57,6 @@ export default class GameObject {
 
   public init(): void {
     this.forEachComponent(component => component.init());
-  }
-
-  public start(): void {
     this.forEachComponent(component => component.start());
   }
 

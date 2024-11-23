@@ -2,24 +2,30 @@ import WorldPacket, { WorldPacketData } from "./WorldPacket";
 import { Opcode } from "./Opcode";
 import MoveCodec from "./codec/MoveCodec";
 import JoinCodec from "./codec/JoinCodec";
+import GameObjectStateCodec from "./codec/GameObjectStateCodec";
+import EnvInitCodec from "./codec/EnvInitCodec";
 
-export interface _Codec<T> {
-  encode(object: T): WorldPacketData;
-  decode(packet: WorldPacket) :T;
+export interface _Codec<I, O> {
+  encode(object: I): WorldPacketData;
+  decode(data: WorldPacketData): O;
 }
 
+export type SymmetricCodec<T> = _Codec<T, T>;
+
 type CodecMapping = {
-  [key in Opcode]?: _Codec<unknown>;
+  [key in Opcode]?: _Codec<unknown, unknown>;
 };
 
 export default class Codec {
   private static readonly _codecs: CodecMapping = {
     [Opcode.CMSG_MOVE]: new MoveCodec(),
     [Opcode.MSG_JOIN]: new JoinCodec(),
+    [Opcode.SMSG_ENV_INIT]: new EnvInitCodec(),
+    [Opcode.SMSG_OBJECT]: new GameObjectStateCodec(),
   }
 
-  public static encode<T>(opcode: Opcode, object: T): WorldPacket {
-    const codec = this.getCodec(opcode);
+  public static encode<I, O>(opcode: Opcode, object: I): WorldPacket {
+    const codec = this.getCodec<I, O>(opcode);
 
     if (codec) {
       return [opcode, ...codec.encode(object)];
@@ -28,18 +34,18 @@ export default class Codec {
     }
   }
 
-  public static decode<T>(packet: WorldPacket): T {
+  public static decode<I, O>(packet: WorldPacket): O {
     const opcode = packet[0];
-    const codec = this.getCodec<T>(opcode);
+    const codec = this.getCodec<I, O>(opcode);
 
     if (codec) {
-        return codec.decode(packet);
+        return codec.decode(packet.slice(1));
     } else {
-        return packet[1] as T;
+        return packet[1] as O;
     }
   }
 
-  public static getCodec<T>(opcode: Opcode): _Codec<T> {
-    return this._codecs[opcode] as _Codec<T>;
+  public static getCodec<I, O>(opcode: Opcode): _Codec<I, O> {
+    return this._codecs[opcode] as _Codec<I, O>;
   }
 }

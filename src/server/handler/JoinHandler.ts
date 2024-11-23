@@ -5,6 +5,7 @@ import { Opcode } from "../../protocol/Opcode";
 import Player from "../core/Player";
 import ModelComponent from "../core/ModelComponent";
 import { WorldSessionStatus } from "../WorldSessionStatus";
+import GameObject from "../../core/GameObject";
 
 export default class JoinHandler extends ObjectHandler<Join> {
 
@@ -19,5 +20,6 @@ export default class JoinHandler extends ObjectHandler<Join> {
       session.status = WorldSessionStatus.STATUS_JOINED;
 
       session.sendPacket([Opcode.MSG_JOIN, player.guid]);
+      this.world.broadcastObject<GameObject>(Opcode.SMSG_OBJECT, player);
     }
 }

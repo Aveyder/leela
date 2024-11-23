@@ -42,7 +42,7 @@ export default class WorldSession {
         this.recvQueue.push(packet);
     }
 
-    public sendObject<T>(opcode: Opcode, object: T) {
+    public sendObject<T>(opcode: Opcode, object: T): void {
         this.sendPacket(Codec.encode(opcode, object));
     }
 
@@ -82,7 +82,7 @@ export default class WorldSession {
     }
 
     private sendUpdate(delta: number): void {
-        this.server.world.collectSessionUpdate(this, delta);
+        this.scope.collectUpdate(delta);
 
         this.socket!.sendBufferedPackets();
     }
