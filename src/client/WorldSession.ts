@@ -5,7 +5,7 @@ import WorldClientConfig from "./WorldClientConfig";
 import WorldPacket from "../protocol/WorldPacket";
 import OpcodeTable from "./OpcodeTable";
 import Codec from "../protocol/Codec";
-import WorldSessionState from "./WorldSessionState";
+import WorldSessionScope from "./WorldSessionScope";
 
 export default class WorldSession {
 
@@ -17,7 +17,7 @@ export default class WorldSession {
   private cmdLoop: Loop;
   private simulationLoop: Loop;
 
-  public readonly state: WorldSessionState;
+  public readonly scope: WorldSessionScope;
 
   private readonly pingInterval: number;
 
@@ -31,7 +31,7 @@ export default class WorldSession {
 
     this.opcodeTable = new OpcodeTable(this._socket.scene);
 
-    this.state = new WorldSessionState(this);
+    this.scope = new WorldSessionScope(this);
 
     this._pingStart = null;
     this.latency = -1;
@@ -85,7 +85,8 @@ export default class WorldSession {
 
   private simulate(delta: number): void {
     this._tick = ++this._tick % this.config.tickCap;
-    this._socket!.scene.simulate(delta);
+
+    this.scope.simulate(delta);
   }
 
   private startPing() {
@@ -97,7 +98,7 @@ export default class WorldSession {
   }
 
   public destroy(): void {
-    this.state.destroy();
+    this.scope.destroy();
 
     this._socket = null;
 

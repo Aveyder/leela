@@ -61,10 +61,6 @@ export default class WorldScene extends Phaser.Scene {
     this._session = null;
   }
 
-  public simulate(delta: number): void {
-    this.session?.state.player?.getComponent(ControlComponent).applyControl();
-  }
-
   public createObject(): SceneGameObject<WorldScene> {
     const gameObject = new SceneGameObject(this);
 

@@ -1,8 +1,9 @@
 import WorldScene from "./world/WorldScene";
 import WorldSession from "./WorldSession";
 import Player from "./core/Player";
+import ControlComponent from "./core/ControlComponent";
 
-export default class WorldSessionState {
+export default class WorldSessionScope {
   public readonly session: WorldSession;
   public readonly scene: WorldScene;
 
@@ -13,6 +14,10 @@ export default class WorldSessionState {
     this.scene = session.scene!;
 
     this.player = null;
+  }
+
+  public simulate(delta: number) {
+    this.player?.getComponent(ControlComponent).applyControl();
   }
 
   public destroy(): void {

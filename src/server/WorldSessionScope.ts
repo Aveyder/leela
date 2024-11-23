@@ -2,7 +2,7 @@ import WorldSession from "./WorldSession";
 import World from "./world/World";
 import Player from "./core/Player";
 
-export default class WorldSessionState {
+export default class WorldSessionScope {
 
   public readonly session: WorldSession;
   public readonly world: World;

@@ -6,7 +6,7 @@ import { Opcode } from "../protocol/Opcode";
 import WorldServer from "./WorldServer";
 import { WorldSessionStatus } from "./WorldSessionStatus";
 import Codec from "../protocol/Codec";
-import WorldSessionState from "./WorldSessionState";
+import WorldSessionScope from "./WorldSessionScope";
 
 export default class WorldSession {
 
@@ -14,7 +14,7 @@ export default class WorldSession {
     public readonly server: WorldServer;
     private readonly config: WorldServerConfig;
 
-    public readonly state: WorldSessionState;
+    public readonly scope: WorldSessionScope;
 
     public status: null | WorldSessionStatus;
     public latency: number;
@@ -28,7 +28,7 @@ export default class WorldSession {
         this.server = socket.server;
         this.config = this.server.config;
 
-        this.state = new WorldSessionState(this);
+        this.scope = new WorldSessionScope(this);
 
         this.status = WorldSessionStatus.STATUS_AUTHED;
         this.latency = -1;
@@ -73,7 +73,7 @@ export default class WorldSession {
     }
 
     public destroy() {
-        this.state.destroy();
+        this.scope.destroy();
 
         this.updateLoop?.stop();
 

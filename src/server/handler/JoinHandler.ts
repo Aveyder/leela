@@ -15,7 +15,7 @@ export default class JoinHandler extends ObjectHandler<Join> {
 
       this.world.objects.add(player);
 
-      session.state.player = player;
+      session.scope.player = player;
       session.status = WorldSessionStatus.STATUS_JOINED;
 
       session.sendPacket([Opcode.MSG_JOIN, player.guid]);

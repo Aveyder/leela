@@ -19,6 +19,6 @@ export default class JoinHandler extends WorldPacketHandler {
 
         this.scene.objects.add(player);
 
-        session.state.player = player;
+        session.scope.player = player;
     }
 }

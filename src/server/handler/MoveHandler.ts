@@ -10,7 +10,7 @@ import MovementComponent from "../../core/MovementComponent";
 export default class MoveHandler extends ObjectHandler<Move> {
 
     public handleObject(session: WorldSession, move: Move): void {
-      const player = session.state.player!;
+      const player = session.scope.player!;
 
       const movement = player.getComponent(MovementComponent);
       movement.dx = move.dir.x;
