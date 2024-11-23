@@ -1,9 +1,10 @@
-import WorldPacketHandler, { WorldPacketHandlerFactory } from "./WorldPacketHandler";
+import WorldPacketHandler, { NOOPHandler, WorldPacketHandlerFactory } from "./WorldPacketHandler";
 import { Opcode } from "../protocol/Opcode";
 import { WorldSessionStatus } from "./WorldSessionStatus";
 import UpdateRateHandler from "./handler/UpdateRateHandler";
 import World from "./world/World";
 import JoinHandler from "./handler/JoinHandler";
+import MoveHandler from "./handler/MoveHandler";
 
 export default class OpcodeTable {
 
@@ -14,6 +15,7 @@ export default class OpcodeTable {
 
     this.define(Opcode.CMSG_UPDATE_RATE, WorldSessionStatus.STATUS_AUTHED, _.handler(UpdateRateHandler));
     this.define(Opcode.MSG_JOIN, WorldSessionStatus.STATUS_AUTHED, _.handler(JoinHandler));
+    this.define(Opcode.CMSG_MOVE, WorldSessionStatus.STATUS_JOINED, _.handler(MoveHandler));
   }
 
   private define(opcode: Opcode, sessionStatus: WorldSessionStatus, handler: WorldPacketHandler) {

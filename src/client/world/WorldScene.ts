@@ -4,11 +4,12 @@ import WorldClient from "../WorldClient";
 import WorldSession from "../WorldSession";
 import { Keys } from "./Keys";
 import InitService from "./InitService";
-import { Model } from "../../resource/ModelDescriptor";
+import { Model } from "../../resource/Model";
 import ControlComponent from "../core/ControlComponent";
 import GameObjectManager from "../../core/GameObjectManager";
 import { Opcode } from "../../protocol/Opcode";
 import Join from "../../entity/Join";
+import SceneGameObject from "../core/phaser/SceneGameObject";
 
 export default class WorldScene extends Phaser.Scene {
 
@@ -44,24 +45,32 @@ export default class WorldScene extends Phaser.Scene {
   }
 
   public update(time: number, delta: number): void {
-    this._objects.update(delta);
+    this._objects.update(delta / 1000);
   }
 
   public addSession(session: WorldSession) {
     this._session = session;
 
     this._session.sendObject<Join>(Opcode.MSG_JOIN, {
-      modelId: Model.UNIT_3.id,
+      model: Model.UNIT_3,
       name: "Kinsinar"
     });
   }
 
-  public simulate(delta: number): void {
-        this.session?.state.player?.getComponent(ControlComponent).applyControl();
-  }
-
   public removeSession() {
     this._session = null;
+  }
+
+  public simulate(delta: number): void {
+    this.session?.state.player?.getComponent(ControlComponent).applyControl();
+  }
+
+  public createObject(): SceneGameObject<WorldScene> {
+    const gameObject = new SceneGameObject(this);
+
+    this.objects.add(gameObject);
+
+    return gameObject;
   }
 
   public get config(): WorldClientConfig {

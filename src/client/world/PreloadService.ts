@@ -3,7 +3,7 @@ import basePng from "../../assets/map/tilesets/base.png";
 import grassPng from "../../assets/map/tilesets/grass.png";
 import { Tilemap } from "../../resource/map/Tilemap";
 import WorldScene from "./WorldScene";
-import { ModelDescriptor, MODELS, ModelType } from "../../resource/ModelDescriptor";
+import { ModelDescriptor, MODELS, ModelType } from "../../resource/Model";
 import { Image } from "../../resource/Image";
 import LoaderPlugin = Phaser.Loader.LoaderPlugin;
 import AnimationManager = Phaser.Animations.AnimationManager;

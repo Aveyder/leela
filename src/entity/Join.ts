@@ -1,4 +1,6 @@
+import { ModelDescriptor } from "../resource/Model";
+
 export default interface Join {
-  modelId: number,
+  model: ModelDescriptor,
   name: string
 }

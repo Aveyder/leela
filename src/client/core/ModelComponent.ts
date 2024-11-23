@@ -1,7 +1,7 @@
 import Component from "../../core/Component";
-import { Model, ModelDescriptor } from "../../resource/ModelDescriptor";
+import { Model, ModelDescriptor } from "../../resource/Model";
 import SpriteComponent from "./phaser/SpriteComponent";
-import MovementComponent from "./MovementComponent";
+import MovementComponent from "../../core/MovementComponent";
 import Sprite = Phaser.GameObjects.Sprite;
 
 export default class ModelComponent extends Component {
@@ -16,7 +16,7 @@ export default class ModelComponent extends Component {
     this._model = Model.UNIT_0;
   }
 
-  public get model(): ModelDescriptor {
+  public get model(): Model {
     return this._model;
   }
 

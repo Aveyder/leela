@@ -72,3 +72,12 @@ MODELS.forEach((model: ModelDescriptor) => {
     right: `${model.imageKey}:right`,
   }
 });
+
+export const MODELS_BY_ID: Map<number, ModelDescriptor> = MODELS.reduce(
+  (acc: Map<number, ModelDescriptor>, model: ModelDescriptor) => {
+    acc.set(model.id, model);
+
+    return acc;
+  },
+  new Map<number, ModelDescriptor>()
+);

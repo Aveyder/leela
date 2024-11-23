@@ -1,13 +1,13 @@
-import WorldGameObject from "./core/WorldGameObject";
 import WorldSession from "./WorldSession";
 import World from "./world/World";
+import Player from "./core/Player";
 
 export default class WorldSessionState {
 
   public readonly session: WorldSession;
   public readonly world: World;
 
-  public player: WorldGameObject | null;
+  public player: Player | null;
 
   constructor(session: WorldSession) {
     this.session = session;
@@ -17,6 +17,8 @@ export default class WorldSessionState {
   }
 
   public destroy(): void {
-    this.player?.destroy();
+    if (this.player) {
+      this.world.objects.delete(this.player);
+    }
   }
 }

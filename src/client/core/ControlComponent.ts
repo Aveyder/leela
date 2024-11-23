@@ -1,12 +1,27 @@
 import { Keys } from "../world/Keys";
 import { Vec2 } from "../../utils/math";
 import SceneComponent from "./phaser/SceneComponent";
-import MovementComponent from "./MovementComponent";
+import MovementComponent from "../../core/MovementComponent";
 import WorldScene from "../world/WorldScene";
+import WorldSession from "../WorldSession";
+import { Opcode } from "../../protocol/Opcode";
+import Move from "../../entity/Move";
 
 export default class ControlComponent extends SceneComponent<WorldScene> {
+
+  private readonly session: WorldSession;
+
   private keys!: Keys;
   private movement!: MovementComponent;
+
+  private prevControl: Vec2;
+
+  constructor(session: WorldSession) {
+    super();
+
+    this.session = session;
+    this.prevControl = {x: 0, y: 0};
+  }
 
   public start(): void {
     this.keys = this.scene.keys;
@@ -18,6 +33,14 @@ export default class ControlComponent extends SceneComponent<WorldScene> {
 
     this.movement.dx = dir.x;
     this.movement.dy = dir.y;
+
+    if (this.prevControl.x === 0 && this.prevControl.y === 0 && dir.x === 0 && dir.y === 0) return;
+
+    this.prevControl = dir;
+
+    this.session.sendObject<Move>(Opcode.CMSG_MOVE, {
+      tick: this.session.tick, dir
+    });
   }
 
   public getVec2Keys(): Vec2 {

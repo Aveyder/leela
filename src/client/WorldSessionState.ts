@@ -16,6 +16,8 @@ export default class WorldSessionState {
   }
 
   public destroy(): void {
-    this.player?.destroy();
+    this.scene.objects.destroy();
+
+    this.player = null;
   }
 }

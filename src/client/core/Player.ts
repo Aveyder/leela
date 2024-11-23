@@ -1,20 +1,21 @@
 import SceneGameObject from "./phaser/SceneGameObject";
 import WorldScene from "../world/WorldScene";
 import ModelComponent from "./ModelComponent";
-import MovementComponent from "./MovementComponent";
+import MovementComponent from "../../core/MovementComponent";
 import ControlComponent from "./ControlComponent";
 import SpriteComponent from "./phaser/SpriteComponent";
+import WorldSession from "../WorldSession";
 
 export default class Player extends SceneGameObject<WorldScene> {
 
-  constructor(scene: WorldScene, guid: number) {
+  constructor(scene: WorldScene, session: WorldSession, guid: number) {
     super(scene, guid);
 
     this.addComponents([
       new SpriteComponent(),
       new ModelComponent(),
-      new MovementComponent(),
-      new ControlComponent(),
+      new MovementComponent(session.config.charSpeed),
+      new ControlComponent(session),
     ]);
   }
 }

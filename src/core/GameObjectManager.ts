@@ -32,6 +32,8 @@ export default class GameObjectManager {
     for(const gameObject of this.gameObjects.values()) {
       this.delete(gameObject);
     }
+
+    this.guid = 0;
   }
 
   public delete(gameObject: GameObject): void {

@@ -34,3 +34,8 @@ export class WorldPacketHandlerFactory {
         return new constructor(this.world);
     }
 }
+
+export class NOOPHandler extends WorldPacketHandler {
+    public handle(session: WorldSession, packet: WorldPacket, delta: number): void {
+    }
+}
