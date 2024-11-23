@@ -26,22 +26,6 @@ export default class WorldSessionScope {
     this.player?.getComponent(ControlComponent).applyControl();
   }
 
-  public handlePlayerCreation(gameObject: GameObjectState): void {
-    if (this.playerGuid !== gameObject.guid || this.player) return;
-
-    const player = new Player(this.scene, this.session, gameObject.guid);
-
-    const model = gameObject.components[ComponentId.MODEL] as ModelDescriptor;
-    player.getComponent(ModelComponent).setModel(model);
-
-    player.x = gameObject.x;
-    player.y = gameObject.y;
-
-    this.scene.objects.add(player);
-
-    this.player = player;
-  }
-
   public destroy(): void {
     this.scene.objects.destroy();
 

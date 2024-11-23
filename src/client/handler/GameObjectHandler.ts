@@ -5,6 +5,6 @@ import GameObjectState from "../../entity/GameObjectState";
 export default class GameObjectHandler extends ObjectHandler<GameObjectState> {
 
     public handleObject(session: WorldSession, gameObject: GameObjectState): void {
-        session.scope.handlePlayerCreation(gameObject);
+        if (gameObject.guid === session.scope.playerGuid) return;
     }
 }

@@ -14,6 +14,9 @@ export default class JoinHandler extends ObjectHandler<Join> {
 
       player.getComponent(ModelComponent).setModel(join.model);
 
+      player.x = Math.random() * 300 + 100;
+      player.y = 150;
+
       this.world.objects.add(player);
 
       session.scope.player = player;
