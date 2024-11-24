@@ -2,7 +2,6 @@ import WorldServer from "../WorldServer";
 import WorldSession from "../WorldSession";
 import Loop from "../utils/Loop";
 import WorldServerConfig from "../WorldServerConfig";
-import GameObjectManager from "../../core/GameObjectManager";
 import WorldPacket from "../../protocol/WorldPacket";
 import { Opcode } from "../../protocol/Opcode";
 import Codec from "../../protocol/Codec";
@@ -14,7 +13,7 @@ export default class World {
     public readonly config: WorldServerConfig;
     public readonly loop: Loop;
     public readonly sessions: Map<string, WorldSession>;
-    public readonly objects: GameObjectManager;
+    public readonly objects: WorldGameObjectManager;
 
     constructor(server: WorldServer) {
         this.server = server;

@@ -81,7 +81,7 @@ export default class WorldScene extends Phaser.Scene {
   }
 
   public createChar(char: GameObject, state: GameObjectState): void {
-    const model = state.components[ComponentId.MODEL] as ModelDescriptor;
+    const model = state.components.get(ComponentId.MODEL) as ModelDescriptor;
     char.getComponent(ModelComponent).setModel(model);
 
     char.x = state.x;

@@ -1,5 +1,5 @@
 import GameObjectState from "./GameObjectState";
 
 export default interface WorldState {
-  gameObjects: GameObjectState[]
+  gameObjects: Map<number, GameObjectState>;
 }
