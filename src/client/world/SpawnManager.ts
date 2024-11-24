@@ -19,10 +19,10 @@ export default class SpawnManager {
     const session = this.scene.session;
 
     let char;
-    if (state.guid === session?.scope.playerGuid) {
-      char = session.scope.player = new Player(this.scene, session, state.guid);
+    if (state.gameObject.guid === session?.scope.playerGuid) {
+      char = session.scope.player = new Player(this.scene, session, state.gameObject.guid);
     } else {
-      char = new Char(this.scene, state.guid);
+      char = new Char(this.scene, state.gameObject.guid);
     }
     this.char(char, state);
   }
@@ -31,8 +31,8 @@ export default class SpawnManager {
     const model = state.components.get(ComponentId.MODEL) as ModelDescriptor;
     char.getComponent(ModelComponent).setModel(model);
 
-    char.x = state.x;
-    char.y = state.y;
+    char.x = state.gameObject.x;
+    char.y = state.gameObject.y;
 
     this.scene.objects.add(char);
   }

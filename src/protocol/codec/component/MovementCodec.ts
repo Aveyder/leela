@@ -2,9 +2,9 @@ import { _ComponentCodec } from "../ComponentCodec";
 import { ComponentData } from "../ComponentSegment";
 import MovementComponent from "../../../core/MovementComponent";
 import MovementSpec from "../../../entity/component/MovementSpec";
-import ModelComponent from "../../../server/core/ModelComponent";
+import diff from "../../../utils/diff";
 
-export default class MovementCodec implements _ComponentCodec<MovementComponent, MovementSpec, object> {
+export default class MovementCodec implements _ComponentCodec<MovementComponent, MovementSpec, Partial<MovementSpec>> {
   map(component: MovementComponent): MovementSpec {
     return {
       dx: component.dx,
@@ -13,8 +13,8 @@ export default class MovementCodec implements _ComponentCodec<MovementComponent,
       vy: component.vy,
     };
   }
-  delta(componentA: MovementComponent, componentB: MovementComponent): object {
-    throw new Error("Method not implemented.");
+  delta(specA: MovementSpec, specB: MovementSpec): Partial<MovementSpec> {
+    return diff(specA, specB);
   }
   encode(spec: MovementComponent): ComponentData {
     return [
@@ -24,8 +24,22 @@ export default class MovementCodec implements _ComponentCodec<MovementComponent,
       spec.vy,
     ];
   }
-  encodeDelta(delta: object): ComponentData {
-    throw new Error("Method not implemented.");
+  encodeDelta(delta: Partial<MovementSpec>): ComponentData {
+    const data = [];
+    if (delta.dx !== undefined) {
+      data.push([0, delta.dx]);
+    }
+    if (delta.dy !== undefined) {
+      data.push([1, delta.dy]);
+    }
+    if (delta.vx !== undefined) {
+      data.push([2, delta.vx]);
+    }
+    if (delta.vy !== undefined) {
+      data.push([3, delta.vy]);
+    }
+
+    return data;
   }
   decode(packet: ComponentData): MovementSpec {
     return {
@@ -35,7 +49,29 @@ export default class MovementCodec implements _ComponentCodec<MovementComponent,
       vy: packet[3] as number,
     };
   }
-  decodeDelta(delta: ComponentData): object {
-    throw new Error("Method not implemented.");
+  decodeDelta(data: ComponentData[]): Partial<MovementSpec> {
+    const spec = {} as Partial<MovementSpec>;
+
+    for (let element of data) {
+      const field = element[0] as number;
+      const value = element[1] as number;
+
+      switch (field) {
+        case 0:
+          spec.dx = value;
+          break;
+        case 1:
+          spec.dy = value;
+          break;
+        case 2:
+          spec.vx = value;
+          break;
+        case 3:
+          spec.vy = value;
+          break;
+      }
+    }
+
+    return spec;
   }
 }

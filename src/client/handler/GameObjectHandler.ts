@@ -4,9 +4,9 @@ import { GameObjectState } from "../../entity/GameObjectState";
 
 export default class GameObjectHandler extends ObjectHandler<GameObjectState> {
 
-    public handleObject(session: WorldSession, gameObject: GameObjectState): void {
-        if (gameObject.guid === session.scope.playerGuid) return;
+    public handleObject(session: WorldSession, state: GameObjectState): void {
+        if (state.gameObject.guid === session.scope.playerGuid) return;
 
-        this.scene.spawn.gameObject(gameObject);
+        this.scene.spawn.gameObject(state);
     }
 }

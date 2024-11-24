@@ -29,9 +29,9 @@ export default class WorldSessionScope {
     if (lastWorldState === null) {
       this.session.sendObject<WorldState>(Opcode.SMSG_WORLD_INIT, this.worldState);
     } else {
-      // const deltaWorldState = DeltaWorldStateCodec.INSTANCE.delta(lastWorldState, this.worldState);
-      //
-      // this.session.sendObject<DeltaWorldState>(Opcode.SMSG_WORLD_UPDATE, deltaWorldState);
+      const deltaWorldState = DeltaWorldStateCodec.INSTANCE.delta(lastWorldState, this.worldState);
+
+      this.session.sendObject<DeltaWorldState>(Opcode.SMSG_WORLD_UPDATE, deltaWorldState);
     }
   }
 

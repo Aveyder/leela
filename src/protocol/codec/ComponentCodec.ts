@@ -6,7 +6,7 @@ import MovementCodec from "./component/MovementCodec";
 
 export interface _ComponentCodec<C extends Component, S, D> {
   map(component: C): S;
-  delta(componentA: C, componentB: C): D;
+  delta(componentA: S, componentB: S): D | null;
   encode(spec: S): ComponentData;
   encodeDelta(delta: D): ComponentData;
   decode(segment: ComponentData): S;
@@ -29,10 +29,10 @@ export default class ComponentCodec {
     return codec.map(component);
   }
 
-  public static delta<C extends Component, S, D>(id: ComponentId, componentA: C, componentB: C): D {
+  public static delta<C extends Component, S, D>(id: ComponentId, specA: S, specB: S): D | null {
     const codec = this.getCodec<C, S, D>(id);
 
-    return codec.delta(componentA, componentB);
+    return codec.delta(specA, specB);
   }
 
   public static encode<S>(id: ComponentId, spec: S): ComponentSegment {

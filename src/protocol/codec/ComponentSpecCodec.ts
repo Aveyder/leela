@@ -23,20 +23,40 @@ export default class ComponentSpecCodec implements SymmetricCodec<ComponentSpec>
 
     return componentSpec;
   }
-  delta(componentSpecA: ComponentSpec, componentSpecB: ComponentSpec): DeltaComponentSpec {
-    return {} as DeltaComponentSpec;
+  delta(componentASpec: ComponentSpec, componentBSpec: ComponentSpec): DeltaComponentSpec {
+    const deltaComponentSpec = new Map() as DeltaComponentSpec;
+    for (const componentId of componentBSpec.keys()) {
+      const componentSpecA = componentASpec.get(componentId);
+      const componentSpecB = componentBSpec.get(componentId)!;
+
+      if (!componentSpecA) continue;
+
+      const delta = ComponentCodec.delta(componentId, componentSpecA, componentSpecB);
+
+      if (delta !== null) {
+        deltaComponentSpec.set(componentId, delta!);
+      }
+    }
+    return deltaComponentSpec as DeltaComponentSpec;
   }
   encode(componentSpec: ComponentSpec): WorldPacketData {
     const data = [] as WorldPacketData;
 
     for (const componentId of componentSpec.keys()) {
-      if (componentId !== undefined) {
-        const componentSegment = ComponentCodec.encode(
-          componentId as unknown as ComponentId, componentSpec.get(componentId)
-        );
+      const componentSegment = ComponentCodec.encode(componentId, componentSpec.get(componentId));
 
-        data.push(componentSegment);
-      }
+      data.push(componentSegment);
+    }
+
+    return data;
+  }
+  encodeDelta(deltaComponentSpec: DeltaComponentSpec): WorldPacketData {
+    const data = [] as WorldPacketData;
+
+    for (const componentId of deltaComponentSpec.keys()) {
+      const componentSegment = ComponentCodec.encodeDelta(componentId, deltaComponentSpec.get(componentId));
+
+      data.push(componentSegment);
     }
 
     return data;
@@ -48,6 +68,15 @@ export default class ComponentSpecCodec implements SymmetricCodec<ComponentSpec>
       componentSpec.set(componentId, ComponentCodec.decode(segment));
 
       return componentSpec;
-    }, new Map<ComponentId, object>() as ComponentSpec);
+    }, new Map() as ComponentSpec);
+  }
+  decodeDelta(deltaComponentSegments: ComponentSegment[]): DeltaComponentSpec {
+    return deltaComponentSegments.reduce((deltaComponentSpec, segment: ComponentSegment) => {
+      const componentId = segment[0];
+
+      deltaComponentSpec.set(componentId, ComponentCodec.decodeDelta(segment));
+
+      return deltaComponentSpec;
+    }, new Map() as DeltaComponentSpec);
   }
 }

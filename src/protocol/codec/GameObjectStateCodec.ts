@@ -4,6 +4,7 @@ import GameObject from "../../core/GameObject";
 import { ComponentSegment } from "./ComponentSegment";
 import ComponentSpecCodec from "./ComponentSpecCodec";
 import { toFixed } from "../../utils/math";
+import diff from "../../utils/diff";
 import { DeltaGameObjectState, GameObjectState } from "../../entity/GameObjectState";
 
 export class GameObjectStateCodec implements SymmetricCodec<GameObjectState> {
@@ -12,23 +13,25 @@ export class GameObjectStateCodec implements SymmetricCodec<GameObjectState> {
 
   map(gameObject: GameObject): GameObjectState {
     return {
-      guid: gameObject.guid,
-      x: gameObject.x,
-      y: gameObject.y,
-      isStatic: gameObject.isStatic,
-      visible: gameObject.visible,
-      active: gameObject.active,
+      gameObject: {
+        guid: gameObject.guid,
+        x: gameObject.x,
+        y: gameObject.y,
+        isStatic: gameObject.isStatic,
+        visible: gameObject.visible,
+        active: gameObject.active,
+      },
       components: ComponentSpecCodec.INSTANCE.map(gameObject.getComponents())
     };
   }
   encode(state: GameObjectState): WorldPacketData {
     return [
-      state.guid,
-      toFixed(state.x, 1),
-      toFixed(state.y, 1),
-      state.isStatic,
-      state.visible,
-      state.active,
+      state.gameObject.guid,
+      toFixed(state.gameObject.x, 1),
+      toFixed(state.gameObject.y, 1),
+      state.gameObject.isStatic,
+      state.gameObject.visible,
+      state.gameObject.active,
       ...ComponentSpecCodec.INSTANCE.encode(state.components)
     ] as WorldPacketData;
   }
@@ -36,12 +39,14 @@ export class GameObjectStateCodec implements SymmetricCodec<GameObjectState> {
     const componentSegments = data.slice(6) as ComponentSegment[];
 
     return {
-      guid: data[0] as number,
-      x: data[1] as number,
-      y: data[2] as number,
-      isStatic: data[3] as boolean,
-      visible: data[4] as boolean,
-      active: data[5] as boolean,
+      gameObject: {
+        guid: data[0] as number,
+        x: data[1] as number,
+        y: data[2] as number,
+        isStatic: data[3] as boolean,
+        visible: data[4] as boolean,
+        active: data[5] as boolean,
+      },
       components: ComponentSpecCodec.INSTANCE.decode(componentSegments)
     };
   }
@@ -51,13 +56,64 @@ export class DeltaGameObjectStateCodec implements SymmetricCodec<DeltaGameObject
 
   public static readonly INSTANCE: DeltaGameObjectStateCodec = new DeltaGameObjectStateCodec();
 
-  delta(gameObjectA: GameObjectState, gameObjectB: GameObjectState): DeltaGameObjectState {
-    return {} as DeltaGameObjectState;
+  delta(stateA: GameObjectState, stateB: GameObjectState): DeltaGameObjectState {
+    return {
+      gameObject: {
+        ...diff(stateA.gameObject, stateB.gameObject)
+      },
+      components: ComponentSpecCodec.INSTANCE.delta(stateA.components, stateB.components)
+    } as DeltaGameObjectState;
   }
   encode(state: DeltaGameObjectState): WorldPacketData {
-    return [];
+    const gameObjectData = [];
+
+    if (state.gameObject.x !== undefined) {
+      gameObjectData.push([0, toFixed(state.gameObject.x, 1)]);
+    }
+    if (state.gameObject.y !== undefined) {
+      gameObjectData.push([1, toFixed(state.gameObject.y, 1)]);
+    }
+    if (state.gameObject.isStatic !== undefined) {
+      gameObjectData.push([2, state.gameObject.isStatic]);
+    }
+    if (state.gameObject.visible !== undefined) {
+      gameObjectData.push([3, state.gameObject.visible]);
+    }
+    if (state.gameObject.active !== undefined) {
+      gameObjectData.push([4, state.gameObject.active]);
+    }
+
+    return [gameObjectData, ComponentSpecCodec.INSTANCE.encodeDelta(state.components)];
   }
-  decode(state: WorldPacketData): DeltaGameObjectState {
-    return {} as DeltaGameObjectState;
+  decode(data: WorldPacketData[]): DeltaGameObjectState {
+    const state = {
+      gameObject: {},
+      components: ComponentSpecCodec.INSTANCE.decodeDelta(data[1] as ComponentSegment[])
+    } as DeltaGameObjectState;
+
+    for (let element of data) {
+      const field = element[0] as number;
+      const value = element[1];
+
+      switch (field) {
+        case 0:
+          state.gameObject.x = value as number;
+          break;
+        case 1:
+          state.gameObject.y = value as number;
+          break;
+        case 2:
+          state.gameObject.isStatic = value as boolean;
+          break;
+        case 3:
+          state.gameObject.visible = value as boolean;
+          break;
+        case 4:
+          state.gameObject.active = value as boolean;
+          break;
+      }
+    }
+
+    return state;
   }
 }

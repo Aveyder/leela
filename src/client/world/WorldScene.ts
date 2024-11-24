@@ -69,13 +69,13 @@ export default class WorldScene extends Phaser.Scene {
   }
 
   public createGameObject(state: GameObjectState): void {
-    if (state.guid === this._session?.scope.playerGuid) {
-      const player = new Player(this, this._session, state.guid);
+    if (state.gameObject.guid === this._session?.scope.playerGuid) {
+      const player = new Player(this, this._session, state.gameObject.guid);
       this.createChar(player, state);
 
       this._session.scope.player = player;
     } else {
-      const char = new Char(this, state.guid);
+      const char = new Char(this, state.gameObject.guid);
       this.createChar(char, state);
     }
   }
@@ -84,8 +84,8 @@ export default class WorldScene extends Phaser.Scene {
     const model = state.components.get(ComponentId.MODEL) as ModelDescriptor;
     char.getComponent(ModelComponent).setModel(model);
 
-    char.x = state.x;
-    char.y = state.y;
+    char.x = state.gameObject.x;
+    char.y = state.gameObject.y;
 
     this.objects.add(char);
   }
