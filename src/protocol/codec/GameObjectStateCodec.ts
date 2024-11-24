@@ -85,13 +85,13 @@ export class DeltaGameObjectStateCodec implements SymmetricCodec<DeltaGameObject
 
     return [gameObjectData, ComponentSpecCodec.INSTANCE.encodeDelta(state.components)];
   }
-  decode(data: WorldPacketData[]): DeltaGameObjectState {
+  decode(data: WorldPacketData[][]): DeltaGameObjectState {
     const state = {
       gameObject: {},
       components: ComponentSpecCodec.INSTANCE.decodeDelta(data[1] as ComponentSegment[])
     } as DeltaGameObjectState;
 
-    for (let element of data) {
+    for (let element of data[0]) {
       const field = element[0] as number;
       const value = element[1];
 

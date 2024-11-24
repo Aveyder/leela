@@ -60,7 +60,7 @@ export class DeltaWorldStateCodec implements SymmetricCodec<DeltaWorldState> {
   decode(data: WorldPacketData[]): DeltaWorldState {
     return {
       gameObjects: data.reduce((acc: Map<number, DeltaGameObjectState>, data: WorldPacketData) => {
-        acc.set(data[0] as number, DeltaGameObjectStateCodec.INSTANCE.decode(data[1] as WorldPacketData[]));
+        acc.set(data[0] as number, DeltaGameObjectStateCodec.INSTANCE.decode(data[1] as WorldPacketData[][]));
 
         return acc;
       }, new Map<number, DeltaGameObjectState>())

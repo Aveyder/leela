@@ -12,7 +12,7 @@ export default class Char extends SceneGameObject<WorldScene> {
     this.addComponents([
       new SpriteComponent(),
       new ModelComponent(),
-      new MovementComponent(scene.config.charSpeed)
+      new MovementComponent(scene.config.charSpeed),
     ]);
   }
 }

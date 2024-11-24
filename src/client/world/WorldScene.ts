@@ -23,6 +23,7 @@ export default class WorldScene extends Phaser.Scene {
   private _config!: WorldClientConfig;
   private _client!: WorldClient;
   private _keys!: Keys;
+  private _clientObjects!: GameObjectManager;
   private _objects!: GameObjectManager;
   private _spawn!: SpawnManager;
 
@@ -47,11 +48,13 @@ export default class WorldScene extends Phaser.Scene {
     const init = new InitService(this);
 
     this._keys = init.keys;
+    this._clientObjects = new GameObjectManager();
     this._objects = new GameObjectManager();
     this._spawn = new SpawnManager(this);
   }
 
   public update(time: number, delta: number): void {
+    this._clientObjects.update(delta / 1000);
     this._objects.update(delta / 1000);
   }
 
@@ -100,6 +103,10 @@ export default class WorldScene extends Phaser.Scene {
 
   public get keys(): Keys {
     return this._keys;
+  }
+
+  public get clientObjects(): GameObjectManager {
+    return this._clientObjects;
   }
 
   public get objects(): GameObjectManager {
