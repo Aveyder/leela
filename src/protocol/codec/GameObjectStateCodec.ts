@@ -4,6 +4,7 @@ import GameObjectState from "../../entity/GameObjectState";
 import GameObject from "../../core/GameObject";
 import { ComponentSegment } from "../ComponentSegment";
 import ComponentSpecCodec from "./ComponentSpecCodec";
+import { toFixed } from "../../utils/math";
 
 export default class GameObjectStateCodec implements _Codec<GameObject, GameObjectState> {
 
@@ -12,8 +13,8 @@ export default class GameObjectStateCodec implements _Codec<GameObject, GameObje
   encode(gameObject: GameObject): WorldPacketData {
     return [
       gameObject.guid,
-      gameObject.x,
-      gameObject.y,
+      toFixed(gameObject.x, 1),
+      toFixed(gameObject.y, 1),
       gameObject.isStatic,
       gameObject.visible,
       gameObject.active,

@@ -6,5 +6,7 @@ export default class GameObjectHandler extends ObjectHandler<GameObjectState> {
 
     public handleObject(session: WorldSession, gameObject: GameObjectState): void {
         if (gameObject.guid === session.scope.playerGuid) return;
+
+        this.scene.spawn.gameObject(gameObject);
     }
 }

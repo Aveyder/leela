@@ -4,11 +4,18 @@ import WorldClient from "../WorldClient";
 import WorldSession from "../WorldSession";
 import { Keys } from "./Keys";
 import InitService from "./InitService";
-import { Model, MODELS } from "../../resource/Model";
+import { Model, ModelDescriptor, MODELS } from "../../resource/Model";
 import GameObjectManager from "../../core/GameObjectManager";
 import { Opcode } from "../../protocol/Opcode";
 import Join from "../../entity/Join";
 import SceneGameObject from "../core/phaser/SceneGameObject";
+import GameObject from "../../core/GameObject";
+import GameObjectState from "../../entity/GameObjectState";
+import { ComponentId } from "../../protocol/ComponentId";
+import ModelComponent from "../core/ModelComponent";
+import Player from "../core/Player";
+import Char from "../core/Char";
+import SpawnManager from "./SpawnManager";
 
 export default class WorldScene extends Phaser.Scene {
 
@@ -18,6 +25,7 @@ export default class WorldScene extends Phaser.Scene {
   private _client!: WorldClient;
   private _keys!: Keys;
   private _objects!: GameObjectManager;
+  private _spawn!: SpawnManager;
 
   private _session: null | WorldSession;
 
@@ -41,6 +49,7 @@ export default class WorldScene extends Phaser.Scene {
 
     this._keys = init.keys;
     this._objects = new GameObjectManager();
+    this._spawn = new SpawnManager(this);
   }
 
   public update(time: number, delta: number): void {
@@ -60,12 +69,26 @@ export default class WorldScene extends Phaser.Scene {
     this._session = null;
   }
 
-  public createObject(): SceneGameObject<WorldScene> {
-    const gameObject = new SceneGameObject(this);
+  public createGameObject(state: GameObjectState): void {
+    if (state.guid === this._session?.scope.playerGuid) {
+      const player = new Player(this, this._session, state.guid);
+      this.createChar(player, state);
 
-    this.objects.add(gameObject);
+      this._session.scope.player = player;
+    } else {
+      const char = new Char(this, state.guid);
+      this.createChar(char, state);
+    }
+  }
 
-    return gameObject;
+  public createChar(char: GameObject, state: GameObjectState): void {
+    const model = state.components[ComponentId.MODEL] as ModelDescriptor;
+    char.getComponent(ModelComponent).setModel(model);
+
+    char.x = state.x;
+    char.y = state.y;
+
+    this.objects.add(char);
   }
 
   public get config(): WorldClientConfig {
@@ -82,6 +105,10 @@ export default class WorldScene extends Phaser.Scene {
 
   public get objects(): GameObjectManager {
     return this._objects;
+  }
+
+  public get spawn(): SpawnManager {
+    return this._spawn;
   }
 
   public get session(): null | WorldSession {

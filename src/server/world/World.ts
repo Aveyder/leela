@@ -7,6 +7,7 @@ import WorldGameObject from "../core/WorldGameObject";
 import WorldPacket from "../../protocol/WorldPacket";
 import { Opcode } from "../../protocol/Opcode";
 import Codec from "../../protocol/Codec";
+import WorldGameObjectManager from "../core/WorldGameObjectManager";
 
 export default class World {
 
@@ -21,7 +22,7 @@ export default class World {
         this.config = server.config;
         this.loop = new Loop();
         this.sessions = new Map();
-        this.objects = new GameObjectManager();
+        this.objects = new WorldGameObjectManager(this);
 
         this.loop.start(delta => this.update(delta), this.config.simulationRate);
     }
@@ -56,13 +57,5 @@ export default class World {
         for(const session of this.sessions.values()) {
             callback(session);
         }
-    }
-
-    public createObject(): WorldGameObject {
-        const gameObject = new WorldGameObject(this);
-
-        this.objects.add(gameObject);
-
-        return gameObject;
     }
 }

@@ -2,6 +2,7 @@ import Component from "../core/Component";
 import { ComponentId } from "./ComponentId";
 import { ComponentData, ComponentSegment } from "./ComponentSegment";
 import ModelCodec from "./codec/component/ModelCodec";
+import MovementCodec from "./codec/component/MovementCodec";
 
 export interface _ComponentCodec<T extends Component> {
   encode(component: T): ComponentData;
@@ -14,7 +15,8 @@ type ComponentCodecMapping = {
 
 export default class ComponentCodec {
   private static readonly _codecs: ComponentCodecMapping = {
-    [ComponentId.MODEL]: new ModelCodec()
+    [ComponentId.MODEL]: new ModelCodec(),
+    [ComponentId.MOVEMENT]: new MovementCodec(),
   }
 
   public static encode<T extends Component>(id: ComponentId, component: T): ComponentSegment {

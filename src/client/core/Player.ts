@@ -14,7 +14,7 @@ export default class Player extends SceneGameObject<WorldScene> {
     this.addComponents([
       new SpriteComponent(),
       new ModelComponent(),
-      new MovementComponent(session.config.charSpeed),
+      new MovementComponent(scene.config.charSpeed),
       new ControlComponent(session),
     ]);
   }

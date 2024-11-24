@@ -31,6 +31,14 @@ export default class GameObjectManager {
     this.guid = 0;
   }
 
+  public deleteByGuid(guid: number): void {
+    const gameObject = this.gameObjects.get(guid);
+
+    if (gameObject) {
+      this.delete(gameObject);
+    }
+  }
+
   public delete(gameObject: GameObject): void {
     gameObject.destroy();
 
