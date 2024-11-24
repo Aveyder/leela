@@ -5,23 +5,24 @@ import { Opcode } from "../../protocol/Opcode";
 import Player from "../core/Player";
 import ModelComponent from "../core/ModelComponent";
 import { WorldSessionStatus } from "../WorldSessionStatus";
-import GameObject from "../../core/GameObject";
 
 export default class JoinHandler extends ObjectHandler<Join> {
 
     public handleObject(session: WorldSession, join: Join): void {
-      const player = new Player(this.world);
+      const guid = this.world.objects.guid();
+
+      const player = new Player(this.world, guid);
 
       player.getComponent(ModelComponent).setModel(join.model);
 
       player.x = Math.random() * 300 + 100;
       player.y = 150;
 
-      this.world.objects.add(player);
-
       session.scope.player = player;
       session.status = WorldSessionStatus.STATUS_JOINED;
 
-      session.sendPacket([Opcode.MSG_JOIN, player.guid]);
+      session.sendPacket([Opcode.MSG_JOIN, guid]);
+
+      this.world.objects.add(player);
     }
 }

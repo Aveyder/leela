@@ -3,7 +3,6 @@ import WorldSession from "../WorldSession";
 import Loop from "../utils/Loop";
 import WorldServerConfig from "../WorldServerConfig";
 import GameObjectManager from "../../core/GameObjectManager";
-import WorldGameObject from "../core/WorldGameObject";
 import WorldPacket from "../../protocol/WorldPacket";
 import { Opcode } from "../../protocol/Opcode";
 import Codec from "../../protocol/Codec";

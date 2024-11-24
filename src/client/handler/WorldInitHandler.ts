@@ -1,10 +1,10 @@
 import WorldSession from "../WorldSession";
 import { ObjectHandler } from "../WorldPacketHandler";
-import EnvInit from "../../entity/EnvInit";
+import WorldState from "../../entity/WorldState";
 
-export default class EnvInitHandler extends ObjectHandler<EnvInit> {
+export default class WorldInitHandler extends ObjectHandler<WorldState> {
 
-    public handleObject(session: WorldSession, envInit: EnvInit): void {
+    public handleObject(session: WorldSession, envInit: WorldState): void {
         for (let gameObject of envInit.gameObjects) {
             this.scene.spawn.gameObject(gameObject);
         }

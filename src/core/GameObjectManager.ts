@@ -2,18 +2,18 @@ import GameObject from "./GameObject";
 
 export default class GameObjectManager {
 
-  private guid: number;
+  private _guid: number;
 
   public readonly gameObjects: Map<number, GameObject>;
 
   constructor() {
-    this.guid = 0;
+    this._guid = 0;
     this.gameObjects = new Map<number, GameObject>();
   }
 
   public add(gameObject: GameObject): void {
     if (gameObject.guid === -1) {
-      gameObject.guid = this.guid++;
+      gameObject.guid = this.guid();
     }
 
     gameObject.init();
@@ -28,7 +28,7 @@ export default class GameObjectManager {
   public destroy(): void {
     this.forEachGameObject((gameObject: GameObject) => this.delete(gameObject));
 
-    this.guid = 0;
+    this._guid = 0;
   }
 
   public deleteByGuid(guid: number): void {
@@ -43,6 +43,10 @@ export default class GameObjectManager {
     gameObject.destroy();
 
     this.gameObjects.delete(gameObject.guid);
+  }
+
+  public guid(): number {
+    return this._guid++;
   }
 
   private forEachGameObject(callback: (gameObject: GameObject) => void): void {

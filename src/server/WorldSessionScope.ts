@@ -2,7 +2,8 @@ import WorldSession from "./WorldSession";
 import World from "./world/World";
 import Player from "./core/Player";
 import { Opcode } from "../protocol/Opcode";
-import GameObject from "../core/GameObject";
+import WorldState from "../entity/WorldState";
+import GameObjectStateCodec from "../protocol/codec/GameObjectStateCodec";
 
 export default class WorldSessionScope {
 
@@ -11,7 +12,7 @@ export default class WorldSessionScope {
 
   public player: Player | null;
 
-  private envInit: boolean;
+  private worldState: WorldState | null;
 
   constructor(session: WorldSession) {
     this.session = session;
@@ -19,18 +20,21 @@ export default class WorldSessionScope {
 
     this.player = null;
 
-    this.envInit = false;
+    this.worldState = null;
   }
 
   public collectUpdate(delta: number): void {
-    if (this.envInit) {
-
-    } else {
+    if (this.worldState === null) {
       const gameObjects = Array.from(this.world.objects.gameObjects.values());
 
-      this.session.sendObject<GameObject[]>(Opcode.SMSG_ENV_INIT, gameObjects);
+      // centralized serialization? and then every session pick the last one?
+      this.worldState = {
+        gameObjects: gameObjects.map(gameObject => GameObjectStateCodec.INSTANCE.map(gameObject))
+      };
 
-      this.envInit = true;
+      this.session.sendObject<WorldState>(Opcode.SMSG_WORLD_INIT, this.worldState);
+    } else {
+
     }
   }
 

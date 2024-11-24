@@ -1,4 +1,4 @@
-import WorldPacketHandler, { NOOPHandler, WorldPacketHandlerFactory } from "./WorldPacketHandler";
+import WorldPacketHandler, { WorldPacketHandlerFactory } from "./WorldPacketHandler";
 import { Opcode } from "../protocol/Opcode";
 import { WorldSessionStatus } from "./WorldSessionStatus";
 import UpdateRateHandler from "./handler/UpdateRateHandler";

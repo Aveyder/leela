@@ -5,8 +5,10 @@ import MovementComponent from "../../core/MovementComponent";
 
 export default class Player extends WorldGameObject {
 
-  constructor(world: World) {
+  constructor(world: World, guid: number) {
     super(world);
+
+    this.guid = guid;
 
     this.addComponents([
       new ModelComponent(),

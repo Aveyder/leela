@@ -3,7 +3,7 @@ import { Opcode } from "./Opcode";
 import MoveCodec from "./codec/MoveCodec";
 import JoinCodec from "./codec/JoinCodec";
 import GameObjectStateCodec from "./codec/GameObjectStateCodec";
-import EnvInitCodec from "./codec/EnvInitCodec";
+import WorldStateCodec from "./codec/WorldStateCodec";
 
 export interface _Codec<I, O> {
   encode(object: I): WorldPacketData;
@@ -20,8 +20,8 @@ export default class Codec {
   private static readonly _codecs: CodecMapping = {
     [Opcode.CMSG_MOVE]: new MoveCodec(),
     [Opcode.MSG_JOIN]: new JoinCodec(),
-    [Opcode.SMSG_ENV_INIT]: new EnvInitCodec(),
-    [Opcode.SMSG_OBJECT]: new GameObjectStateCodec(),
+    [Opcode.SMSG_WORLD_INIT]: new WorldStateCodec(),
+    [Opcode.SMSG_OBJECT]: GameObjectStateCodec.INSTANCE,
   }
 
   public static encode<I, O>(opcode: Opcode, object: I): WorldPacket {

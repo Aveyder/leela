@@ -1,24 +1,36 @@
 import { WorldPacketData } from "../WorldPacket";
-import { _Codec } from "../Codec";
+import { SymmetricCodec } from "../Codec";
 import GameObjectState from "../../entity/GameObjectState";
 import GameObject from "../../core/GameObject";
 import { ComponentSegment } from "../ComponentSegment";
 import ComponentSpecCodec from "./ComponentSpecCodec";
 import { toFixed } from "../../utils/math";
 
-export default class GameObjectStateCodec implements _Codec<GameObject, GameObjectState> {
+export default class GameObjectStateCodec implements SymmetricCodec<GameObjectState> {
 
-  private readonly componentSpecCodec = new ComponentSpecCodec();
+  public static readonly INSTANCE: GameObjectStateCodec = new GameObjectStateCodec();
 
-  encode(gameObject: GameObject): WorldPacketData {
+  map(gameObject: GameObject): GameObjectState {
+    return {
+      guid: gameObject.guid,
+      x: gameObject.x,
+      y: gameObject.y,
+      isStatic: gameObject.isStatic,
+      visible: gameObject.visible,
+      active: gameObject.active,
+      components: ComponentSpecCodec.INSTANCE.map(gameObject.getComponents())
+    };
+  }
+
+  encode(state: GameObjectState): WorldPacketData {
     return [
-      gameObject.guid,
-      toFixed(gameObject.x, 1),
-      toFixed(gameObject.y, 1),
-      gameObject.isStatic,
-      gameObject.visible,
-      gameObject.active,
-      ...this.componentSpecCodec.encode(gameObject)
+      state.guid,
+      toFixed(state.x, 1),
+      toFixed(state.y, 1),
+      state.isStatic,
+      state.visible,
+      state.active,
+      ...ComponentSpecCodec.INSTANCE.encode(state.components)
     ] as WorldPacketData;
   }
   decode(data: WorldPacketData): GameObjectState {
@@ -31,7 +43,7 @@ export default class GameObjectStateCodec implements _Codec<GameObject, GameObje
       isStatic: data[3] as boolean,
       visible: data[4] as boolean,
       active: data[5] as boolean,
-      components: this.componentSpecCodec.decode(componentSegments)
+      components: ComponentSpecCodec.INSTANCE.decode(componentSegments)
     };
   }
 }

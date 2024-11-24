@@ -1,20 +1,37 @@
 import { WorldPacketData } from "../WorldPacket";
-import { _Codec } from "../Codec";
-import GameObject from "../../core/GameObject";
-import { ComponentIdMapping } from "../ComponentId";
+import { SymmetricCodec } from "../Codec";
+import { ComponentId, ComponentIdMapping } from "../ComponentId";
 import ComponentCodec from "../ComponentCodec";
 import { ComponentSegment } from "../ComponentSegment";
 import { ComponentSpec } from "../../entity/ComponentSpec";
+import Component from "../../core/Component";
 
-export default class ComponentSpecCodec implements _Codec<GameObject, ComponentSpec> {
-  encode(gameObject: GameObject): WorldPacketData {
-    const data = [] as WorldPacketData;
+export default class ComponentSpecCodec implements SymmetricCodec<ComponentSpec> {
 
-    for (let component of gameObject.getComponents()) {
+  public static readonly INSTANCE: ComponentSpecCodec = new ComponentSpecCodec();
+
+  map(components: MapIterator<Component>): ComponentSpec {
+    const componentSpec = {} as ComponentSpec;
+
+    for(let component of components) {
       const componentId = ComponentIdMapping.get(component);
 
       if (componentId !== undefined) {
-        const componentSegment = ComponentCodec.encode(componentId, component);
+        componentSpec[componentId] = ComponentCodec.map(componentId, component) as object;
+      }
+    }
+
+    return componentSpec;
+  }
+  encode(componentSpec: ComponentSpec): WorldPacketData {
+    const data = [] as WorldPacketData;
+
+    for (const key in componentSpec) {
+      const componentId = Number(key) as ComponentId;
+      if (componentId !== undefined) {
+        const componentSegment = ComponentCodec.encode(
+          componentId as unknown as ComponentId, componentSpec[componentId]
+        );
 
         data.push(componentSegment);
       }
