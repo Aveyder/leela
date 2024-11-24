@@ -2,8 +2,8 @@ import WorldSession from "./WorldSession";
 import World from "./world/World";
 import Player from "./core/Player";
 import { Opcode } from "../protocol/Opcode";
-import WorldState from "../entity/WorldState";
-import DeltaWorldState from "../entity/DeltaWorldState";
+import { DeltaWorldState, WorldState } from "../entity/WorldState";
+import { DeltaWorldStateCodec } from "../protocol/codec/WorldStateCodec";
 
 export default class WorldSessionScope {
 
@@ -22,13 +22,15 @@ export default class WorldSessionScope {
   }
 
   public collectUpdate(delta: number): void {
-    if (this.worldState === null) {
-      this.worldState = { gameObjects: this.world.objects.state };
+    const lastWorldState = this.worldState;
 
+    this.worldState = { gameObjects: this.world.objects.state };
+
+    if (lastWorldState === null) {
       this.session.sendObject<WorldState>(Opcode.SMSG_WORLD_INIT, this.worldState);
     } else {
-      const deltaWorldState = {} as DeltaWorldState;
-
+      // const deltaWorldState = DeltaWorldStateCodec.INSTANCE.delta(lastWorldState, this.worldState);
+      //
       // this.session.sendObject<DeltaWorldState>(Opcode.SMSG_WORLD_UPDATE, deltaWorldState);
     }
   }

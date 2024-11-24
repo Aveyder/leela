@@ -1,6 +1,10 @@
 import GameObjectSpec from "./GameObjectSpec";
-import { ComponentSpec } from "./ComponentSpec";
+import { ComponentSpec, DeltaComponentSpec } from "./ComponentSpec";
 
-export default interface GameObjectState extends GameObjectSpec {
+export interface GameObjectState extends GameObjectSpec {
   components: ComponentSpec;
+}
+
+export interface DeltaGameObjectState extends Partial<GameObjectSpec> {
+  components: DeltaComponentSpec;
 }

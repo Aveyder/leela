@@ -1,11 +1,11 @@
 import { ModelDescriptor } from "../../resource/Model";
 import GameObject from "../../core/GameObject";
-import GameObjectState from "../../entity/GameObjectState";
-import { ComponentId } from "../../protocol/ComponentId";
+import { ComponentId } from "../../protocol/codec/ComponentId";
 import ModelComponent from "../core/ModelComponent";
 import Player from "../core/Player";
 import Char from "../core/Char";
 import WorldScene from "./WorldScene";
+import { GameObjectState } from "../../entity/GameObjectState";
 
 export default class SpawnManager {
 

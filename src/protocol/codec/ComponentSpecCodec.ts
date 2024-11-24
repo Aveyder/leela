@@ -1,9 +1,9 @@
 import { WorldPacketData } from "../WorldPacket";
 import { SymmetricCodec } from "../Codec";
-import { ComponentId, ComponentIdMapping } from "../ComponentId";
-import ComponentCodec from "../ComponentCodec";
-import { ComponentSegment } from "../ComponentSegment";
-import { ComponentSpec } from "../../entity/ComponentSpec";
+import { ComponentId, ComponentIdMapping } from "./ComponentId";
+import ComponentCodec from "./ComponentCodec";
+import { ComponentSegment } from "./ComponentSegment";
+import { ComponentSpec, DeltaComponentSpec } from "../../entity/ComponentSpec";
 import Component from "../../core/Component";
 
 export default class ComponentSpecCodec implements SymmetricCodec<ComponentSpec> {
@@ -22,6 +22,9 @@ export default class ComponentSpecCodec implements SymmetricCodec<ComponentSpec>
     }
 
     return componentSpec;
+  }
+  delta(componentSpecA: ComponentSpec, componentSpecB: ComponentSpec): DeltaComponentSpec {
+    return {} as DeltaComponentSpec;
   }
   encode(componentSpec: ComponentSpec): WorldPacketData {
     const data = [] as WorldPacketData;

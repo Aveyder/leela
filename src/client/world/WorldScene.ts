@@ -9,12 +9,12 @@ import GameObjectManager from "../../core/GameObjectManager";
 import { Opcode } from "../../protocol/Opcode";
 import Join from "../../entity/Join";
 import GameObject from "../../core/GameObject";
-import GameObjectState from "../../entity/GameObjectState";
-import { ComponentId } from "../../protocol/ComponentId";
+import { ComponentId } from "../../protocol/codec/ComponentId";
 import ModelComponent from "../core/ModelComponent";
 import Player from "../core/Player";
 import Char from "../core/Char";
 import SpawnManager from "./SpawnManager";
+import { GameObjectState } from "../../entity/GameObjectState";
 
 export default class WorldScene extends Phaser.Scene {
 

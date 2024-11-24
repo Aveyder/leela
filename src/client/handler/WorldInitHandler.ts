@@ -1,6 +1,6 @@
 import WorldSession from "../WorldSession";
 import { ObjectHandler } from "../WorldPacketHandler";
-import WorldState from "../../entity/WorldState";
+import { WorldState } from "../../entity/WorldState";
 
 export default class WorldInitHandler extends ObjectHandler<WorldState> {
 

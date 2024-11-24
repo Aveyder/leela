@@ -1,10 +1,10 @@
 import { WorldPacketData } from "../WorldPacket";
 import { SymmetricCodec } from "../Codec";
-import WorldState from "../../entity/WorldState";
-import GameObjectStateCodec from "./GameObjectStateCodec";
-import GameObjectState from "../../entity/GameObjectState";
+import { GameObjectStateCodec } from "./GameObjectStateCodec";
+import { DeltaWorldState, WorldState } from "../../entity/WorldState";
+import { GameObjectState } from "../../entity/GameObjectState";
 
-export default class WorldStateCodec implements SymmetricCodec<WorldState> {
+export class WorldStateCodec implements SymmetricCodec<WorldState> {
 
   encode(worldState: WorldState): WorldPacketData {
     return Array.from(worldState.gameObjects.values()).map(
@@ -19,5 +19,20 @@ export default class WorldStateCodec implements SymmetricCodec<WorldState> {
         return acc;
       }, new Map<number, GameObjectState>())
     };
+  }
+}
+
+export class DeltaWorldStateCodec implements SymmetricCodec<DeltaWorldState> {
+
+  public static readonly INSTANCE: DeltaWorldStateCodec = new DeltaWorldStateCodec();
+
+  delta(worldStateA: WorldState, worldStateB: WorldState): DeltaWorldState {
+    return {} as DeltaWorldState;
+  }
+  encode(worldState: DeltaWorldState): WorldPacketData {
+    return [];
+  }
+  decode(data: WorldPacketData[]): DeltaWorldState {
+    return {} as DeltaWorldState;
   }
 }

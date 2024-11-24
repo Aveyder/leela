@@ -1,6 +1,6 @@
-import ModelComponent from "../server/core/ModelComponent";
-import Component from "../core/Component";
-import MovementComponent from "../core/MovementComponent";
+import ModelComponent from "../../server/core/ModelComponent";
+import Component from "../../core/Component";
+import MovementComponent from "../../core/MovementComponent";
 
 export enum ComponentId {
   MODEL,

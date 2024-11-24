@@ -2,10 +2,8 @@ import GameObjectManager from "../../core/GameObjectManager";
 import GameObject from "../../core/GameObject";
 import World from "../world/World";
 import { Opcode } from "../../protocol/Opcode";
-import GameObjectState from "../../entity/GameObjectState";
-import GameObjectStateCodec from "../../protocol/codec/GameObjectStateCodec";
-import WorldState from "../../entity/WorldState";
-import GameObjectSpec from "../../entity/GameObjectSpec";
+import { GameObjectStateCodec } from "../../protocol/codec/GameObjectStateCodec";
+import { GameObjectState } from "../../entity/GameObjectState";
 
 export default class WorldGameObjectManager extends GameObjectManager {
 

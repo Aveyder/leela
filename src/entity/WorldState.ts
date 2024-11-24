@@ -1,5 +1,9 @@
-import GameObjectState from "./GameObjectState";
+import { DeltaGameObjectState, GameObjectState } from "./GameObjectState";
 
-export default interface WorldState {
+export interface WorldState {
   gameObjects: Map<number, GameObjectState>;
+}
+
+export interface DeltaWorldState {
+  gameObjects: Map<number, DeltaGameObjectState>;
 }
