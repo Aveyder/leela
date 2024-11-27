@@ -11,6 +11,10 @@ export default class GameObjectManagerAdapter {
     this.gameObjects = new Map<number, GameObject>();
   }
 
+  public get(serverGuid: number): GameObject | undefined {
+    return this.gameObjects.get(serverGuid);
+  }
+
   public add(serverGuid: number, gameObject: GameObject): GameObject {
     this.gameObjects.set(serverGuid, gameObject);
 
@@ -18,7 +22,7 @@ export default class GameObjectManagerAdapter {
   }
 
   public deleteByGuid(serverGuid: number): void {
-    const gameObject = this.gameObjects.get(serverGuid);
+    const gameObject = this.get(serverGuid);
 
     if (gameObject) {
       this.objects.delete(gameObject);

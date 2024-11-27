@@ -4,6 +4,7 @@ import Player from "./core/Player";
 import ControlComponent from "./core/ControlComponent";
 import SpawnManager from "./world/SpawnManager";
 import GameObjectManagerAdapter from "./core/GameObjectManagerAdapter";
+import { GameObjectState } from "../entity/GameObjectState";
 
 export default class WorldSessionScope {
   public readonly session: WorldSession;
@@ -34,5 +35,9 @@ export default class WorldSessionScope {
     this.scene.objects.destroy();
 
     this.player = null;
+  }
+
+  public isPlayer(state: GameObjectState) {
+    return state.gameObject.guid === this.playerGuid;
   }
 }
