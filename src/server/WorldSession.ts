@@ -7,6 +7,7 @@ import WorldServer from "./WorldServer";
 import { WorldSessionStatus } from "./WorldSessionStatus";
 import Codec from "../protocol/Codec";
 import WorldSessionScope from "./WorldSessionScope";
+import OpcodeTable from "./OpcodeTable";
 
 export default class WorldSession {
 
@@ -15,6 +16,7 @@ export default class WorldSession {
     private readonly config: WorldServerConfig;
 
     public readonly scope: WorldSessionScope;
+    private readonly opcodeTable: OpcodeTable;
 
     public status: null | WorldSessionStatus;
     public latency: number;
@@ -29,6 +31,7 @@ export default class WorldSession {
         this.config = this.server.config;
 
         this.scope = new WorldSessionScope(this);
+        this.opcodeTable = new OpcodeTable(this);
 
         this.status = WorldSessionStatus.STATUS_AUTHED;
         this.latency = -1;
@@ -38,8 +41,16 @@ export default class WorldSession {
         this.resetUpdateLoop(this.config.serverUpdateRate);
     }
 
-    public queuePacket(packet: WorldPacket): void {
+    public queuePacket(packet: WorldPacket): boolean {
+        const opcode = packet[0];
+
+        const sessionStatus = this.opcodeTable.getSessionStatus(opcode);
+
+        if (this.status != sessionStatus) return false;
+
         this.recvQueue.push(packet);
+
+        return true;
     }
 
     public sendObject<T>(opcode: Opcode, object: T): void {
@@ -47,16 +58,16 @@ export default class WorldSession {
     }
 
     public sendPacket(packet: WorldPacket): void {
-        this.socket!.sendPacket(packet, false);
+        this.socket.sendPacket(packet, false);
     }
 
     public handleQueuedPackets(delta: number): void {
         this.recvQueue.forEach(packet => {
             const opcode = packet[0] as Opcode;
 
-            const handler = this.socket.opcodeTable.getHandler(opcode);
+            const handler = this.opcodeTable.getHandler(opcode);
 
-            handler.handle(this, packet, delta);
+            handler.handle(packet, delta);
         });
         this.recvQueue.length = 0;
     }
@@ -84,7 +95,7 @@ export default class WorldSession {
     private sendUpdate(delta: number): void {
         this.scope.collectUpdate(delta);
 
-        this.socket!.sendBufferedPackets();
+        this.socket.sendBufferedPackets();
     }
 
     private calcTickrate(tickrate: number) {

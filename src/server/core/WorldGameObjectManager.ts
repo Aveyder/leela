@@ -16,10 +16,12 @@ export default class WorldGameObjectManager extends GameObjectManager {
     this._state = new Map();
   }
 
-  public add(gameObject: GameObject): void {
-    super.add(gameObject);
+  public add(gameObject: GameObject): GameObject {
+    const createdGameObject = super.add(gameObject);
 
-    this.world.broadcastObject<GameObjectState>(Opcode.SMSG_OBJECT, GameObjectStateCodec.INSTANCE.map(gameObject));
+    this.world.broadcastObject<GameObjectState>(Opcode.SMSG_OBJECT, GameObjectStateCodec.INSTANCE.map(createdGameObject));
+
+    return createdGameObject;
   }
 
   update(delta: number) {

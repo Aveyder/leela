@@ -3,8 +3,6 @@ import { SymmetricCodec } from "../Codec";
 import { DeltaGameObjectStateCodec, GameObjectStateCodec } from "./GameObjectStateCodec";
 import { DeltaWorldState, WorldState } from "../../entity/WorldState";
 import { DeltaGameObjectState, GameObjectState } from "../../entity/GameObjectState";
-import { DeltaComponentSpec } from "../../entity/ComponentSpec";
-import ComponentCodec from "./ComponentCodec";
 
 export class WorldStateCodec implements SymmetricCodec<WorldState> {
 

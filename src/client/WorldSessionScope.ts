@@ -2,6 +2,8 @@ import WorldScene from "./world/WorldScene";
 import WorldSession from "./WorldSession";
 import Player from "./core/Player";
 import ControlComponent from "./core/ControlComponent";
+import SpawnManager from "./world/SpawnManager";
+import GameObjectManagerAdapter from "./core/GameObjectManagerAdapter";
 
 export default class WorldSessionScope {
   public readonly session: WorldSession;
@@ -10,12 +12,18 @@ export default class WorldSessionScope {
   public playerGuid: number;
   public player: Player | null;
 
+  public readonly objects: GameObjectManagerAdapter;
+  public readonly spawn: SpawnManager;
+
   constructor(session: WorldSession) {
     this.session = session;
     this.scene = session.scene!;
 
     this.playerGuid = -1;
     this.player = null;
+
+    this.objects = new GameObjectManagerAdapter(this.scene.objects);
+    this.spawn = new SpawnManager(this);
   }
 
   public simulate(delta: number) {

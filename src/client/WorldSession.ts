@@ -9,7 +9,7 @@ import WorldSessionScope from "./WorldSessionScope";
 
 export default class WorldSession {
 
-  private _socket: null | WorldSocket;
+  public readonly socket: WorldSocket;
   public readonly config: WorldClientConfig;
 
   private readonly opcodeTable: OpcodeTable;
@@ -26,12 +26,12 @@ export default class WorldSession {
   private _tick: number;
 
   constructor(socket: WorldSocket) {
-    this._socket = socket;
+    this.socket = socket;
     this.config = socket.config;
 
-    this.opcodeTable = new OpcodeTable(this._socket.scene);
-
     this.scope = new WorldSessionScope(this);
+
+    this.opcodeTable = new OpcodeTable(this);
 
     this._pingStart = null;
     this.latency = -1;
@@ -50,7 +50,7 @@ export default class WorldSession {
   }
 
   public sendPacket(packet: WorldPacket): void {
-    this._socket!.sendPacket(packet, !this.config.clientCmdLoop);
+    this.socket.sendPacket(packet, !this.config.clientCmdLoop);
   }
 
   public recvPacket(packet: WorldPacket): void {
@@ -58,14 +58,14 @@ export default class WorldSession {
 
     const handler = this.opcodeTable.getHandler(opcode);
 
-    handler.handle(this, packet);
+    handler.handle(packet);
   }
 
   private initCmdLoop(): Loop {
     const cmdLoop= new Loop();
 
     cmdLoop.start(
-      () => this._socket!.sendBufferedPackets(),
+      () => this.socket.sendBufferedPackets(),
       this.config.clientCmdRate < 0 ? this.config.simulationRate : this.config.clientCmdRate
     );
 
@@ -93,14 +93,12 @@ export default class WorldSession {
     return setInterval(() => {
       this._pingStart = Date.now();
 
-      this._socket!.sendPacket([Opcode.CMSG_PING, this.latency], true);
+      this.socket.sendPacket([Opcode.CMSG_PING, this.latency], true);
     }, this.config.pingIntervalMs) as unknown as number;
   }
 
   public destroy(): void {
     this.scope.destroy();
-
-    this._socket = null;
 
     this.cmdLoop.stop();
     this.simulationLoop.stop();
@@ -111,11 +109,7 @@ export default class WorldSession {
   }
 
   public get scene() {
-    return this._socket?.scene;
-  }
-
-  public get socket() {
-    return this._socket;
+    return this.socket.scene;
   }
 
   public get tick() {

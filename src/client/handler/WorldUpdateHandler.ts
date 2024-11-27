@@ -1,10 +1,9 @@
-import WorldSession from "../WorldSession";
 import { ObjectHandler } from "../WorldPacketHandler";
 import { DeltaWorldState } from "../../entity/WorldState";
 
 export default class WorldUpdateHandler extends ObjectHandler<DeltaWorldState> {
 
-    public handleObject(session: WorldSession, deltaWorldState: DeltaWorldState): void {
+    public handleObject(deltaWorldState: DeltaWorldState): void {
         for (const guid of deltaWorldState.gameObjects.keys()) {
             const deltaGameObjectState = deltaWorldState.gameObjects.get(guid)!;
 

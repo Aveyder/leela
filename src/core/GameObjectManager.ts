@@ -11,7 +11,7 @@ export default class GameObjectManager {
     this.gameObjects = new Map<number, GameObject>();
   }
 
-  public add(gameObject: GameObject): void {
+  public add(gameObject: GameObject): GameObject {
     if (gameObject.guid === -1) {
       gameObject.guid = this.guid();
     }
@@ -19,6 +19,8 @@ export default class GameObjectManager {
     gameObject.init();
 
     this.gameObjects.set(gameObject.guid, gameObject);
+
+    return gameObject;
   }
 
   public update(delta: number): void {

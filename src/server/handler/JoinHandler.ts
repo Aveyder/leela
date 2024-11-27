@@ -1,4 +1,3 @@
-import WorldSession from "../WorldSession";
 import { ObjectHandler } from "../WorldPacketHandler";
 import Join from "../../entity/Join";
 import { Opcode } from "../../protocol/Opcode";
@@ -7,8 +6,7 @@ import ModelComponent from "../core/ModelComponent";
 import { WorldSessionStatus } from "../WorldSessionStatus";
 
 export default class JoinHandler extends ObjectHandler<Join> {
-
-    public handleObject(session: WorldSession, join: Join): void {
+    public handleObject(join: Join): void {
       const guid = this.world.objects.guid();
 
       const player = new Player(this.world, guid);
@@ -18,10 +16,10 @@ export default class JoinHandler extends ObjectHandler<Join> {
       player.x = Math.random() * 300 + 100;
       player.y = 150;
 
-      session.scope.player = player;
-      session.status = WorldSessionStatus.STATUS_JOINED;
+      this.scope.player = player;
+      this.session.status = WorldSessionStatus.STATUS_JOINED;
 
-      session.sendPacket([Opcode.MSG_JOIN, guid]);
+      this.session.sendPacket([Opcode.MSG_JOIN, guid]);
 
       this.world.objects.add(player);
     }

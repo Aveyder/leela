@@ -3,16 +3,18 @@ import WorldScene from "../world/WorldScene";
 import ModelComponent from "./ModelComponent";
 import SpriteComponent from "./phaser/SpriteComponent";
 import MovementComponent from "../../core/MovementComponent";
+import ServerComponent from "./ServerComponent";
 
 export default class Char extends SceneGameObject<WorldScene> {
 
-  constructor(scene: WorldScene, guid: number) {
-    super(scene, guid);
+  constructor(scene: WorldScene) {
+    super(scene);
 
     this.addComponents([
       new SpriteComponent(),
       new ModelComponent(),
       new MovementComponent(scene.config.charSpeed),
+      new ServerComponent()
     ]);
   }
 }

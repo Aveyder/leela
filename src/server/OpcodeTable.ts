@@ -2,16 +2,16 @@ import WorldPacketHandler, { WorldPacketHandlerFactory } from "./WorldPacketHand
 import { Opcode } from "../protocol/Opcode";
 import { WorldSessionStatus } from "./WorldSessionStatus";
 import UpdateRateHandler from "./handler/UpdateRateHandler";
-import World from "./world/World";
 import JoinHandler from "./handler/JoinHandler";
 import MoveHandler from "./handler/MoveHandler";
+import WorldSession from "./WorldSession";
 
 export default class OpcodeTable {
 
   private readonly _table: [WorldSessionStatus, WorldPacketHandler][] = [];
 
-  constructor(world: World) {
-    const _ = new WorldPacketHandlerFactory(world);
+  constructor(session: WorldSession) {
+    const _ = new WorldPacketHandlerFactory(session);
 
     this.define(Opcode.CMSG_UPDATE_RATE, WorldSessionStatus.STATUS_AUTHED, _.handler(UpdateRateHandler));
     this.define(Opcode.MSG_JOIN, WorldSessionStatus.STATUS_AUTHED, _.handler(JoinHandler));

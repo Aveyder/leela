@@ -6,34 +6,43 @@ import Player from "../core/Player";
 import Char from "../core/Char";
 import WorldScene from "./WorldScene";
 import { GameObjectState } from "../../entity/GameObjectState";
+import WorldSession from "../WorldSession";
+import GameObjectManagerAdapter from "../core/GameObjectManagerAdapter";
+import WorldSessionScope from "../WorldSessionScope";
 
 export default class SpawnManager {
 
+  private readonly scope: WorldSessionScope;
+  private readonly session: WorldSession;
   private readonly scene: WorldScene;
 
-  constructor(scene: WorldScene) {
-    this.scene = scene;
+  private readonly objects: GameObjectManagerAdapter;
+
+  constructor(scope: WorldSessionScope) {
+    this.scope = scope;
+    this.session = scope.session;
+    this.scene = scope.scene;
+    this.objects = scope.objects;
   }
 
-  public gameObject(state: GameObjectState): void {
-    const session = this.scene.session;
-
+  public gameObject(state: GameObjectState): GameObject {
     let char;
-    if (state.gameObject.guid === session?.scope.playerGuid) {
-      char = session.scope.player = new Player(this.scene, session, state.gameObject.guid);
+    if (state.gameObject.guid === this.scope.playerGuid) {
+      char = this.scope.player = new Player(this.scene, this.session);
     } else {
-      char = new Char(this.scene, state.gameObject.guid);
+      char = new Char(this.scene);
     }
-    this.char(char, state);
+
+    return this.char(char, state);
   }
 
-  public char(char: GameObject, state: GameObjectState): void {
+  public char(char: GameObject, state: GameObjectState): GameObject {
     const model = state.components.get(ComponentId.MODEL) as ModelDescriptor;
     char.getComponent(ModelComponent).setModel(model);
 
     char.x = state.gameObject.x;
     char.y = state.gameObject.y;
 
-    this.scene.objects.add(char);
+    return this.objects.add(state.gameObject.guid, char);
   }
 }

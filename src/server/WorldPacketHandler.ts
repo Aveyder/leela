@@ -3,39 +3,44 @@ import WorldPacket from "../protocol/WorldPacket";
 import Codec from "../protocol/Codec";
 import World from "./world/World";
 import { Constructor } from "../utils/Constructor";
+import WorldSessionScope from "./WorldSessionScope";
 
 export default abstract class WorldPacketHandler {
+    protected readonly session: WorldSession;
+    protected readonly scope: WorldSessionScope;
     protected readonly world: World;
 
-    public constructor(world: World) {
-        this.world = world;
+    public constructor(session: WorldSession) {
+        this.session = session;
+        this.scope = session.scope;
+        this.world = session.scope.world;
     }
 
-    public abstract handle(session: WorldSession, packet: WorldPacket, delta: number): void;
+    public abstract handle(packet: WorldPacket, delta: number): void;
 }
 
 export abstract class ObjectHandler<T> extends WorldPacketHandler {
 
-    public handle = (session: WorldSession, packet: WorldPacket, delta: number): void => {
-        this.handleObject(session, Codec.decode(packet), delta);
+    public handle = (packet: WorldPacket, delta: number): void => {
+        this.handleObject(Codec.decode(packet), delta);
     }
 
-    public abstract handleObject(session: WorldSession, object: T, delta: number): void;
+    public abstract handleObject(object: T, delta: number): void;
 }
 
 export class WorldPacketHandlerFactory {
-    private readonly world: World;
+    private readonly session: WorldSession;
 
-    constructor(world: World) {
-        this.world = world;
+    constructor(session: WorldSession) {
+        this.session = session;
     }
 
     public handler<T extends WorldPacketHandler>(constructor: Constructor<T>): T {
-        return new constructor(this.world);
+        return new constructor(this.session);
     }
 }
 
 export class NOOPHandler extends WorldPacketHandler {
-    public handle(session: WorldSession, packet: WorldPacket, delta: number): void {
+    public handle(packet: WorldPacket, delta: number): void {
     }
 }
