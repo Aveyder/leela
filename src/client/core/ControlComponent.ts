@@ -6,6 +6,7 @@ import WorldScene from "../world/WorldScene";
 import WorldSession from "../WorldSession";
 import { Opcode } from "../../protocol/Opcode";
 import Move from "../../entity/Move";
+import ModelComponent from "./ModelComponent";
 
 export default class ControlComponent extends SceneComponent<WorldScene> {
 
@@ -13,6 +14,7 @@ export default class ControlComponent extends SceneComponent<WorldScene> {
 
   private keys!: Keys;
   private movement!: MovementComponent;
+  private model!: ModelComponent;
 
   private prevControl: Vec2;
 
@@ -26,13 +28,16 @@ export default class ControlComponent extends SceneComponent<WorldScene> {
   public start(): void {
     this.keys = this.scene.keys;
     this.movement = this.gameObject.getComponent(MovementComponent);
+    this.model = this.gameObject.getComponent(ModelComponent);
   }
 
   public applyControl(): void {
     const dir = this.getVec2Keys();
 
-    this.movement.dx = dir.x;
-    this.movement.dy = dir.y;
+    // this.movement.dx = dir.x;
+    // this.movement.dy = dir.y;
+
+    this.model.setDirection(dir.x, dir.y);
 
     if (this.prevControl.x === 0 && this.prevControl.y === 0 && dir.x === 0 && dir.y === 0) return;
 

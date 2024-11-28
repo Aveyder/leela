@@ -12,6 +12,11 @@ export default class WorldUpdateHandler extends ObjectHandler<WorldStateDelta> {
 
       const gameObject = this.scope.objects.get(guid)!;
 
+      if (!gameObject) {
+        console.warn(`Received an update for a game object with GUID ${guid}, but this game object does not exist in the world.`);
+        return;
+      }
+
       const serverComponent = gameObject.getComponent(ServerComponent);
       serverComponent.addStateDelta(worldStateDelta.timestamp, stateDelta);
     }

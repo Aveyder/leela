@@ -3,6 +3,7 @@ import WorldScene from "../world/WorldScene";
 import ModelComponent from "./ModelComponent";
 import SpriteComponent from "./phaser/SpriteComponent";
 import MovementComponent from "../../core/MovementComponent";
+import ServerControlComponent from "./ServerControlComponent";
 
 export default class Char extends SceneGameObject<WorldScene> {
 
@@ -13,6 +14,7 @@ export default class Char extends SceneGameObject<WorldScene> {
       new SpriteComponent(),
       new ModelComponent(),
       new MovementComponent(scene.config.charSpeed),
+      new ServerControlComponent(),
     ]);
   }
 }

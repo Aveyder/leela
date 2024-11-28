@@ -25,6 +25,10 @@ export default class ServerComponent extends Component {
     this.states = [];
   }
 
+  public getLastState(): GameObjectState {
+    return this.states[this.states.length - 1].state;
+  }
+
   public addState(timestamp: number, state: GameObjectState): void {
     this.states.push({timestamp, state});
 
@@ -34,9 +38,7 @@ export default class ServerComponent extends Component {
   }
 
   public addStateDelta(timestamp: number, stateDelta: GameObjectStateDelta): void {
-    const prevState = this.states[this.states.length - 1].state;
-
-    const state = this.cloneState(prevState);
+    const state = this.cloneState(this.getLastState());
 
     if (stateDelta.gameObject.x !== undefined) {
       state.gameObject.x = stateDelta.gameObject.x;

@@ -5,6 +5,7 @@ import MovementComponent from "../../core/MovementComponent";
 import ControlComponent from "./ControlComponent";
 import SpriteComponent from "./phaser/SpriteComponent";
 import WorldSession from "../WorldSession";
+import ServerControlComponent from "./ServerControlComponent";
 
 export default class Player extends SceneGameObject<WorldScene> {
 
@@ -15,7 +16,8 @@ export default class Player extends SceneGameObject<WorldScene> {
       new SpriteComponent(),
       new ModelComponent(),
       new MovementComponent(scene.config.charSpeed),
-      new ControlComponent(session)
+      new ControlComponent(session),
+      new ServerControlComponent(),
     ]);
   }
 }

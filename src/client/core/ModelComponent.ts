@@ -7,7 +7,6 @@ import Sprite = Phaser.GameObjects.Sprite;
 export default class ModelComponent extends Component {
 
   private sprite!: Sprite;
-  private movement!: MovementComponent;
   private _model: ModelDescriptor;
 
   constructor() {
@@ -22,14 +21,11 @@ export default class ModelComponent extends Component {
 
   public start(): void {
     this.sprite = this.gameObject.getComponent(SpriteComponent).sprite;
-    this.movement = this.gameObject.getComponent(MovementComponent);
 
     this.setModel(this._model);
   }
 
-  public lateUpdate(delta: number): void {
-    const dx = this.movement.dx;
-    const dy = this.movement.dy;
+  public setDirection(dx: number, dy: number) {
     if (dx === 0 && dy === 0) {
       this.stay();
     } else {
@@ -47,12 +43,12 @@ export default class ModelComponent extends Component {
     this.sprite.play(model.anim.down);
   }
 
-  private stay(): void {
+  public stay(): void {
     this.sprite!.anims.pause();
     this.sprite!.setFrame(1);
   }
 
-  private walk(dx: number, dy: number): void {
+  public walk(dx: number, dy: number): void {
     const walkAnim = this.getWalkAnim(dx, dy);
 
     const sprite = this.sprite!;
