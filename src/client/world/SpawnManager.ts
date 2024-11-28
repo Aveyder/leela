@@ -31,24 +31,28 @@ export default class SpawnManager {
     this.objects = scope.objects;
   }
 
-  public gameObject(timestamp: number, state: GameObjectState): GameObject {
+  public gameObject(timestamp: number, state: GameObjectState): void {
+    const serverGuid = state.gameObject.guid;
+
+    if (this.objects.get(serverGuid)) return;
+
     let gameObject;
-    if (state.gameObject.guid === this.scope.playerGuid) {
-      gameObject = this.scope.player = new Player(this.scene, this.session);
+    if (serverGuid === this.scope.playerGuid) {
+      gameObject = new Player(this.scene, this.session);
+
+      this.scope.player = gameObject;
     } else {
       gameObject = new Char(this.scene);
     }
 
-    const serverComponent = new ServerComponent(
-      state.gameObject.guid, this.config.clientStateBufferSize
-    );
-    serverComponent.addState(timestamp, state);
-
-    gameObject.addComponent(serverComponent);
-
     gameObject.x = state.gameObject.x;
     gameObject.y = state.gameObject.y;
 
-    return this.objects.add(state.gameObject.guid, gameObject);
+    gameObject.addComponent(new ServerComponent(
+      serverGuid, this.config.clientStateBufferSize
+    ));
+    gameObject.getComponent(ServerComponent).addState(timestamp, state);
+
+    this.objects.add(serverGuid, gameObject);
   }
 }

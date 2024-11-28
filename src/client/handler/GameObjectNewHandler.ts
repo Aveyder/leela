@@ -7,8 +7,6 @@ export default class GameObjectNewHandler extends ObjectHandler<GameObjectNew> {
 
     const state = gameObjectNew.state;
 
-    if (!this.scope.isPlayer(state)) {
-      this.scope.spawn.gameObject(gameObjectNew.timestamp, state);
-    }
+    this.scope.spawn.gameObject(gameObjectNew.timestamp, state);
   }
 }
