@@ -57,10 +57,9 @@ export class DeltaGameObjectStateCodec implements SymmetricCodec<DeltaGameObject
   public static readonly INSTANCE: DeltaGameObjectStateCodec = new DeltaGameObjectStateCodec();
 
   delta(stateA: GameObjectState, stateB: GameObjectState): DeltaGameObjectState {
+    const gameObjectDelta = diff(stateA.gameObject, stateB.gameObject)
     return {
-      gameObject: {
-        ...diff(stateA.gameObject, stateB.gameObject)
-      },
+      gameObject: gameObjectDelta ? gameObjectDelta : {},
       components: ComponentSpecCodec.INSTANCE.delta(stateA.components, stateB.components)
     } as DeltaGameObjectState;
   }

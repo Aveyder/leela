@@ -74,7 +74,7 @@ export default class WorldSocket {
                 if (!this.session) {
                     this.createSession();
 
-                    this.sendPacket([Opcode.SMSG_AUTH_SUCCESS], true);
+                    this.sendPacket([Opcode.SMSG_AUTH_SUCCESS, this.server.startTime], true);
 
                     return true;
                 }

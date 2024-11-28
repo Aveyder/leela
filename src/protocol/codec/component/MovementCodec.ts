@@ -13,7 +13,7 @@ export default class MovementCodec implements _ComponentCodec<MovementComponent,
       vy: component.vy,
     };
   }
-  delta(specA: MovementSpec, specB: MovementSpec): Partial<MovementSpec> {
+  delta(specA: MovementSpec, specB: MovementSpec): Partial<MovementSpec> | null {
     return diff(specA, specB);
   }
   encode(spec: MovementComponent): ComponentData {

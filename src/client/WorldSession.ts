@@ -12,6 +12,8 @@ export default class WorldSession {
   public readonly socket: WorldSocket;
   public readonly config: WorldClientConfig;
 
+  public readonly serverStartTime: number;
+
   private readonly opcodeTable: OpcodeTable;
 
   private cmdLoop: Loop;
@@ -25,9 +27,11 @@ export default class WorldSession {
   public latency: number;
   private _tick: number;
 
-  constructor(socket: WorldSocket) {
+  constructor(socket: WorldSocket, serverStartTime: number) {
     this.socket = socket;
     this.config = socket.config;
+
+    this.serverStartTime = serverStartTime;
 
     this.scope = new WorldSessionScope(this);
 
@@ -106,6 +110,10 @@ export default class WorldSession {
     clearInterval(this.pingInterval);
     this._pingStart = null;
     this.latency = -1;
+  }
+
+  public getServerTimestamp(timestamp: number) {
+    return this.serverStartTime + timestamp;
   }
 
   public get scene() {

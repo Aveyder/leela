@@ -15,6 +15,7 @@ export default class WorldServer {
     public readonly io: io.Server;
     public readonly world: World;
     public readonly sockets: Record<string, WorldSocket>;
+    public readonly startTime: number;
 
     constructor(config: WorldServerConfig) {
         this.config = config;
@@ -26,6 +27,8 @@ export default class WorldServer {
         this.world = new World(this);
 
         this.sockets = {};
+
+        this.startTime = Date.now();
 
         this.initWorldSocketManagement();
     }
@@ -80,5 +83,9 @@ export default class WorldServer {
                 delete this.sockets[socket.id];
             });
         });
+    }
+
+    public getTimestamp(): number {
+        return Date.now() - this.startTime;
     }
 }

@@ -4,7 +4,7 @@ import { WorldState } from "../../entity/WorldState";
 export default class WorldInitHandler extends ObjectHandler<WorldState> {
 
   public handleObject(worldState: WorldState): void {
-    for (let gameObject of worldState.gameObjects.values()) {
+    for (let gameObject of worldState.objects.values()) {
       this.scope.spawn.gameObject(gameObject);
     }
   }

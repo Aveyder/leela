@@ -1,9 +1,11 @@
 import { DeltaGameObjectState, GameObjectState } from "./GameObjectState";
 
 export interface WorldState {
-  gameObjects: Map<number, GameObjectState>;
+  timestamp: number;
+  objects: Map<number, GameObjectState>;
 }
 
 export interface DeltaWorldState {
-  gameObjects: Map<number, DeltaGameObjectState>;
+  timestamp: number;
+  objects: Map<number, DeltaGameObjectState>;
 }

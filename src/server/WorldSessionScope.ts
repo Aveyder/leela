@@ -24,7 +24,10 @@ export default class WorldSessionScope {
   public collectUpdate(delta: number): void {
     const lastWorldState = this.worldState;
 
-    this.worldState = { gameObjects: this.world.objects.state };
+    this.worldState = {
+      timestamp: this.world.server.getTimestamp(),
+      objects: this.world.objects.state,
+    };
 
     if (lastWorldState === null) {
       this.session.sendObject<WorldState>(Opcode.SMSG_WORLD_INIT, this.worldState);

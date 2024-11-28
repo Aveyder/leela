@@ -68,7 +68,9 @@ export default class WorldSocket {
         if (!this._session) {
             switch (opcode) {
                 case Opcode.SMSG_AUTH_SUCCESS:
-                    this.createSession();
+                    const serverStartTime = packet[1] as number;
+
+                    this.createSession(serverStartTime);
                     break;
             }
             return;
@@ -77,8 +79,8 @@ export default class WorldSocket {
         this._session.recvPacket(packet);
     }
 
-    private createSession() {
-        this._session = new WorldSession(this);
+    private createSession(serverStartTime: number) {
+        this._session = new WorldSession(this, serverStartTime);
 
         this.scene!.addSession(this._session);
     }
