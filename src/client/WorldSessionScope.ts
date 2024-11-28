@@ -3,8 +3,8 @@ import WorldSession from "./WorldSession";
 import Player from "./core/Player";
 import ControlComponent from "./core/ControlComponent";
 import SpawnManager from "./world/SpawnManager";
-import GameObjectManagerAdapter from "./core/GameObjectManagerAdapter";
-import { GameObjectState } from "../entity/GameObjectState";
+import ServerGameObjectManager from "./core/ServerGameObjectManager";
+import { DeltaGameObjectState, GameObjectState } from "../entity/GameObjectState";
 
 export default class WorldSessionScope {
   public readonly session: WorldSession;
@@ -13,7 +13,7 @@ export default class WorldSessionScope {
   public playerGuid: number;
   public player: Player | null;
 
-  public readonly objects: GameObjectManagerAdapter;
+  public readonly objects: ServerGameObjectManager;
   public readonly spawn: SpawnManager;
 
   constructor(session: WorldSession) {
@@ -23,7 +23,7 @@ export default class WorldSessionScope {
     this.playerGuid = -1;
     this.player = null;
 
-    this.objects = new GameObjectManagerAdapter(this.scene.objects);
+    this.objects = new ServerGameObjectManager(this.scene.objects);
     this.spawn = new SpawnManager(this);
   }
 
@@ -37,7 +37,7 @@ export default class WorldSessionScope {
     this.player = null;
   }
 
-  public isPlayer(state: GameObjectState) {
+  public isPlayer(state: GameObjectState | DeltaGameObjectState) {
     return state.gameObject.guid === this.playerGuid;
   }
 }

@@ -7,7 +7,7 @@ import Char from "../core/Char";
 import WorldScene from "./WorldScene";
 import { GameObjectState } from "../../entity/GameObjectState";
 import WorldSession from "../WorldSession";
-import GameObjectManagerAdapter from "../core/GameObjectManagerAdapter";
+import ServerGameObjectManager from "../core/ServerGameObjectManager";
 import WorldSessionScope from "../WorldSessionScope";
 import MovementComponent from "../../core/MovementComponent";
 import MovementSpec from "../../entity/component/MovementSpec";
@@ -18,7 +18,7 @@ export default class SpawnManager {
   private readonly session: WorldSession;
   private readonly scene: WorldScene;
 
-  private readonly objects: GameObjectManagerAdapter;
+  private readonly objects: ServerGameObjectManager;
 
   constructor(scope: WorldSessionScope) {
     this.scope = scope;

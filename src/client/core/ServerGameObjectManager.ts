@@ -1,7 +1,8 @@
 import GameObjectManager from "../../core/GameObjectManager";
 import GameObject from "../../core/GameObject";
+import ServerComponent from "./ServerComponent";
 
-export default class GameObjectManagerAdapter {
+export default class ServerGameObjectManager {
 
   private readonly objects: GameObjectManager;
   public readonly gameObjects: Map<number, GameObject>;
@@ -17,6 +18,8 @@ export default class GameObjectManagerAdapter {
 
   public add(serverGuid: number, gameObject: GameObject): GameObject {
     this.gameObjects.set(serverGuid, gameObject);
+
+    gameObject.addComponent(new ServerComponent(serverGuid));
 
     return this.objects.add(gameObject);
   }
