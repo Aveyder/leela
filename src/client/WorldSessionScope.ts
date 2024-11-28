@@ -4,7 +4,8 @@ import Player from "./core/Player";
 import ControlComponent from "./core/ControlComponent";
 import SpawnManager from "./world/SpawnManager";
 import ServerGameObjectManager from "./core/ServerGameObjectManager";
-import { DeltaGameObjectState, GameObjectState } from "../entity/GameObjectState";
+import { GameObjectStateDelta, GameObjectState } from "../entity/GameObjectState";
+import { WorldStateDelta, WorldState } from "../entity/WorldState";
 
 export default class WorldSessionScope {
   public readonly session: WorldSession;
@@ -23,7 +24,7 @@ export default class WorldSessionScope {
     this.playerGuid = -1;
     this.player = null;
 
-    this.objects = new ServerGameObjectManager(this.scene.objects);
+    this.objects = new ServerGameObjectManager(this);
     this.spawn = new SpawnManager(this);
   }
 
@@ -32,12 +33,16 @@ export default class WorldSessionScope {
   }
 
   public destroy(): void {
-    this.scene.objects.destroy();
+    this.objects.destroy();
 
     this.player = null;
   }
 
-  public isPlayer(state: GameObjectState | DeltaGameObjectState) {
+  public isPlayer(state: GameObjectState | GameObjectStateDelta) {
     return state.gameObject.guid === this.playerGuid;
+  }
+
+  public resolveTimestamp(state: { timestamp: number }) {
+    state.timestamp = this.session.getServerTimestamp(state.timestamp);
   }
 }

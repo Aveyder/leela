@@ -1,11 +1,14 @@
 import { ObjectHandler } from "../WorldPacketHandler";
 import { WorldState } from "../../entity/WorldState";
+import ServerComponent from "../core/ServerComponent";
 
 export default class WorldInitHandler extends ObjectHandler<WorldState> {
 
   public handleObject(worldState: WorldState): void {
-    for (let gameObject of worldState.objects.values()) {
-      this.scope.spawn.gameObject(gameObject);
+    this.scope.resolveTimestamp(worldState);
+
+    for (let state of worldState.objects.values()) {
+      this.scope.spawn.gameObject(worldState.timestamp, state);
     }
   }
 }

@@ -5,7 +5,7 @@ import { ComponentSegment } from "./ComponentSegment";
 import ComponentSpecCodec from "./ComponentSpecCodec";
 import { toFixed } from "../../utils/math";
 import diff from "../../utils/diff";
-import { DeltaGameObjectState, GameObjectState } from "../../entity/GameObjectState";
+import { GameObjectStateDelta, GameObjectState } from "../../entity/GameObjectState";
 
 export class GameObjectStateCodec implements SymmetricCodec<GameObjectState> {
 
@@ -52,18 +52,18 @@ export class GameObjectStateCodec implements SymmetricCodec<GameObjectState> {
   }
 }
 
-export class DeltaGameObjectStateCodec implements SymmetricCodec<DeltaGameObjectState> {
+export class DeltaGameObjectStateCodec implements SymmetricCodec<GameObjectStateDelta> {
 
   public static readonly INSTANCE: DeltaGameObjectStateCodec = new DeltaGameObjectStateCodec();
 
-  delta(stateA: GameObjectState, stateB: GameObjectState): DeltaGameObjectState {
+  delta(stateA: GameObjectState, stateB: GameObjectState): GameObjectStateDelta {
     const gameObjectDelta = diff(stateA.gameObject, stateB.gameObject)
     return {
       gameObject: gameObjectDelta ? gameObjectDelta : {},
       components: ComponentSpecCodec.INSTANCE.delta(stateA.components, stateB.components)
-    } as DeltaGameObjectState;
+    } as GameObjectStateDelta;
   }
-  encode(state: DeltaGameObjectState): WorldPacketData {
+  encode(state: GameObjectStateDelta): WorldPacketData {
     const gameObjectData = [];
 
     if (state.gameObject.x !== undefined) {
@@ -84,11 +84,11 @@ export class DeltaGameObjectStateCodec implements SymmetricCodec<DeltaGameObject
 
     return [gameObjectData, ComponentSpecCodec.INSTANCE.encodeDelta(state.components)];
   }
-  decode(data: WorldPacketData[][]): DeltaGameObjectState {
+  decode(data: WorldPacketData[][]): GameObjectStateDelta {
     const state = {
       gameObject: {},
       components: ComponentSpecCodec.INSTANCE.decodeDelta(data[1] as ComponentSegment[])
-    } as DeltaGameObjectState;
+    } as GameObjectStateDelta;
 
     for (let element of data[0]) {
       const field = element[0] as number;

@@ -4,6 +4,7 @@ import World from "../world/World";
 import { Opcode } from "../../protocol/Opcode";
 import { GameObjectStateCodec } from "../../protocol/codec/GameObjectStateCodec";
 import { GameObjectState } from "../../entity/GameObjectState";
+import { GameObjectNew } from "../../entity/GameObjectNew";
 
 export default class WorldGameObjectManager extends GameObjectManager {
 
@@ -19,7 +20,10 @@ export default class WorldGameObjectManager extends GameObjectManager {
   public add(gameObject: GameObject): GameObject {
     const createdGameObject = super.add(gameObject);
 
-    this.world.broadcastObject<GameObjectState>(Opcode.SMSG_OBJECT, GameObjectStateCodec.INSTANCE.map(createdGameObject));
+    this.world.broadcastObject<GameObjectNew>(Opcode.SMSG_OBJECT, {
+      timestamp: this.world.server.getTimestamp(),
+      state: GameObjectStateCodec.INSTANCE.map(createdGameObject)
+    });
 
     return createdGameObject;
   }

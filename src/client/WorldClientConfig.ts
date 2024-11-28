@@ -9,6 +9,7 @@ export default class WorldClientConfig {
   public readonly msgpackEnabled!: boolean;
   public readonly tickCap!: number;
   public readonly charSpeed!: number;
+  public readonly clientStateBufferSize!: number;
 
   public static fromEnv(): WorldClientConfig {
     return {
@@ -21,7 +22,8 @@ export default class WorldClientConfig {
       pingIntervalMs: Number(process.env.PING_INTERVAL_MS),
       msgpackEnabled: process.env.MSGPACK_ENABLED === 'true',
       tickCap: Number(process.env.TICK_CAP),
-      charSpeed: Number(process.env.CHAR_SPEED)
+      charSpeed: Number(process.env.CHAR_SPEED),
+      clientStateBufferSize: Number(process.env.CLIENT_STATE_BUFFER_SIZE),
     };
   }
 }

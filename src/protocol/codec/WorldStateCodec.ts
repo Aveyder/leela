@@ -1,8 +1,8 @@
 import { WorldPacketData } from "../WorldPacket";
 import { SymmetricCodec } from "../Codec";
 import { DeltaGameObjectStateCodec, GameObjectStateCodec } from "./GameObjectStateCodec";
-import { DeltaWorldState, WorldState } from "../../entity/WorldState";
-import { DeltaGameObjectState, GameObjectState } from "../../entity/GameObjectState";
+import { WorldStateDelta, WorldState } from "../../entity/WorldState";
+import { GameObjectStateDelta, GameObjectState } from "../../entity/GameObjectState";
 
 export class WorldStateCodec implements SymmetricCodec<WorldState> {
 
@@ -29,15 +29,15 @@ export class WorldStateCodec implements SymmetricCodec<WorldState> {
   }
 }
 
-export class DeltaWorldStateCodec implements SymmetricCodec<DeltaWorldState> {
+export class DeltaWorldStateCodec implements SymmetricCodec<WorldStateDelta> {
 
   public static readonly INSTANCE: DeltaWorldStateCodec = new DeltaWorldStateCodec();
 
-  delta(worldStateA: WorldState, worldStateB: WorldState): DeltaWorldState {
+  delta(worldStateA: WorldState, worldStateB: WorldState): WorldStateDelta {
     const deltaWorldState = {
       timestamp: worldStateB.timestamp,
       objects: new Map()
-    } as DeltaWorldState;
+    } as WorldStateDelta;
 
     for (const guid of worldStateB.objects.keys()) {
       const gameObjectA = worldStateA.objects.get(guid);
@@ -51,7 +51,7 @@ export class DeltaWorldStateCodec implements SymmetricCodec<DeltaWorldState> {
     }
     return deltaWorldState;
   }
-  encode(deltaWorldState: DeltaWorldState): WorldPacketData {
+  encode(deltaWorldState: WorldStateDelta): WorldPacketData {
     const data = [deltaWorldState.timestamp] as WorldPacketData;
     for (const guid of deltaWorldState.objects.keys()) {
       const gameObjectState = deltaWorldState.objects.get(guid)!;
@@ -63,16 +63,16 @@ export class DeltaWorldStateCodec implements SymmetricCodec<DeltaWorldState> {
 
     return data;
   }
-  decode(data: WorldPacketData): DeltaWorldState {
+  decode(data: WorldPacketData): WorldStateDelta {
     const timestamp = data[0] as number;
     const gameObjectsSegment = data.slice(1) as WorldPacketData[];
     return {
       timestamp,
-      objects: gameObjectsSegment.reduce((acc: Map<number, DeltaGameObjectState>, data: WorldPacketData) => {
+      objects: gameObjectsSegment.reduce((acc: Map<number, GameObjectStateDelta>, data: WorldPacketData) => {
         acc.set(data[0] as number, DeltaGameObjectStateCodec.INSTANCE.decode(data.slice(1) as WorldPacketData[][]));
 
         return acc;
-      }, new Map<number, DeltaGameObjectState>())
+      }, new Map<number, GameObjectStateDelta>())
     };
   }
 }

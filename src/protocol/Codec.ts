@@ -4,6 +4,7 @@ import MoveCodec from "./codec/MoveCodec";
 import JoinCodec from "./codec/JoinCodec";
 import { GameObjectStateCodec } from "./codec/GameObjectStateCodec";
 import { DeltaWorldStateCodec, WorldStateCodec } from "./codec/WorldStateCodec";
+import GameObjectNewCodec from "./codec/GameObjectNewCodec";
 
 export interface _Codec<I, O> {
   encode(object: I): WorldPacketData;
@@ -21,7 +22,7 @@ export default class Codec {
     [Opcode.CMSG_MOVE]: new MoveCodec(),
     [Opcode.MSG_JOIN]: new JoinCodec(),
     [Opcode.SMSG_WORLD_INIT]: new WorldStateCodec(),
-    [Opcode.SMSG_OBJECT]: GameObjectStateCodec.INSTANCE,
+    [Opcode.SMSG_OBJECT]: new GameObjectNewCodec(),
     [Opcode.SMSG_WORLD_UPDATE]: DeltaWorldStateCodec.INSTANCE,
   }
 

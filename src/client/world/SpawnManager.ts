@@ -11,11 +11,14 @@ import ServerGameObjectManager from "../core/ServerGameObjectManager";
 import WorldSessionScope from "../WorldSessionScope";
 import MovementComponent from "../../core/MovementComponent";
 import MovementSpec from "../../entity/component/MovementSpec";
+import ServerComponent from "../core/ServerComponent";
+import WorldClientConfig from "../WorldClientConfig";
 
 export default class SpawnManager {
 
   private readonly scope: WorldSessionScope;
   private readonly session: WorldSession;
+  private readonly config: WorldClientConfig;
   private readonly scene: WorldScene;
 
   private readonly objects: ServerGameObjectManager;
@@ -23,19 +26,26 @@ export default class SpawnManager {
   constructor(scope: WorldSessionScope) {
     this.scope = scope;
     this.session = scope.session;
+    this.config = scope.session.config;
     this.scene = scope.scene;
     this.objects = scope.objects;
   }
 
-  public gameObject(state: GameObjectState): GameObject {
-    let char;
+  public gameObject(timestamp: number, state: GameObjectState): GameObject {
+    let gameObject;
     if (state.gameObject.guid === this.scope.playerGuid) {
-      char = this.scope.player = new Player(this.scene, this.session);
+      gameObject = this.scope.player = new Player(this.scene, this.session);
     } else {
-      char = new Char(this.scene);
+      gameObject = new Char(this.scene);
     }
 
-    return this.char(char, state);
+    const serverComponent = new ServerComponent(state.gameObject.guid, this.config.clientStateBufferSize);
+    serverComponent.addState(timestamp, state);
+    gameObject.addComponent(serverComponent);
+
+    gameObject = this.char(gameObject, state);
+
+    return gameObject;
   }
 
   public char(char: GameObject, state: GameObjectState): GameObject {

@@ -2,7 +2,7 @@ import WorldSession from "./WorldSession";
 import World from "./world/World";
 import Player from "./core/Player";
 import { Opcode } from "../protocol/Opcode";
-import { DeltaWorldState, WorldState } from "../entity/WorldState";
+import { WorldStateDelta, WorldState } from "../entity/WorldState";
 import { DeltaWorldStateCodec } from "../protocol/codec/WorldStateCodec";
 
 export default class WorldSessionScope {
@@ -34,7 +34,7 @@ export default class WorldSessionScope {
     } else {
       const deltaWorldState = DeltaWorldStateCodec.INSTANCE.delta(lastWorldState, this.worldState);
 
-      this.session.sendObject<DeltaWorldState>(Opcode.SMSG_WORLD_UPDATE, deltaWorldState);
+      this.session.sendObject<WorldStateDelta>(Opcode.SMSG_WORLD_UPDATE, deltaWorldState);
     }
   }
 

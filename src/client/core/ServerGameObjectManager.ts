@@ -1,14 +1,16 @@
 import GameObjectManager from "../../core/GameObjectManager";
 import GameObject from "../../core/GameObject";
-import ServerComponent from "./ServerComponent";
+import WorldSessionScope from "../WorldSessionScope";
 
 export default class ServerGameObjectManager {
 
   private readonly objects: GameObjectManager;
+
   public readonly gameObjects: Map<number, GameObject>;
 
-  constructor(gameObjects: GameObjectManager) {
-    this.objects = gameObjects;
+  constructor(scope: WorldSessionScope) {
+    this.objects = scope.scene.objects;
+
     this.gameObjects = new Map<number, GameObject>();
   }
 
@@ -19,8 +21,6 @@ export default class ServerGameObjectManager {
   public add(serverGuid: number, gameObject: GameObject): GameObject {
     this.gameObjects.set(serverGuid, gameObject);
 
-    gameObject.addComponent(new ServerComponent(serverGuid));
-
     return this.objects.add(gameObject);
   }
 
@@ -30,5 +30,13 @@ export default class ServerGameObjectManager {
     if (gameObject) {
       this.objects.delete(gameObject);
     }
+
+    this.gameObjects.delete(serverGuid);
+  }
+
+  public destroy(): void {
+    this.gameObjects.clear();
+
+    this.objects.destroy();
   }
 }
