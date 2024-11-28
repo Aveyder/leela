@@ -10,6 +10,9 @@ export default class WorldClientConfig {
   public readonly tickCap!: number;
   public readonly charSpeed!: number;
   public readonly clientStateBufferSize!: number;
+  public readonly interpolationMs!: number;
+  public readonly extrapolateEntity!: boolean;
+  public readonly extrapolateEntityMaxMs!: number;
 
   public static fromEnv(): WorldClientConfig {
     return {
@@ -24,6 +27,9 @@ export default class WorldClientConfig {
       tickCap: Number(process.env.TICK_CAP),
       charSpeed: Number(process.env.CHAR_SPEED),
       clientStateBufferSize: Number(process.env.CLIENT_STATE_BUFFER_SIZE),
+      interpolationMs: Number(process.env.INTERPOLATION_MS),
+      extrapolateEntity: process.env.EXTRAPOLATE_ENTITY === 'true',
+      extrapolateEntityMaxMs: Number(process.env.EXTRAPOLATE_ENTITY_MAX_MS),
     };
   }
 }

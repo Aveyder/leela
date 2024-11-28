@@ -19,7 +19,6 @@ export default class SpawnManager {
   private readonly scope: WorldSessionScope;
   private readonly session: WorldSession;
   private readonly config: WorldClientConfig;
-  private readonly scene: WorldScene;
 
   private readonly objects: ServerGameObjectManager;
 
@@ -27,7 +26,6 @@ export default class SpawnManager {
     this.scope = scope;
     this.session = scope.session;
     this.config = scope.session.config;
-    this.scene = scope.scene;
     this.objects = scope.objects;
   }
 
@@ -38,11 +36,11 @@ export default class SpawnManager {
 
     let gameObject;
     if (serverGuid === this.scope.playerGuid) {
-      gameObject = new Player(this.scene, this.session);
+      gameObject = new Player(this.session);
 
       this.scope.player = gameObject;
     } else {
-      gameObject = new Char(this.scene);
+      gameObject = new Char(this.session);
     }
 
     gameObject.x = state.gameObject.x;

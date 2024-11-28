@@ -13,27 +13,27 @@ export default class ServerComponent extends Component {
 
   public guid: number;
 
-  private readonly stateBufferSize: number;
-  public readonly states: ServerGameObjectSnapshot[];
+  private readonly snapshotBufferSize: number;
+  public readonly snapshots: ServerGameObjectSnapshot[];
 
   constructor(guid: number = -1, stateBufferSize: number) {
     super();
 
     this.guid = guid;
 
-    this.stateBufferSize = stateBufferSize;
-    this.states = [];
+    this.snapshotBufferSize = stateBufferSize;
+    this.snapshots = [];
   }
 
   public getLastState(): GameObjectState {
-    return this.states[this.states.length - 1].state;
+    return this.snapshots[this.snapshots.length - 1].state;
   }
 
   public addState(timestamp: number, state: GameObjectState): void {
-    this.states.push({timestamp, state});
+    this.snapshots.push({timestamp, state});
 
-    if (this.states.length > this.stateBufferSize) {
-      this.states.splice(0, 1);
+    if (this.snapshots.length > this.snapshotBufferSize) {
+      this.snapshots.splice(0, 1);
     }
   }
 

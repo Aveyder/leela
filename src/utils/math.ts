@@ -1,13 +1,17 @@
-function toFixed(value: number, fractionDigits: number): number {
+export function toFixed(value: number, fractionDigits: number): number {
     return Number(value.toFixed(fractionDigits));
 }
 
-type Vec2 = {x: number, y: number};
+export type Vec2 = {x: number, y: number};
 
-const TMP_VEC2: Vec2 = {x: 0, y: 0};
+export const TMP_VEC2: Vec2 = {x: 0, y: 0};
 
-export {
-    toFixed,
-    Vec2,
-    TMP_VEC2
-}
+export const interpolate = (vecA: Vec2, vecB: Vec2, progress: number, result?: Vec2) => {
+    if (!result) {
+        result = {x: 0, y: 0};
+    }
+    result.x = vecA.x + (vecB.x - vecA.x) * progress;
+    result.y = vecA.y + (vecB.y - vecA.y) * progress;
+
+    return result;
+};

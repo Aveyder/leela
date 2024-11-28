@@ -8,8 +8,8 @@ import ServerControlComponent from "./ServerControlComponent";
 
 export default class Player extends SceneGameObject<WorldScene> {
 
-  constructor(scene: WorldScene, session: WorldSession) {
-    super(scene);
+  constructor(session: WorldSession) {
+    super(session.scene);
 
     this.addComponents([
       new SpriteComponent(),

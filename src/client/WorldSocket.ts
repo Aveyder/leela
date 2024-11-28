@@ -16,7 +16,7 @@ export default class WorldSocket {
 
     private readonly bufferQueue: WorldPacket[];
 
-    private _ts: null | TimeSync;
+    private _ts: TimeSync;
     private _session: null | WorldSession;
 
     constructor(client: WorldClient) {
@@ -97,11 +97,10 @@ export default class WorldSocket {
         this.io!.removeAllListeners("message");
         this.io!.removeAllListeners("timesync");
 
-        this._ts!.destroy();
-        this._ts = null;
+        this._ts.destroy();
     }
 
-    public get ts() {
+    public get ts(): TimeSync {
         return this._ts;
     }
 }
