@@ -13,7 +13,6 @@ export default class ControlComponent extends SceneComponent<WorldScene> {
   private readonly session: WorldSession;
 
   private keys!: Keys;
-  private movement!: MovementComponent;
   private model!: ModelComponent;
 
   private prevControl: Vec2;
@@ -27,15 +26,11 @@ export default class ControlComponent extends SceneComponent<WorldScene> {
 
   public start(): void {
     this.keys = this.scene.keys;
-    this.movement = this.gameObject.getComponent(MovementComponent);
     this.model = this.gameObject.getComponent(ModelComponent);
   }
 
   public applyControl(): void {
     const dir = this.getVec2Keys();
-
-    // this.movement.dx = dir.x;
-    // this.movement.dy = dir.y;
 
     this.model.setDirection(dir.x, dir.y);
 

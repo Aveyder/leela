@@ -39,27 +39,16 @@ export default class SpawnManager {
       gameObject = new Char(this.scene);
     }
 
-    const serverComponent = new ServerComponent(state.gameObject.guid, this.config.clientStateBufferSize);
+    const serverComponent = new ServerComponent(
+      state.gameObject.guid, this.config.clientStateBufferSize
+    );
     serverComponent.addState(timestamp, state);
+
     gameObject.addComponent(serverComponent);
 
-    gameObject = this.char(gameObject, state);
+    gameObject.x = state.gameObject.x;
+    gameObject.y = state.gameObject.y;
 
-    return gameObject;
-  }
-
-  public char(char: GameObject, state: GameObjectState): GameObject {
-    const model = state.components.get(ComponentId.MODEL) as ModelDescriptor;
-    char.getComponent(ModelComponent).setModel(model);
-
-    const movementState = state.components.get(ComponentId.MOVEMENT) as MovementSpec;
-    const movement = char.getComponent(MovementComponent);
-    movement.dx = movementState.dx;
-    movement.dy = movementState.dy;
-
-    char.x = state.gameObject.x;
-    char.y = state.gameObject.y;
-
-    return this.objects.add(state.gameObject.guid, char);
+    return this.objects.add(state.gameObject.guid, gameObject);
   }
 }

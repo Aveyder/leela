@@ -1,7 +1,6 @@
 import Component from "../../core/Component";
 import { Model, ModelDescriptor } from "../../resource/Model";
 import SpriteComponent from "./phaser/SpriteComponent";
-import MovementComponent from "../../core/MovementComponent";
 import Sprite = Phaser.GameObjects.Sprite;
 
 export default class ModelComponent extends Component {
@@ -34,6 +33,8 @@ export default class ModelComponent extends Component {
   }
 
   public setModel(model: ModelDescriptor): void {
+    if (this._model === model) return;
+
     this._model = model;
 
     if (!this.sprite) return;

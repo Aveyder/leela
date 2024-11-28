@@ -3,6 +3,7 @@ import ModelComponent from "./ModelComponent";
 import ServerComponent from "./ServerComponent";
 import { ComponentId } from "../../protocol/codec/ComponentId";
 import MovementSpec from "../../entity/component/MovementSpec";
+import { ModelDescriptor } from "../../resource/Model";
 
 export default class ServerControlComponent extends Component {
 
@@ -20,8 +21,10 @@ export default class ServerControlComponent extends Component {
     this.gameObject.x = state.gameObject.x;
     this.gameObject.y = state.gameObject.y;
 
-    const movementSpec = state.components.get(ComponentId.MOVEMENT) as MovementSpec;
+    const model = state.components.get(ComponentId.MODEL) as ModelDescriptor;
+    this.model.setModel(model);
 
+    const movementSpec = state.components.get(ComponentId.MOVEMENT) as MovementSpec;
     this.model.setDirection(movementSpec.dx, movementSpec.dy);
   }
 }

@@ -7,19 +7,19 @@ export default class ModelCodec implements _ComponentCodec<ModelComponent, Model
     map(component: ModelComponent): ModelDescriptor {
         return component.model;
     }
-    delta(specA: ModelDescriptor, specB: ModelDescriptor): object | null {
-        return null;
+    delta(specA: ModelDescriptor, specB: ModelDescriptor): ModelDescriptor | null {
+        return specA !== specB ? specB : null;
     }
     encode(spec: ModelDescriptor): ComponentData {
         return [spec.id];
     }
-    encodeDelta(delta: object): ComponentData {
-        throw new Error();
+    encodeDelta(delta: ModelDescriptor): ComponentData {
+        return this.encode(delta);
     }
     decode(data: ComponentData): ModelDescriptor {
         return MODELS_BY_ID.get(data[0] as number)!;
     }
-    decodeDelta(delta: ComponentData): object {
-        throw new Error();
+    decodeDelta(delta: ComponentData): ModelDescriptor {
+        return this.decode(delta);
     }
 }
