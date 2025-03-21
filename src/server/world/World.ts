@@ -6,8 +6,9 @@ import WorldPacket from "../../protocol/WorldPacket";
 import { Opcode } from "../../protocol/Opcode";
 import Codec from "../../protocol/Codec";
 import WorldGameObjectManager from "../core/WorldGameObjectManager";
-import Matter, { Bodies, World as MatterWorld } from "matter-js";
+import Matter, { World as MatterWorld } from "matter-js";
 import CaltheraMap from '../../assets/map/calthera.json';
+import * as matterUtils from "../../utils/matter";
 
 export default class World {
 
@@ -30,48 +31,16 @@ export default class World {
             gravity: {x: 0, y: 0}
         });
 
-        const objectMap = new Map();
-        for (const tileset of CaltheraMap.tilesets) {
-            const tiles = tileset.tiles;
-            if (tiles) {
-                for (const tile of tileset.tiles) {
-                    if (tile.objectgroup) {
-                        objectMap.set(tile.id, tile.objectgroup.objects)
-                    }
-                }
-            }
-        }
+        matterUtils.createBodiesFromObjectGroups(CaltheraMap).forEach(body => {
+            body.label = 'wall';
+            MatterWorld.add(this.matterEngine.world, body);
+        });
 
-        const tilewidth = CaltheraMap.tilewidth;
-        const tileheight = CaltheraMap.tileheight;
-
-        for(const layer of CaltheraMap.layers) {
-            const chunks = layer.chunks;
-
-            if (chunks) {
-                for(const chunk of chunks) {
-                    for (let i = 0; i < chunk.height; i++) {
-                        for(let j = 0; j < chunk.width; j++) {
-                            const tileId = chunk.data[i * chunk.width + j];
-
-                            const objects = objectMap.get(tileId);
-                            if (objects) {
-                                const tileX = (layer.x + chunk.x + j) * tilewidth;
-                                const tileY = (layer.y + chunk.y + i) * tileheight;
-
-                                for (const object of objects) {
-                                    const body = Bodies.rectangle(tileX + object.x, tileY + object.y, object.width, object.height, {
-                                        isStatic: true
-                                    });
-
-                                    MatterWorld.add(this.matterEngine.world, body);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        Matter.Events.on(this.matterEngine, "collisionStart", (event) => {
+            event.pairs.forEach((pair) => {
+                console.log("Collision started between:", pair.bodyA.label, "and", pair.bodyB.label);
+            });
+        });
 
         this.loop.start(delta => this.update(delta), this.config.simulationRate);
     }

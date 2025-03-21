@@ -5,6 +5,8 @@ import SceneComponent from "./SceneComponent";
 import GameObject = Phaser.GameObjects.GameObject;
 import Sprite = Phaser.Physics.Matter.Sprite;
 import Image = Phaser.Physics.Matter.Image;
+import Collision = Phaser.Physics.Matter.Components.Collision;
+import { CollisionCategory } from "../../../shared/CollisionCategory";
 
 export default class MatterComponent extends SceneComponent<WorldScene> {
 
@@ -23,6 +25,9 @@ export default class MatterComponent extends SceneComponent<WorldScene> {
         height: 32
       }
     });
+
+    (this._matterGameObject as Collision).setCollisionCategory(CollisionCategory.PLAYER);
+    (this._matterGameObject as Collision).setCollidesWith(CollisionCategory.WALL);
 
     (this._matterGameObject as MatterTransform).setFixedRotation()
   }

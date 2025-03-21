@@ -10,6 +10,8 @@ import { Opcode } from "../../protocol/Opcode";
 import Join from "../../entity/Join";
 import { GameObjectName } from "../resource/GameObjectName";
 import TilemapLayer = Phaser.Tilemaps.TilemapLayer;
+import MatterTileBody= Phaser.Physics.Matter.TileBody
+import { CollisionCategory } from "../../shared/CollisionCategory";
 
 export default class WorldScene extends Phaser.Scene {
 
@@ -45,6 +47,14 @@ export default class WorldScene extends Phaser.Scene {
       GameObjectName.BUILD_INTERIOR_LAYER
     ) as TilemapLayer;
     this.matter.world.convertTiles(buildingInteriorLayer.cull(this.cameras.main));
+
+    buildingInteriorLayer.cull(this.cameras.main).forEach(tile => {
+      const matterBody = (tile.physics as any).matterBody as MatterTileBody;
+      if (matterBody) {
+        matterBody.setCollisionCategory(CollisionCategory.PLAYER);
+        matterBody.setCollidesWith(CollisionCategory.WALL | CollisionCategory.PLAYER);
+      }
+    });
   }
 
   public update(time: number, delta: number): void {
