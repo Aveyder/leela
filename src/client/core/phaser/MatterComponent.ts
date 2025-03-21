@@ -21,7 +21,7 @@ export default class MatterComponent extends SceneComponent<WorldScene> {
 
     this._matterGameObject = this.scene.matter.add.gameObject(sprite.phaserGameObject, {
       shape: {
-        width: 16,
+        width: 24,
         height: 32
       }
     });

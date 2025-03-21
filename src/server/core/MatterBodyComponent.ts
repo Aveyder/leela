@@ -15,14 +15,13 @@ export default class MatterBodyComponent extends Component {
   }
 
   start() {
-    this.body = Bodies.rectangle(this.gameObject.x, this.gameObject.y, 16, 32, {
+    this.body = Bodies.rectangle(this.gameObject.x, this.gameObject.y, 24, 32, {
       inertia: Infinity,
       collisionFilter: {
         category: CollisionCategory.PLAYER,
         mask: CollisionCategory.WALL
       }
     });
-    this.body.label = 'player';
 
     MatterWorld.add(this.world.matterEngine.world, this.body);
   }
@@ -31,7 +30,7 @@ export default class MatterBodyComponent extends Component {
     Body.setPosition(this.body, this.gameObject);
   }
 
-  lateUpdate(delta: number) {
+  syncGameObjectPosition() {
     this.gameObject.x = this.body.position.x;
     this.gameObject.y = this.body.position.y;
   }

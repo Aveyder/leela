@@ -27,7 +27,7 @@ export function createBodiesFromObjectGroups(tiledMap: typeof CaltheraMap): Matt
       for(const chunk of chunks) {
         for (let i = 0; i < chunk.height; i++) {
           for(let j = 0; j < chunk.width; j++) {
-            const tileId = chunk.data[i * chunk.width + j];
+            const tileId = chunk.data[i * chunk.width + j] - 1;
 
             const objects = objectMap.get(tileId);
             if (objects) {
@@ -36,7 +36,7 @@ export function createBodiesFromObjectGroups(tiledMap: typeof CaltheraMap): Matt
 
               for (const object of objects) {
                 bodies.push(
-                  Bodies.rectangle(tileX + object.x, tileY + object.y, object.width, object.height, {
+                  Bodies.rectangle(tileX + object.x + object.width / 2, tileY + object.y + object.height / 2, object.width, object.height, {
                     isStatic: true,
                     collisionFilter: {
                       category: CollisionCategory.WALL,

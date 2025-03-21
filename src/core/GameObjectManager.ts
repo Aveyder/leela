@@ -28,11 +28,11 @@ export default class GameObjectManager {
   }
 
   public update(delta: number): void {
-    this.forEachGameObject((gameObject: GameObject) => gameObject.update(delta));
+    this.forEach((gameObject: GameObject) => gameObject.update(delta));
   }
 
   public destroy(): void {
-    this.forEachGameObject((gameObject: GameObject) => this.delete(gameObject));
+    this.forEach((gameObject: GameObject) => this.delete(gameObject));
 
     this._guid = 0;
   }
@@ -55,7 +55,7 @@ export default class GameObjectManager {
     return this._guid++;
   }
 
-  private forEachGameObject(callback: (gameObject: GameObject) => void): void {
+  public forEach(callback: (gameObject: GameObject) => void): void {
     for(const gameObject of this.gameObjects.values()) {
       callback(gameObject);
     }

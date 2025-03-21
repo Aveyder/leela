@@ -9,6 +9,7 @@ import WorldGameObjectManager from "../core/WorldGameObjectManager";
 import Matter, { World as MatterWorld } from "matter-js";
 import CaltheraMap from '../../assets/map/calthera.json';
 import * as matterUtils from "../../utils/matter";
+import MatterBodyComponent from "../core/MatterBodyComponent";
 
 export default class World {
 
@@ -32,14 +33,7 @@ export default class World {
         });
 
         matterUtils.createBodiesFromObjectGroups(CaltheraMap).forEach(body => {
-            body.label = 'wall';
             MatterWorld.add(this.matterEngine.world, body);
-        });
-
-        Matter.Events.on(this.matterEngine, "collisionStart", (event) => {
-            event.pairs.forEach((pair) => {
-                console.log("Collision started between:", pair.bodyA.label, "and", pair.bodyB.label);
-            });
         });
 
         this.loop.start(delta => this.update(delta), this.config.simulationRate);
@@ -66,7 +60,14 @@ export default class World {
 
         this.objects.update(delta);
 
-        Matter.Engine.update(this.matterEngine, delta * 1000);
+        // TODO: move this responsibility into a separate service/component called 'Physics/Matter'
+        Matter.Engine.update(this.matterEngine, delta * 1000, 10);
+
+        this.objects.forEach(gameObject =>
+          gameObject.getComponent(MatterBodyComponent)?.syncGameObjectPosition()
+        );
+
+        this.objects.captureState();
     }
 
     private applyClientUpdates(delta: number) {

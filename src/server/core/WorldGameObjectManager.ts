@@ -30,17 +30,19 @@ export default class WorldGameObjectManager extends GameObjectManager {
 
   update(delta: number) {
     super.update(delta);
-
-    this._state = new Map();
-    for (let gameObject of this.gameObjects.values()) {
-      this._state.set(gameObject.guid, GameObjectStateCodec.INSTANCE.map(gameObject));
-    }
   }
 
   public delete(gameObject: GameObject): void {
     this.world.broadcast([Opcode.SMGS_OBJECT_DESTROY, gameObject.guid]);
 
     super.delete(gameObject);
+  }
+
+  public captureState(): void {
+    this._state = new Map();
+    for (let gameObject of this.gameObjects.values()) {
+      this._state.set(gameObject.guid, GameObjectStateCodec.INSTANCE.map(gameObject));
+    }
   }
 
   public get state(): Map<number, GameObjectState> {
