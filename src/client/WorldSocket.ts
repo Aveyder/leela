@@ -52,6 +52,8 @@ export default class WorldSocket {
     private initTimesync() {
         const ts = timesync.create({
             server: this.io!,
+            repeat: this.config.timesyncRepeat,
+            delay: this.config.timesyncDelayMs,
             interval: this.config.timesyncIntervalMs
         });
 

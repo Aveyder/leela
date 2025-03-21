@@ -4,6 +4,7 @@ import { Tilemap } from "../../resource/map/Tilemap";
 import { Tileset } from "../../resource/map/Tileset";
 import { Layer } from "../../resource/map/Layer";
 import { Image } from "../../resource/Image";
+import { GameObjectName } from "../resource/GameObjectName";
 
 export default class InitService {
 
@@ -34,6 +35,7 @@ export default class InitService {
 
     const buildingInteriorLayer = tilemap.createLayer(Layer.BUILDING_INTERIOR.name, [Tileset.BASE])!;
     buildingInteriorLayer.depth = Layer.BUILDING_INTERIOR.zIndex;
+    buildingInteriorLayer.name = GameObjectName.BUILD_INTERIOR_LAYER;
 
     const foregroundLayer = tilemap.createLayer(Layer.FOREGROUND.name, [Tileset.BASE])!;
     foregroundLayer.depth = Layer.FOREGROUND.zIndex;

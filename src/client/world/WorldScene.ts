@@ -8,6 +8,8 @@ import { MODELS } from "../../resource/Model";
 import GameObjectManager from "../../core/GameObjectManager";
 import { Opcode } from "../../protocol/Opcode";
 import Join from "../../entity/Join";
+import { GameObjectName } from "../resource/GameObjectName";
+import TilemapLayer = Phaser.Tilemaps.TilemapLayer;
 
 export default class WorldScene extends Phaser.Scene {
 
@@ -38,6 +40,11 @@ export default class WorldScene extends Phaser.Scene {
 
     this._keys = init.keys;
     this._objects = new GameObjectManager();
+
+    const buildingInteriorLayer = this.children.getByName(
+      GameObjectName.BUILD_INTERIOR_LAYER
+    ) as TilemapLayer;
+    this.matter.world.convertTiles(buildingInteriorLayer.cull(this.cameras.main));
   }
 
   public update(time: number, delta: number): void {

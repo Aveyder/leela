@@ -25,4 +25,8 @@ export default class GameObjectComponent<G extends GameObject & Transform & Visi
   public destroy(): void {
     this._phaserGameObject.destroy();
   }
+
+  public get phaserGameObject(): G {
+    return this._phaserGameObject;
+  }
 }

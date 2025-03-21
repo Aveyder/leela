@@ -13,6 +13,12 @@ function main() {
       createContainer: true
     },
     parent: document.querySelector(".game") as HTMLElement,
+    physics: {
+      default: 'matter',
+      matter: {
+        debug: true
+      }
+    },
     scene: WorldScene
   });
 }

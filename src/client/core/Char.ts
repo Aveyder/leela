@@ -6,6 +6,7 @@ import MovementComponent from "../../core/MovementComponent";
 import ServerControlComponent from "./ServerControlComponent";
 import InterpolateComponent from "./InterpolateComponent";
 import WorldSession from "../WorldSession";
+import MatterComponent from "./phaser/MatterComponent";
 
 export default class Char extends SceneGameObject<WorldScene> {
 
@@ -14,6 +15,7 @@ export default class Char extends SceneGameObject<WorldScene> {
 
     this.addComponents([
       new SpriteComponent(),
+      new MatterComponent(),
       new ModelComponent(),
       new MovementComponent(session.config.charSpeed),
       new ServerControlComponent(),
