@@ -555,3 +555,5 @@ dist
 .history/
 
 package-lock.json
+
+*.tiled-session
