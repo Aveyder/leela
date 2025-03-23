@@ -113,7 +113,7 @@ export default class PredictPositionComponent extends SceneComponent<WorldScene>
 
   private smoothError(delta: number): void {
     if (this.errorTimer != -1) {
-      this.errorTimer += delta;
+      this.errorTimer += delta * 1000;
 
       const progress = Math.min(this.errorTimer / this.config.clientSmoothPosMs, 1);
 
