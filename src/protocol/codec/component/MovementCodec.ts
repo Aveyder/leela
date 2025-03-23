@@ -1,6 +1,6 @@
 import { _ComponentCodec } from "../ComponentCodec";
 import { ComponentData } from "../ComponentSegment";
-import MovementComponent from "../../../core/MovementComponent";
+import MovementComponent from "../../../server/core/MovementComponent";
 import MovementSpec from "../../../entity/component/MovementSpec";
 import diff from "../../../utils/diff";
 
@@ -9,8 +9,6 @@ export default class MovementCodec implements _ComponentCodec<MovementComponent,
     return {
       dx: component.dx,
       dy: component.dy,
-      vx: component.vx,
-      vy: component.vy,
     };
   }
   delta(specA: MovementSpec, specB: MovementSpec): Partial<MovementSpec> | null {
@@ -20,8 +18,6 @@ export default class MovementCodec implements _ComponentCodec<MovementComponent,
     return [
       spec.dx,
       spec.dy,
-      spec.vx,
-      spec.vy,
     ];
   }
   encodeDelta(delta: Partial<MovementSpec>): ComponentData {
@@ -32,12 +28,6 @@ export default class MovementCodec implements _ComponentCodec<MovementComponent,
     if (delta.dy !== undefined) {
       data.push([1, delta.dy]);
     }
-    if (delta.vx !== undefined) {
-      data.push([2, delta.vx]);
-    }
-    if (delta.vy !== undefined) {
-      data.push([3, delta.vy]);
-    }
 
     return data;
   }
@@ -45,8 +35,6 @@ export default class MovementCodec implements _ComponentCodec<MovementComponent,
     return {
       dx: packet[0] as number,
       dy: packet[1] as number,
-      vx: packet[2] as number,
-      vy: packet[3] as number,
     };
   }
   decodeDelta(data: ComponentData[]): Partial<MovementSpec> {
@@ -62,12 +50,6 @@ export default class MovementCodec implements _ComponentCodec<MovementComponent,
           break;
         case 1:
           spec.dy = value;
-          break;
-        case 2:
-          spec.vx = value;
-          break;
-        case 3:
-          spec.vy = value;
           break;
       }
     }

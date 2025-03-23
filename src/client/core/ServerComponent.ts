@@ -67,12 +67,6 @@ export default class ServerComponent extends Component {
       if (movementSpecDelta.dy !== undefined) {
         movementSpec.dy = movementSpecDelta.dy;
       }
-      if (movementSpecDelta.vx !== undefined) {
-        movementSpec.vx = movementSpecDelta.vx;
-      }
-      if (movementSpecDelta.vy !== undefined) {
-        movementSpec.vy = movementSpecDelta.vy;
-      }
       state.components.set(ComponentId.MOVEMENT, movementSpec);
     }
 

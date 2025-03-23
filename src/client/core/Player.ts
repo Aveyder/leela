@@ -4,7 +4,7 @@ import ModelComponent from "./ModelComponent";
 import ControlComponent from "./ControlComponent";
 import SpriteComponent from "./phaser/SpriteComponent";
 import WorldSession from "../WorldSession";
-import ServerControlComponent from "./ServerControlComponent";
+import ServerModelComponent from "./ServerModelComponent";
 import PredictPositionComponent from "./PredictPositionComponent";
 
 export default class Player extends SceneGameObject<WorldScene> {
@@ -17,7 +17,7 @@ export default class Player extends SceneGameObject<WorldScene> {
       new ModelComponent(),
       new ControlComponent(session),
       new PredictPositionComponent(session),
-      new ServerControlComponent(),
+      new ServerModelComponent(),
     ]);
   }
 }

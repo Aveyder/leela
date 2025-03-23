@@ -40,13 +40,13 @@ export default class PredictPositionComponent extends SceneComponent<WorldScene>
     this.targetPosition = {x: 0, y: 0};
 
     this.errorTimer = -1;
-
-    this.reset();
   }
 
   start() {
     this.predictedBody = this.createBody();
     this.reconciledBody = this.createBody();
+
+    this.reset();
     // this.server = this.gameObject.getComponent(ServerComponent);
     // this.model = this.gameObject.getComponent(ModelComponent);
   }
@@ -59,11 +59,12 @@ export default class PredictPositionComponent extends SceneComponent<WorldScene>
     this.initPosition.x = this.gameObject.x;
     this.initPosition.y = this.gameObject.y;
 
-    MatterJS.Body.setPosition(
+    this.scene.matter.body.setPosition(
       this.predictedBody,
       this.calcNextPosition(this.predictedBody.position, dir)
     );
-    MatterJS.Body.setPosition(
+
+    this.scene.matter.body.setPosition(
       this.reconciledBody,
       this.calcNextPosition(this.reconciledBody.position, dir)
     );
@@ -157,6 +158,16 @@ export default class PredictPositionComponent extends SceneComponent<WorldScene>
 
     this.initPosition.x = this.targetPosition.x = this.gameObject.x;
     this.initPosition.y = this.targetPosition.y = this.gameObject.y;
+
+    this.scene.matter.body.setPosition(
+      this.predictedBody,
+      this.gameObject
+    );
+
+    this.scene.matter.body.setPosition(
+      this.reconciledBody,
+      this.gameObject
+    );
 
     this.errorTimer = -1;
   }

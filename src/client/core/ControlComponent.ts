@@ -1,12 +1,12 @@
 import { Keys } from "../world/Keys";
 import { Vec2 } from "../../utils/math";
 import SceneComponent from "./phaser/SceneComponent";
-import MovementComponent from "../../core/MovementComponent";
 import WorldScene from "../world/WorldScene";
 import WorldSession from "../WorldSession";
 import { Opcode } from "../../protocol/Opcode";
 import Move from "../../entity/Move";
 import ModelComponent from "./ModelComponent";
+import PredictPositionComponent from "./PredictPositionComponent";
 
 export default class ControlComponent extends SceneComponent<WorldScene> {
 
@@ -14,6 +14,7 @@ export default class ControlComponent extends SceneComponent<WorldScene> {
 
   private keys!: Keys;
   private model!: ModelComponent;
+  private predictPosition!: PredictPositionComponent;
 
   private prevControl: Vec2;
 
@@ -27,10 +28,15 @@ export default class ControlComponent extends SceneComponent<WorldScene> {
   public start(): void {
     this.keys = this.scene.keys;
     this.model = this.gameObject.getComponent(ModelComponent);
+    this.predictPosition = this.gameObject.getComponent(PredictPositionComponent);
   }
 
   public applyControl(): void {
     const dir = this.getVec2Keys();
+
+    if (dir.x != 0 || dir.y != 0) {
+      this.predictPosition.predict(dir);
+    }
 
     this.model.setDirection(dir.x, dir.y);
 

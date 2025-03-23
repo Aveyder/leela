@@ -1,16 +1,9 @@
-import { ModelDescriptor } from "../../resource/Model";
-import GameObject from "../../core/GameObject";
-import { ComponentId } from "../../protocol/codec/ComponentId";
-import ModelComponent from "../core/ModelComponent";
 import Player from "../core/Player";
 import Char from "../core/Char";
-import WorldScene from "./WorldScene";
 import { GameObjectState } from "../../entity/GameObjectState";
 import WorldSession from "../WorldSession";
 import ServerGameObjectManager from "../core/ServerGameObjectManager";
 import WorldSessionScope from "../WorldSessionScope";
-import MovementComponent from "../../core/MovementComponent";
-import MovementSpec from "../../entity/component/MovementSpec";
 import ServerComponent from "../core/ServerComponent";
 import WorldClientConfig from "../WorldClientConfig";
 

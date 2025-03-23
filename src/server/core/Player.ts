@@ -1,7 +1,7 @@
 import WorldGameObject from "./WorldGameObject";
 import World from "../world/World";
 import ModelComponent from "./ModelComponent";
-import MovementComponent from "../../core/MovementComponent";
+import MovementComponent from "./MovementComponent";
 import MatterBodyComponent from "./MatterBodyComponent";
 
 export default class Player extends WorldGameObject {
@@ -13,7 +13,7 @@ export default class Player extends WorldGameObject {
 
     this.addComponents([
       new ModelComponent(),
-      new MovementComponent(world.config.charSpeed),
+      new MovementComponent(world.config),
       new MatterBodyComponent(world),
     ]);
   }

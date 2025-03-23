@@ -51,7 +51,7 @@ export default class WorldScene extends Phaser.Scene {
     buildingInteriorLayer.cull(this.cameras.main).forEach(tile => {
       const matterBody = (tile.physics as any).matterBody as MatterTileBody;
       if (matterBody) {
-        matterBody.setCollisionCategory(CollisionCategory.PLAYER);
+        matterBody.setCollisionCategory(CollisionCategory.WALL);
         matterBody.setCollidesWith(CollisionCategory.WALL | CollisionCategory.PLAYER);
       }
     });
