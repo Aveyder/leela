@@ -9,9 +9,9 @@ import GameObjectManager from "../../core/GameObjectManager";
 import { Opcode } from "../../protocol/Opcode";
 import Join from "../../entity/Join";
 import { GameObjectName } from "../resource/GameObjectName";
+import { CollisionCategory } from "../../shared/Constants";
 import TilemapLayer = Phaser.Tilemaps.TilemapLayer;
-import MatterTileBody= Phaser.Physics.Matter.TileBody
-import { CollisionCategory } from "../../shared/CollisionCategory";
+import MatterTileBody = Phaser.Physics.Matter.TileBody;
 
 export default class WorldScene extends Phaser.Scene {
 

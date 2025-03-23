@@ -15,6 +15,9 @@ export default class WorldClientConfig {
   public readonly interpolationMs!: number;
   public readonly extrapolateEntity!: boolean;
   public readonly extrapolateEntityMaxMs!: number;
+  public readonly clientSmoothPosMs!: number;
+  public readonly clientSmoothPosErrorPrecision!: number;
+  public readonly clientSmoothPosErrorThreshold!: number;
 
   public static fromEnv(): WorldClientConfig {
     return {
@@ -34,6 +37,9 @@ export default class WorldClientConfig {
       interpolationMs: Number(process.env.INTERPOLATION_MS),
       extrapolateEntity: process.env.EXTRAPOLATE_ENTITY === 'true',
       extrapolateEntityMaxMs: Number(process.env.EXTRAPOLATE_ENTITY_MAX_MS),
+      clientSmoothPosMs: Number(process.env.CLIENT_SMOOTH_POS_MS),
+      clientSmoothPosErrorPrecision: Number(process.env.CLIENT_SMOOTH_POS_ERROR_PRECISION),
+      clientSmoothPosErrorThreshold: Number(process.env.CLIENT_SMOOTH_POS_ERROR_THRESHOLD),
     };
   }
 }

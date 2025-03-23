@@ -1,7 +1,7 @@
 import Component from "../../core/Component";
 import Matter, { Bodies, Body, World as MatterWorld } from "matter-js";
 import World from "../world/World";
-import { CollisionCategory } from "../../shared/CollisionCategory";
+import { CHAR_WIDTH, CHAT_HEIGHT, CollisionCategory } from "../../shared/Constants";
 
 export default class MatterBodyComponent extends Component {
 
@@ -15,7 +15,7 @@ export default class MatterBodyComponent extends Component {
   }
 
   start() {
-    this.body = Bodies.rectangle(this.gameObject.x, this.gameObject.y, 24, 32, {
+    this.body = Bodies.rectangle(this.gameObject.x, this.gameObject.y, CHAR_WIDTH, CHAT_HEIGHT, {
       inertia: Infinity,
       collisionFilter: {
         category: CollisionCategory.PLAYER,

@@ -1,6 +1,6 @@
 import CaltheraMap from "../assets/map/calthera.json";
-import Matter, { Bodies, World as MatterWorld } from "matter-js";
-import { CollisionCategory } from "../shared/CollisionCategory";
+import Matter, { Bodies } from "matter-js";
+import { CollisionCategory } from "../shared/Constants";
 
 export function createBodiesFromObjectGroups(tiledMap: typeof CaltheraMap): Matter.Body[] {
   const objectMap = new Map();

@@ -5,7 +5,7 @@ import ControlComponent from "./ControlComponent";
 import SpriteComponent from "./phaser/SpriteComponent";
 import WorldSession from "../WorldSession";
 import ServerControlComponent from "./ServerControlComponent";
-import MatterComponent from "./phaser/MatterComponent";
+import PredictPositionComponent from "./PredictPositionComponent";
 
 export default class Player extends SceneGameObject<WorldScene> {
 
@@ -14,9 +14,9 @@ export default class Player extends SceneGameObject<WorldScene> {
 
     this.addComponents([
       new SpriteComponent(),
-      new MatterComponent(),
       new ModelComponent(),
       new ControlComponent(session),
+      new PredictPositionComponent(session),
       new ServerControlComponent(),
     ]);
   }

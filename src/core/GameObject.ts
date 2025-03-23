@@ -10,7 +10,7 @@ export default class GameObject implements GameObjectSpec {
   public visible: boolean;
   public active: boolean;
 
-  private components: Map<Function, Component> = new Map();
+  private components: Map<Function | string, Component> = new Map();
 
   constructor(guid: number = -1) {
     this.guid = guid;
