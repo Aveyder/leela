@@ -4,8 +4,7 @@ import Player from "./core/Player";
 import ControlComponent from "./core/ControlComponent";
 import SpawnManager from "./world/SpawnManager";
 import ServerGameObjectManager from "./core/ServerGameObjectManager";
-import { GameObjectStateDelta, GameObjectState } from "../entity/GameObjectState";
-import { WorldStateDelta, WorldState } from "../entity/WorldState";
+import { GameObjectState, GameObjectStateDelta } from "../entity/GameObjectState";
 
 export default class WorldSessionScope {
   public readonly session: WorldSession;
@@ -13,6 +12,7 @@ export default class WorldSessionScope {
 
   public playerGuid: number;
   public player: Player | null;
+  public lastProcessedTick: number;
 
   public readonly objects: ServerGameObjectManager;
   public readonly spawn: SpawnManager;
@@ -23,6 +23,7 @@ export default class WorldSessionScope {
 
     this.playerGuid = -1;
     this.player = null;
+    this.lastProcessedTick = -1;
 
     this.objects = new ServerGameObjectManager(this);
     this.spawn = new SpawnManager(this);

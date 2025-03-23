@@ -6,6 +6,7 @@ export default class WorldUpdateHandler extends ObjectHandler<WorldStateDelta> {
 
   public handleObject(worldStateDelta: WorldStateDelta): void {
     this.scope.resolveTimestamp(worldStateDelta);
+    this.scope.lastProcessedTick = worldStateDelta.lastProcessedTick;
 
     for (const guid of worldStateDelta.objects.keys()) {
       const stateDelta = worldStateDelta.objects.get(guid)!;

@@ -7,7 +7,7 @@ import { GameObjectStateDelta, GameObjectState } from "../../entity/GameObjectSt
 export class WorldStateCodec implements SymmetricCodec<WorldState> {
 
   encode(worldState: WorldState): WorldPacketData {
-    const data = [worldState.timestamp] as WorldPacketData;
+    const data = [worldState.timestamp, worldState.lastProcessedTick] as WorldPacketData;
 
     Array.from(worldState.objects.values()).forEach(
       gameObjectState => data.push(GameObjectStateCodec.INSTANCE.encode(gameObjectState))
@@ -17,9 +17,11 @@ export class WorldStateCodec implements SymmetricCodec<WorldState> {
   }
   decode(data: WorldPacketData): WorldState {
     const timestamp = data[0] as number;
-    const gameObjectsSegment = data.slice(1) as WorldPacketData[];
+    const lastProcessedTick = data[1] as number;
+    const gameObjectsSegment = data.slice(2) as WorldPacketData[];
     return {
       timestamp,
+      lastProcessedTick,
       objects: gameObjectsSegment.reduce((acc: Map<number, GameObjectState>, data: WorldPacketData) => {
         acc.set(data[0] as number, GameObjectStateCodec.INSTANCE.decode(data as WorldPacketData));
 
@@ -36,6 +38,7 @@ export class DeltaWorldStateCodec implements SymmetricCodec<WorldStateDelta> {
   delta(worldStateA: WorldState, worldStateB: WorldState): WorldStateDelta {
     const deltaWorldState = {
       timestamp: worldStateB.timestamp,
+      lastProcessedTick: worldStateB.lastProcessedTick,
       objects: new Map()
     } as WorldStateDelta;
 
@@ -52,7 +55,10 @@ export class DeltaWorldStateCodec implements SymmetricCodec<WorldStateDelta> {
     return deltaWorldState;
   }
   encode(deltaWorldState: WorldStateDelta): WorldPacketData {
-    const data = [deltaWorldState.timestamp] as WorldPacketData;
+    const data = [
+      deltaWorldState.timestamp,
+      deltaWorldState.lastProcessedTick
+    ] as WorldPacketData;
     for (const guid of deltaWorldState.objects.keys()) {
       const gameObjectState = deltaWorldState.objects.get(guid)!;
 
@@ -65,9 +71,11 @@ export class DeltaWorldStateCodec implements SymmetricCodec<WorldStateDelta> {
   }
   decode(data: WorldPacketData): WorldStateDelta {
     const timestamp = data[0] as number;
-    const gameObjectsSegment = data.slice(1) as WorldPacketData[];
+    const lastProcessedTick = data[1] as number;
+    const gameObjectsSegment = data.slice(2) as WorldPacketData[];
     return {
       timestamp,
+      lastProcessedTick,
       objects: gameObjectsSegment.reduce((acc: Map<number, GameObjectStateDelta>, data: WorldPacketData) => {
         acc.set(data[0] as number, DeltaGameObjectStateCodec.INSTANCE.decode(data.slice(1) as WorldPacketData[][]));
 

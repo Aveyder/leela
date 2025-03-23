@@ -10,5 +10,7 @@ export default class MoveHandler extends ObjectHandler<Move> {
       const movement = player.getComponent(MovementComponent);
 
       movement.move(move.dir);
+
+      this.session.scope.lastProcessedTick = move.tick;
     }
 }

@@ -11,6 +11,7 @@ export default class WorldSessionScope {
   public readonly world: World;
 
   public player: Player | null;
+  public lastProcessedTick: number;
   private worldState: WorldState | null;
 
   constructor(session: WorldSession) {
@@ -18,6 +19,7 @@ export default class WorldSessionScope {
     this.world = session.server.world;
 
     this.player = null;
+    this.lastProcessedTick = -1;
     this.worldState = null;
   }
 
@@ -26,6 +28,7 @@ export default class WorldSessionScope {
 
     this.worldState = {
       timestamp: this.world.server.getTimestamp(),
+      lastProcessedTick: this.lastProcessedTick,
       objects: this.world.objects.state,
     };
 
