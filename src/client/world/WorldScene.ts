@@ -10,8 +10,10 @@ import { Opcode } from "../../protocol/Opcode";
 import Join from "../../entity/Join";
 import { GameObjectName } from "../resource/GameObjectName";
 import { CollisionCategory } from "../../shared/Constants";
+import { Layer } from "../../resource/map/Layer";
 import TilemapLayer = Phaser.Tilemaps.TilemapLayer;
 import MatterTileBody = Phaser.Physics.Matter.TileBody;
+import PhaserLayer = Phaser.GameObjects.Layer;
 
 export default class WorldScene extends Phaser.Scene {
 
@@ -21,6 +23,8 @@ export default class WorldScene extends Phaser.Scene {
   private _objects!: GameObjectManager;
 
   private _session: null | WorldSession;
+
+  private _charLayer!: PhaserLayer;
 
   constructor() {
     super("world");
@@ -55,10 +59,15 @@ export default class WorldScene extends Phaser.Scene {
         matterBody.setCollidesWith(CollisionCategory.WALL | CollisionCategory.PLAYER);
       }
     });
+
+    this._charLayer = this.add.layer();
+    this._charLayer.depth = Layer.BUILDING_INTERIOR.zIndex;
   }
 
   public update(time: number, delta: number): void {
     this._objects.update(delta / 1000);
+
+    this._charLayer.sort('y');
   }
 
   public addSession(session: WorldSession) {
@@ -92,5 +101,9 @@ export default class WorldScene extends Phaser.Scene {
 
   public get session(): null | WorldSession {
     return this._session;
+  }
+
+  public get charLayer(): PhaserLayer {
+    return this._charLayer;
   }
 }

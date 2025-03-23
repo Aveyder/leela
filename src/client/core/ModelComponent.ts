@@ -1,9 +1,11 @@
-import Component from "../../core/Component";
 import { Model, ModelDescriptor } from "../../resource/Model";
 import SpriteComponent from "./phaser/SpriteComponent";
+import { Image } from "../../resource/Image";
+import SceneComponent from "./phaser/SceneComponent";
+import WorldScene from "../world/WorldScene";
 import Sprite = Phaser.GameObjects.Sprite;
 
-export default class ModelComponent extends Component {
+export default class ModelComponent extends SceneComponent<WorldScene> {
 
   private sprite!: Sprite;
   private _model: ModelDescriptor;
@@ -20,6 +22,7 @@ export default class ModelComponent extends Component {
 
   public start(): void {
     this.sprite = this.gameObject.getComponent(SpriteComponent).sprite;
+    this.scene.charLayer.add(this.sprite);
 
     this.setModel(this._model);
   }
@@ -33,7 +36,7 @@ export default class ModelComponent extends Component {
   }
 
   public setModel(model: ModelDescriptor): void {
-    if (this._model === model) return;
+    if (this._model === model && this.sprite.texture.key != Image.PLACEHOLDER) return;
 
     this._model = model;
 

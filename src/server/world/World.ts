@@ -10,6 +10,9 @@ import Matter, { World as MatterWorld } from "matter-js";
 import CaltheraMap from '../../assets/map/calthera.json';
 import * as matterUtils from "../../utils/matter";
 import MatterBodyComponent from "../core/MatterBodyComponent";
+import NPC from "../core/NPC";
+import ModelComponent from "../core/ModelComponent";
+import { MODELS } from "../../resource/Model";
 
 export default class World {
 
@@ -37,6 +40,18 @@ export default class World {
         });
 
         this.loop.start(delta => this.update(delta), this.config.simulationRate);
+
+        for(let i = 0; i < 50; i++) {
+            const npc = new NPC(this, this.objects.guid());
+
+            npc.x = Math.random() * 600 + 100;
+            npc.y = Math.random() * 600 + 100;
+
+            const randomModel = Math.floor(MODELS.length * Math.random());
+            npc.getComponent(ModelComponent).setModel(MODELS[randomModel]);
+
+            this.objects.add(npc);
+        }
     }
 
     public addSession(session: WorldSession): void {
