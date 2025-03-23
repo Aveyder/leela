@@ -26,8 +26,9 @@ export default class InitService {
     const tilemap = this.scene.add.tilemap(Tilemap.CALTHERA.jsonKey);
 
     tilemap.addTilesetImage(Tileset.BASE, Image.TILESET_BASE);
+    tilemap.addTilesetImage(Tileset.GRASS, Image.TILESET_GRASS);
 
-    const groundLayer = tilemap.createLayer(Layer.GROUND.name, [Tileset.BASE])!;
+    const groundLayer = tilemap.createLayer(Layer.GROUND.name, [Tileset.BASE, Tileset.GRASS])!;
     groundLayer.depth = Layer.GROUND.zIndex;
 
     const terrainLayer = tilemap.createLayer(Layer.TERRAIN.name, [Tileset.BASE])!;

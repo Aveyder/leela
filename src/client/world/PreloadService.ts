@@ -47,7 +47,7 @@ export default class PreloadService {
 
   private loadTilemap(): void {
     this.load.spritesheet(Image.TILESET_BASE, basePng, {frameWidth: 32, frameHeight: 32});
-    this.load.image(Image.TILESET_GRASS, grassPng);
+    this.load.spritesheet(Image.TILESET_GRASS, grassPng, {frameWidth: 32, frameHeight: 32});
     this.load.tilemapTiledJSON(Tilemap.CALTHERA.jsonKey, caltheraJson);
   }
 
