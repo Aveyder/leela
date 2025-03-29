@@ -5,21 +5,24 @@ import UpdateRateHandler from "./handler/UpdateRateHandler";
 import JoinHandler from "./handler/JoinHandler";
 import MoveHandler from "./handler/MoveHandler";
 import WorldSession from "./WorldSession";
+import { Constructor } from "../utils/Constructor";
 
 export default class OpcodeTable {
 
   private readonly _table: [WorldSessionStatus, WorldPacketHandler][] = [];
 
-  constructor(session: WorldSession) {
-    const _ = new WorldPacketHandlerFactory(session);
+  private readonly _: WorldPacketHandlerFactory;
 
-    this.define(Opcode.CMSG_UPDATE_RATE, WorldSessionStatus.STATUS_AUTHED, _.handler(UpdateRateHandler));
-    this.define(Opcode.MSG_JOIN, WorldSessionStatus.STATUS_AUTHED, _.handler(JoinHandler));
-    this.define(Opcode.CMSG_MOVE, WorldSessionStatus.STATUS_JOINED, _.handler(MoveHandler));
+  constructor(session: WorldSession) {
+    this._ = new WorldPacketHandlerFactory(session);
+
+    this.define(Opcode.CMSG_UPDATE_RATE, WorldSessionStatus.STATUS_AUTHED, UpdateRateHandler);
+    this.define(Opcode.MSG_JOIN, WorldSessionStatus.STATUS_AUTHED, JoinHandler);
+    this.define(Opcode.CMSG_MOVE, WorldSessionStatus.STATUS_JOINED, MoveHandler);
   }
 
-  private define(opcode: Opcode, sessionStatus: WorldSessionStatus, handler: WorldPacketHandler) {
-    this._table[opcode] = [sessionStatus, handler];
+  private define(opcode: Opcode, sessionStatus: WorldSessionStatus, handler: Constructor<WorldPacketHandler>) {
+    this._table[opcode] = [sessionStatus, this._.handler(handler)];
   }
 
   public getSessionStatus(opcode: Opcode): WorldSessionStatus {

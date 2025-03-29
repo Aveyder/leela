@@ -7,24 +7,27 @@ import GameObjectNewHandler from "./handler/GameObjectNewHandler";
 import GameObjectDestroyHandler from "./handler/GameObjectDestroyHandler";
 import WorldUpdateHandler from "./handler/WorldUpdateHandler";
 import WorldSession from "./WorldSession";
+import { Constructor } from "../utils/Constructor";
 
 export default class OpcodeTable {
 
   private readonly _table: WorldPacketHandler[] = [];
 
-  constructor(session: WorldSession) {
-    const _ = new WorldPacketHandlerFactory(session);
+  private readonly _: WorldPacketHandlerFactory;
 
-    this.define(Opcode.SMSG_PONG, _.handler(PongHandler));
-    this.define(Opcode.MSG_JOIN, _.handler(JoinHandler));
-    this.define(Opcode.SMSG_WORLD_INIT, _.handler(WorldInitHandler));
-    this.define(Opcode.SMSG_WORLD_UPDATE, _.handler(WorldUpdateHandler));
-    this.define(Opcode.SMSG_OBJECT, _.handler(GameObjectNewHandler));
-    this.define(Opcode.SMGS_OBJECT_DESTROY, _.handler(GameObjectDestroyHandler));
+  constructor(session: WorldSession) {
+    this._ = new WorldPacketHandlerFactory(session);
+
+    this.define(Opcode.SMSG_PONG, PongHandler);
+    this.define(Opcode.MSG_JOIN, JoinHandler);
+    this.define(Opcode.SMSG_WORLD_INIT, WorldInitHandler);
+    this.define(Opcode.SMSG_WORLD_UPDATE, WorldUpdateHandler);
+    this.define(Opcode.SMSG_OBJECT, GameObjectNewHandler);
+    this.define(Opcode.SMGS_OBJECT_DESTROY, GameObjectDestroyHandler);
   }
 
-  private define(opcode: Opcode, handler: WorldPacketHandler) {
-    this._table[opcode] = handler;
+  private define(opcode: Opcode, handler: Constructor<WorldPacketHandler>) {
+    this._table[opcode] = this._.handler(handler);
   }
 
   public getHandler(opcode: Opcode): WorldPacketHandler {
