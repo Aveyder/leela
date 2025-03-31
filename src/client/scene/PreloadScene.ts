@@ -1,29 +1,40 @@
-import caltheraJson from "../../assets/map/calthera.json";
+import { ModelDescriptor, MODELS, ModelType } from "../../resource/Model";
+import { Image } from "../../resource/Image";
 import basePng from "../../assets/map/tilesets/base.png";
 import grassPng from "../../assets/map/tilesets/grass.png";
 import { Tilemap } from "../../resource/map/Tilemap";
-import WorldScene from "./WorldScene";
-import { ModelDescriptor, MODELS, ModelType } from "../../resource/Model";
-import { Image } from "../../resource/Image";
-import LoaderPlugin = Phaser.Loader.LoaderPlugin;
-import AnimationManager = Phaser.Animations.AnimationManager;
+import caltheraJson from "../../assets/map/calthera.json";
 import { SPRITESHEETS } from "../../resource/Spritesheet";
 
-export default class PreloadService {
-
-  public readonly scene: WorldScene;
-  public readonly load: LoaderPlugin;
-  private readonly anims: AnimationManager;
-
-  constructor(scene: WorldScene) {
-    this.scene = scene;
-    this.load = scene.load;
-    this.anims = scene.anims;
-
-    this.preload();
+export default class PreloadScene extends Phaser.Scene {
+  constructor() {
+    super('PreloadScene');
   }
 
-  private preload(): void {
+  preload() {
+    const width = this.scale.width;
+    const height = this.scale.height;
+
+    const progressBox = this.add.rectangle(width / 2, height / 2, 304, 34, 0x222222);
+    const progressBar = this.add.rectangle(width / 2 - 150, height / 2, 0, 30, 0xffffff).setOrigin(0, 0.5);
+
+    const loadingText = this.add.text(width / 2, height / 2 - 35, 'Loading...', {
+      fontSize: '16px',
+      color: '#000000'
+    }).setOrigin(0.5);
+
+    this.load.on('progress', (value: number) => {
+      progressBar.width = 300 * value;
+    });
+
+    this.load.on('complete', () => {
+      this.scene.start('ConnectScene');
+    });
+
+    this.doPreload();
+  }
+
+  private doPreload(): void {
     this.loadModels();
     this.loadTilemap();
     this.loadTextures();
@@ -36,7 +47,7 @@ export default class PreloadService {
       const model = MODELS[i];
 
       if (model.type === ModelType.CHAR) {
-         this.loadCharModel(model);
+        this.loadCharModel(model);
       }
     }
   }

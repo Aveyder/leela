@@ -2,7 +2,7 @@ import { Model, ModelDescriptor } from "../../resource/Model";
 import SpriteComponent from "./phaser/SpriteComponent";
 import { Image } from "../../resource/Image";
 import SceneComponent from "./phaser/SceneComponent";
-import WorldScene from "../world/WorldScene";
+import WorldScene from "../scene/WorldScene";
 import Sprite = Phaser.GameObjects.Sprite;
 
 export default class ModelComponent extends SceneComponent<WorldScene> {

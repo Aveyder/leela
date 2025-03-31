@@ -1,5 +1,5 @@
 import SceneGameObject from "./phaser/SceneGameObject";
-import WorldScene from "../world/WorldScene";
+import WorldScene from "../scene/WorldScene";
 import ModelComponent from "./ModelComponent";
 import SpriteComponent from "./phaser/SpriteComponent";
 import ServerModelComponent from "./ServerModelComponent";

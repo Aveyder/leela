@@ -1,5 +1,5 @@
-import WorldScene from "./WorldScene";
-import { Keys } from "./Keys";
+import WorldScene from "../scene/WorldScene";
+import { Keys } from "../resource/Keys";
 import { Tilemap } from "../../resource/map/Tilemap";
 import { Tileset } from "../../resource/map/Tileset";
 import { Layer } from "../../resource/map/Layer";

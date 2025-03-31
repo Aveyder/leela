@@ -2,7 +2,7 @@ import WorldSession from "./WorldSession";
 import WorldPacket from "../protocol/WorldPacket";
 import Codec from "../protocol/Codec";
 import { Constructor } from "../utils/Constructor";
-import WorldScene from "./world/WorldScene";
+import WorldScene from "./scene/WorldScene";
 import WorldSessionScope from "./WorldSessionScope";
 
 export default abstract class WorldPacketHandler {

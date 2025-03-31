@@ -1,14 +1,13 @@
-import WorldScene from "./world/WorldScene";
+import WorldScene from "./scene/WorldScene";
 import WorldSession from "./WorldSession";
 import Player from "./core/Player";
 import ControlComponent from "./core/ControlComponent";
-import SpawnManager from "./world/SpawnManager";
+import SpawnManager from "./service/SpawnManager";
 import ServerGameObjectManager from "./core/ServerGameObjectManager";
 import { GameObjectState, GameObjectStateDelta } from "../entity/GameObjectState";
 
 export default class WorldSessionScope {
   public readonly session: WorldSession;
-  public readonly scene: WorldScene;
 
   public playerGuid: number;
   public player: Player | null;
@@ -19,7 +18,6 @@ export default class WorldSessionScope {
 
   constructor(session: WorldSession) {
     this.session = session;
-    this.scene = session.scene!;
 
     this.playerGuid = -1;
     this.player = null;
@@ -45,5 +43,9 @@ export default class WorldSessionScope {
 
   public resolveTimestamp(state: { timestamp: number }) {
     state.timestamp = this.session.getServerTimestamp(state.timestamp);
+  }
+
+  public get scene(): WorldScene {
+    return this.session.scene;
   }
 }

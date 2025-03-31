@@ -6,26 +6,30 @@ import WorldPacket from "../protocol/WorldPacket";
 import OpcodeTable from "./OpcodeTable";
 import Codec from "../protocol/Codec";
 import WorldSessionScope from "./WorldSessionScope";
+import WorldScene from "./scene/WorldScene";
 
 export default class WorldSession {
 
   public readonly socket: WorldSocket;
   public readonly config: WorldClientConfig;
 
+  public scene!: WorldScene;
+
   public readonly serverStartTime: number;
-
-  private readonly opcodeTable: OpcodeTable;
-
-  private cmdLoop: Loop;
-  private simulationLoop: Loop;
-
-  public readonly scope: WorldSessionScope;
-
-  private readonly pingInterval: number;
 
   private _pingStart: null | number;
   public latency: number;
   private _tick: number;
+
+  private ready: boolean;
+  public scope!: WorldSessionScope;
+
+  private opcodeTable?: OpcodeTable;
+
+  private cmdLoop?: Loop;
+  private simulationLoop?: Loop;
+
+  private pingInterval?: number;
 
   constructor(socket: WorldSocket, serverStartTime: number) {
     this.socket = socket;
@@ -33,13 +37,19 @@ export default class WorldSession {
 
     this.serverStartTime = serverStartTime;
 
-    this.scope = new WorldSessionScope(this);
-
-    this.opcodeTable = new OpcodeTable(this);
-
     this._pingStart = null;
     this.latency = -1;
     this._tick = -1;
+
+    this.ready = false;
+  }
+
+  public init(scene: WorldScene): void {
+    this.scene = scene;
+
+    this.scope = new WorldSessionScope(this);
+
+    this.opcodeTable = new OpcodeTable(this);
 
     this.sendPacket([Opcode.CMSG_UPDATE_RATE, this.config.clientUpdateRate]);
 
@@ -47,6 +57,8 @@ export default class WorldSession {
     this.simulationLoop = this.initSimulationLoop();
 
     this.pingInterval = this.startPing();
+
+    this.ready = true;
   }
 
   public sendObject<T>(opcode: Opcode, object: T): void {
@@ -58,9 +70,11 @@ export default class WorldSession {
   }
 
   public recvPacket(packet: WorldPacket): void {
+    if (!this.ready) return;
+
     const opcode = packet[0] as Opcode;
 
-    const handler = this.opcodeTable.getHandler(opcode);
+    const handler = this.opcodeTable!.getHandler(opcode);
 
     handler.handle(packet);
   }
@@ -90,7 +104,7 @@ export default class WorldSession {
   private simulate(delta: number): void {
     this._tick = ++this._tick % this.config.tickCap;
 
-    this.scope.simulate(delta);
+    this.scope!.simulate(delta);
   }
 
   private startPing(): number {
@@ -102,10 +116,10 @@ export default class WorldSession {
   }
 
   public destroy(): void {
-    this.scope.destroy();
+    this.scope?.destroy();
 
-    this.cmdLoop.stop();
-    this.simulationLoop.stop();
+    this.cmdLoop?.stop();
+    this.simulationLoop?.stop();
 
     clearInterval(this.pingInterval);
     this._pingStart = null;
@@ -114,10 +128,6 @@ export default class WorldSession {
 
   public getServerTimestamp(timestamp: number) {
     return this.serverStartTime + timestamp;
-  }
-
-  public get scene() {
-    return this.socket.scene;
   }
 
   public get tick() {

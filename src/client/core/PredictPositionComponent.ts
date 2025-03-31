@@ -1,7 +1,7 @@
 import { deltaVec2, interpolate, TMP_VEC2, Vec2 } from "../../utils/math";
 import WorldSession from "../WorldSession";
 import SceneComponent from "./phaser/SceneComponent";
-import WorldScene from "../world/WorldScene";
+import WorldScene from "../scene/WorldScene";
 import { CHAR_WIDTH, CHAT_HEIGHT, CollisionCategory } from "../../shared/Constants";
 import WorldClientConfig from "../WorldClientConfig";
 import ServerComponent from "./ServerComponent";

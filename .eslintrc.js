@@ -10,6 +10,7 @@ module.exports = {
     ],
     rules: {
         'quotes': 'off',
-        '@typescript-eslint/no-require-imports': 'off'
+        '@typescript-eslint/no-require-imports': 'off',
+        '@typescript-eslint/no-unused-vars': 'off'
     }
 };
