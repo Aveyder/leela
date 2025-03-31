@@ -10,13 +10,6 @@ module.exports = {
     ],
     rules: {
         'quotes': 'off',
-        '@typescript-eslint/quotes': [
-            'error',
-            'double',
-            {
-                avoidEscape: true,
-                allowTemplateLiterals: true
-            }
-        ]
+        '@typescript-eslint/no-require-imports': 'off'
     }
 };

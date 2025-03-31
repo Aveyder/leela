@@ -7,6 +7,7 @@ import { ModelDescriptor, MODELS, ModelType } from "../../resource/Model";
 import { Image } from "../../resource/Image";
 import LoaderPlugin = Phaser.Loader.LoaderPlugin;
 import AnimationManager = Phaser.Animations.AnimationManager;
+import { SPRITESHEETS } from "../../resource/Spritesheet";
 
 export default class PreloadService {
 
@@ -42,7 +43,7 @@ export default class PreloadService {
 
   private loadCharModel(model: ModelDescriptor): void {
     const unitUri = require(`../../assets/model/${model.asset}`);
-    this.load.spritesheet(model.imageKey, unitUri.default, {frameWidth: 32, frameHeight: 32});
+    this.load.spritesheet(model.imageKey, unitUri, {frameWidth: 32, frameHeight: 32});
   }
 
   private loadTilemap(): void {
@@ -53,6 +54,7 @@ export default class PreloadService {
 
   private loadTextures(): void {
     this.load.image(Image.PLACEHOLDER, 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg==')
+    this.loadSpritesheets();
   }
 
   private createAnims(): void {
@@ -96,5 +98,16 @@ export default class PreloadService {
       frames: this.anims.generateFrameNames(model.imageKey, {start: 9, end: 11}),
       ...charAnimConfig
     });
+  }
+
+  private loadSpritesheets(): void {
+    for (let i = 0; i < SPRITESHEETS.length; i++) {
+      const sprite = SPRITESHEETS[i];
+      this.load.atlas(
+        sprite.imageKey,
+        require(`../../assets/sprites/${sprite.assetImage}`),
+        require(`../../assets/sprites/${sprite.assetJSON}?url`),
+      );
+    }
   }
 }

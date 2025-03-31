@@ -36,4 +36,8 @@ export class Layer {
         name: "weather",
         zIndex: 7
     };
+    static readonly UI: LayerDescriptor = {
+        name: "UI",
+        zIndex: 8
+    };
 }

@@ -4,7 +4,9 @@ import { Tilemap } from "../../resource/map/Tilemap";
 import { Tileset } from "../../resource/map/Tileset";
 import { Layer } from "../../resource/map/Layer";
 import { Image } from "../../resource/Image";
-import { GameObjectName } from "../resource/GameObjectName";
+import { CollisionCategory } from "../../shared/Constants";
+import MatterTileBody = Phaser.Physics.Matter.TileBody;
+import { Sprite } from "../../resource/Sprite";
 
 export default class InitService {
 
@@ -20,6 +22,8 @@ export default class InitService {
   private init(): void {
     this.initTilemap();
     this.initKeys();
+    this.initCharLayer();
+    this.initUI();
   }
 
   private initTilemap(): void {
@@ -36,14 +40,33 @@ export default class InitService {
 
     const buildingInteriorLayer = tilemap.createLayer(Layer.BUILDING_INTERIOR.name, [Tileset.BASE])!;
     buildingInteriorLayer.depth = Layer.BUILDING_INTERIOR.zIndex;
-    buildingInteriorLayer.name = GameObjectName.BUILD_INTERIOR_LAYER;
 
     const foregroundLayer = tilemap.createLayer(Layer.FOREGROUND.name, [Tileset.BASE])!;
     foregroundLayer.depth = Layer.FOREGROUND.zIndex;
+
+    // tilemap physics
+    this.scene.matter.world.convertTiles(buildingInteriorLayer.cull(this.scene.cameras.main));
+    buildingInteriorLayer.cull(this.scene.cameras.main).forEach(tile => {
+      const matterBody = (tile.physics as any).matterBody as MatterTileBody;
+      if (matterBody) {
+        matterBody.setCollisionCategory(CollisionCategory.WALL);
+        matterBody.setCollidesWith(CollisionCategory.WALL | CollisionCategory.PLAYER);
+      }
+    });
   }
 
   private initKeys(): void {
     this._keys = this.scene.input.keyboard!.addKeys("W,A,S,D,up,left,down,right,Z", false) as Keys;
+  }
+
+  private initCharLayer(): void {
+    this.scene.charLayer = this.scene.add.layer();
+    this.scene.charLayer.depth = Layer.BUILDING_INTERIOR.zIndex;
+  }
+
+  private initUI(): void {
+    const bagButton = this.scene.add.image(300, 300, Image.GENERAL, Sprite.BAG_BUTTON);
+    bagButton.depth = Layer.UI.zIndex;
   }
 
   public get keys(): Keys {

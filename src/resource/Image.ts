@@ -9,4 +9,5 @@ export enum Image {
     UNIT_4 = "image:unit_4",
     UNIT_5 = "image:unit_5",
     UNIT_6 = "image:unit_6",
+    GENERAL = "image:general",
 }

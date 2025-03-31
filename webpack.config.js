@@ -28,9 +28,20 @@ module.exports = {
                 exclude: /node_modules/
             },
             {
-                type: "javascript/auto",
                 test: /\.(png|xml|json|woff(2?))$/,
-                use: "file-loader"
+                type: "asset/resource",
+            },
+            {
+                test: /\.json$/,
+                oneOf: [
+                    {
+                        type: 'asset/resource',
+                        resourceQuery: /url/
+                    },
+                    {
+                        type: 'json'
+                    }
+                ]
             },
             {
                 test: /\.css$/,

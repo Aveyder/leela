@@ -1,0 +1,62 @@
+{
+	"textures": [
+		{
+			"image": "general.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 115,
+				"h": 66
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "bag_cell.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 64,
+						"h": 64
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 64,
+						"h": 64
+					},
+					"frame": {
+						"x": 1,
+						"y": 1,
+						"w": 64,
+						"h": 64
+					}
+				},
+				{
+					"filename": "bag_button.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 51,
+						"h": 51
+					},
+					"spriteSourceSize": {
+						"x": 2,
+						"y": 2,
+						"w": 47,
+						"h": 48
+					},
+					"frame": {
+						"x": 67,
+						"y": 1,
+						"w": 47,
+						"h": 48
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:2f8e64e6991864d5600a7f4ca1e2880f:f3ea2a00c2e5939f0a51c49a71b573a6:49afdaefc8003509a7dad15a6a269fdc$"
+	}
+}
