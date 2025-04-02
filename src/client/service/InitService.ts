@@ -45,14 +45,16 @@ export default class InitService {
     foregroundLayer.depth = Layer.FOREGROUND.zIndex;
 
     // tilemap physics
-    this.scene.matter.world.convertTiles(buildingInteriorLayer.cull(this.scene.cameras.main));
-    buildingInteriorLayer.cull(this.scene.cameras.main).forEach(tile => {
-      const matterBody = (tile.physics as any).matterBody as MatterTileBody;
-      if (matterBody) {
-        matterBody.setCollisionCategory(CollisionCategory.WALL);
-        matterBody.setCollidesWith(CollisionCategory.WALL | CollisionCategory.PLAYER);
-      }
-    });
+    setTimeout(() => {
+      this.scene.matter.world.convertTiles(buildingInteriorLayer.cull(this.scene.cameras.main));
+      buildingInteriorLayer.cull(this.scene.cameras.main).forEach(tile => {
+        const matterBody = (tile.physics as any).matterBody as MatterTileBody;
+        if (matterBody) {
+          matterBody.setCollisionCategory(CollisionCategory.WALL);
+          matterBody.setCollidesWith(CollisionCategory.WALL | CollisionCategory.PLAYER);
+        }
+      });
+    }, 0);
   }
 
   private initKeys(): void {

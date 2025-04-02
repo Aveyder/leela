@@ -1,6 +1,5 @@
-import { Data } from "../resource/Data";
-import WorldClient from "../WorldClient";
 import WorldSession from "../WorldSession";
+import WorldClientHolder from "../utils/WorldClientHolder";
 
 export default class ConnectScene extends Phaser.Scene {
   constructor() {
@@ -22,24 +21,9 @@ export default class ConnectScene extends Phaser.Scene {
       connectText.setText('Connecting...');
       connectText.disableInteractive();
 
-      const worldClient = this.registry.get(Data.WORLD_CLIENT) as WorldClient;
-
-      worldClient.connect((session: WorldSession) => {
+      WorldClientHolder.get(this).connect((session: WorldSession) => {
         this.scene.start('WorldScene', { session });
       });
-
-      // try {
-      //   const worldClient = getWorldClient();
-      //   const session = await worldClient.connect();
-      //
-      //   // Transition to GameScene, passing the session
-      //   this.scene.start('GameScene', { session });
-      //
-      // } catch (err) {
-      //   console.error('Connection failed:', err);
-      //   connectText.setText('Connect Failed (Retry)');
-      //   connectText.setInteractive();
-      // }
     });
   }
 }

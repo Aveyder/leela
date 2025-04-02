@@ -8,7 +8,7 @@ import Codec from "../../protocol/Codec";
 import WorldGameObjectManager from "../core/WorldGameObjectManager";
 import Matter, { World as MatterWorld } from "matter-js";
 import CaltheraMap from '../../assets/map/calthera.json';
-import * as matterUtils from "../../utils/matter";
+import * as matterUtils from "../utils/matter";
 import MatterBodyComponent from "../core/MatterBodyComponent";
 import NPC from "../core/NPC";
 import ModelComponent from "../core/ModelComponent";
@@ -41,17 +41,17 @@ export default class World {
 
         this.loop.start(delta => this.update(delta), this.config.simulationRate);
 
-        for(let i = 0; i < 100; i++) {
-            const npc = new NPC(this, this.objects.guid());
-
-            npc.x = Math.random() * 600 + 100;
-            npc.y = Math.random() * 600 + 100;
-
-            const randomModel = Math.floor(MODELS.length * Math.random());
-            npc.getComponent(ModelComponent).setModel(MODELS[randomModel]);
-
-            this.objects.add(npc);
-        }
+        // for(let i = 0; i < 100; i++) {
+        //     const npc = new NPC(this, this.objects.guid());
+        //
+        //     npc.x = Math.random() * 600 + 100;
+        //     npc.y = Math.random() * 600 + 100;
+        //
+        //     const randomModel = Math.floor(MODELS.length * Math.random());
+        //     npc.getComponent(ModelComponent).setModel(MODELS[randomModel]);
+        //
+        //     this.objects.add(npc);
+        // }
     }
 
     public addSession(session: WorldSession): void {
@@ -76,7 +76,7 @@ export default class World {
         this.objects.update(delta);
 
         // TODO: move this responsibility into a separate service/component called 'Physics/Matter'
-        Matter.Engine.update(this.matterEngine, delta * 1000, 10);
+        Matter.Engine.update(this.matterEngine, delta * 1000);
 
         this.objects.forEach(gameObject =>
           gameObject.getComponent(MatterBodyComponent)?.syncGameObjectPosition()

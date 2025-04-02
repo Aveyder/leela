@@ -44,8 +44,6 @@ export default class WorldClient {
 
                 this._io!.removeAllListeners("disconnect");
             });
-
-            console.log(this._socket);
         });
     }
 

@@ -1,5 +1,5 @@
 html, body {
-    background: black;
+    background-color: #000;
 
     margin: 0;
     padding: 0;
@@ -7,9 +7,19 @@ html, body {
     height: 100%;
 
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
 }
 
-.game {
+body {
+    width: 100%;
+
+    background-image: url('./background.png');
+    background-repeat: repeat;
+}
+
+.game canvas {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    border-radius: 8px;
 }
