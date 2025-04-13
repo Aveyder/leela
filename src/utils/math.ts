@@ -25,3 +25,10 @@ export const deltaVec2 = (vecA: Vec2, vecB: Vec2, result?: Vec2) => {
 
     return result;
 }
+
+export const distance = (vecA: Vec2, vecB: Vec2) => {
+    const dx = vecB.x - vecA.x;
+    const dy = vecB.y - vecA.y;
+
+    return Math.sqrt(dx * dx + dy * dy);
+}

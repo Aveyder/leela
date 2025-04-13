@@ -8,8 +8,8 @@ export default class ServerGameObjectManager {
 
   public readonly gameObjects: Map<number, GameObject>;
 
-  constructor(scope: WorldSessionScope) {
-    this.objects = scope.scene.objects;
+  constructor(objects: GameObjectManager) {
+    this.objects = objects;
 
     this.gameObjects = new Map<number, GameObject>();
   }

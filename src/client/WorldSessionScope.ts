@@ -23,7 +23,7 @@ export default class WorldSessionScope {
     this.player = null;
     this.lastProcessedTick = -1;
 
-    this.objects = new ServerGameObjectManager(this);
+    this.objects = new ServerGameObjectManager(this.scene.objects);
     this.spawn = new SpawnManager(this);
   }
 

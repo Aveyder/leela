@@ -233,8 +233,10 @@ export default class PredictPositionComponent extends SceneComponent<WorldScene>
   }
 
   private calcNextPosition(pos: Vec2, dir: Vec2): Vec2 {
-    TMP_VEC2.x = pos.x + dir.x * this.config.charSpeed * this.simulationDelta / 1000;
-    TMP_VEC2.y = pos.y + dir.y * this.config.charSpeed * this.simulationDelta / 1000;
+    const mag = dir.x != 0 || dir.y != 0 ? Math.sqrt(1) : 1;
+
+    TMP_VEC2.x = pos.x + dir.x * this.config.charSpeed * this.simulationDelta / 1000 * mag;
+    TMP_VEC2.y = pos.y + dir.y * this.config.charSpeed * this.simulationDelta / 1000 * mag;
 
     return TMP_VEC2;
   }

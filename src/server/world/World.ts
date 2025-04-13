@@ -6,7 +6,7 @@ import WorldPacket from "../../protocol/WorldPacket";
 import { Opcode } from "../../protocol/Opcode";
 import Codec from "../../protocol/Codec";
 import WorldGameObjectManager from "../core/WorldGameObjectManager";
-import Matter, { World as MatterWorld } from "matter-js";
+import Matter, { Bodies, Body, World as MatterWorld } from "matter-js";
 import CaltheraMap from '../../assets/map/calthera.json';
 import * as matterUtils from "../utils/matter";
 import MatterBodyComponent from "../core/MatterBodyComponent";
@@ -35,9 +35,10 @@ export default class World {
             gravity: {x: 0, y: 0}
         });
 
-        matterUtils.createBodiesFromObjectGroups(CaltheraMap).forEach(body => {
-            MatterWorld.add(this.matterEngine.world, body);
-        });
+        MatterWorld.add(this.matterEngine.world, Body.create({
+            parts: matterUtils.createBodiesFromObjectGroups(CaltheraMap),
+            isStatic: true
+        }));
 
         this.loop.start(delta => this.update(delta), this.config.simulationRate);
 

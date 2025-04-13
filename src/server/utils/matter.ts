@@ -41,6 +41,9 @@ export function createBodiesFromObjectGroups(tiledMap: typeof CaltheraMap): Matt
                     collisionFilter: {
                       category: CollisionCategory.WALL,
                       mask: CollisionCategory.WALL | CollisionCategory.PLAYER
+                    },
+                    chamfer: {
+                      radius: 2
                     }
                   })
                 );
