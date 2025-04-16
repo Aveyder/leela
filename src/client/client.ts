@@ -21,14 +21,6 @@ function main() {
       createContainer: true
     },
     parent: document.querySelector(".game") as HTMLElement,
-    physics: {
-      default: 'matter',
-      matter: {
-        debug: false,
-        gravity: { x: 0, y: 0 },
-        autoUpdate: false,
-      }
-    },
     scene: [PreloadScene, ConnectScene, WorldScene, JoinScene],
     callbacks: {
       preBoot: game => {

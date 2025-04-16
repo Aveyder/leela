@@ -4,9 +4,9 @@ import { Tilemap } from "../../resource/map/Tilemap";
 import { Tileset } from "../../resource/map/Tileset";
 import { Layer } from "../../resource/map/Layer";
 import { Image } from "../../resource/Image";
-import { CollisionCategory } from "../../shared/Constants";
-import MatterTileBody = Phaser.Physics.Matter.TileBody;
 import { Sprite } from "../../resource/Sprite";
+import * as tiledUtils from "../../server/utils/tiled";
+import CaltheraMap from "../../assets/map/calthera.json";
 
 export default class InitService {
 
@@ -45,16 +45,7 @@ export default class InitService {
     foregroundLayer.depth = Layer.FOREGROUND.zIndex;
 
     // tilemap physics
-    setTimeout(() => {
-      this.scene.matter.world.convertTiles(buildingInteriorLayer.cull(this.scene.cameras.main));
-      buildingInteriorLayer.cull(this.scene.cameras.main).forEach(tile => {
-        const matterBody = (tile.physics as any).matterBody as MatterTileBody;
-        if (matterBody) {
-          matterBody.setCollisionCategory(CollisionCategory.WALL);
-          matterBody.setCollidesWith(CollisionCategory.WALL | CollisionCategory.PLAYER);
-        }
-      });
-    }, 0);
+    tiledUtils.createBodiesFromObjectGroups(CaltheraMap).forEach(body => this.scene.physicsWorld.add(body));
   }
 
   private initKeys(): void {

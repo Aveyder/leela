@@ -2,16 +2,14 @@ import { deltaVec2, interpolate, TMP_VEC2, Vec2 } from "../../utils/math";
 import WorldSession from "../WorldSession";
 import SceneComponent from "./phaser/SceneComponent";
 import WorldScene from "../scene/WorldScene";
-import { CHAR_WIDTH, CHAT_HEIGHT, CollisionCategory } from "../../shared/Constants";
+import { CHAR_WIDTH, CHAT_HEIGHT } from "../../shared/Constants";
 import WorldClientConfig from "../WorldClientConfig";
 import ServerComponent from "./ServerComponent";
-import BodyFactory = MatterJS.BodyFactory;
+import Body from "../../shared/physics/Body";
 
 type Input = {dir: Vec2, tick: number};
 
 export default class PredictPositionComponent extends SceneComponent<WorldScene> {
-
-  private bodyFactory!: BodyFactory;
 
   private readonly session: WorldSession;
   private readonly config: WorldClientConfig;
@@ -19,8 +17,8 @@ export default class PredictPositionComponent extends SceneComponent<WorldScene>
 
   private server!: ServerComponent;
 
-  private predictedBody!: MatterJS.BodyType;
-  private reconciledBody!: MatterJS.BodyType;
+  private predictedBody!: Body;
+  private reconciledBody!: Body;
 
   private readonly inputs: Input[];
 
@@ -53,15 +51,20 @@ export default class PredictPositionComponent extends SceneComponent<WorldScene>
   }
 
   start() {
-    this.bodyFactory = this.scene.matter.body;
-
     this.server = this.gameObject.getComponent(ServerComponent);
 
     this.predictedBody = this.createBody();
+    this.scene.physicsWorld.add(this.predictedBody);
 
     this.reconciledBody = this.createBody();
+    this.scene.physicsWorld.add(this.reconciledBody);
+
     this.reset();
-    // this.model = this.gameObject.getComponent(ModelComponent);
+  }
+
+  destroy() {
+    this.scene.physicsWorld.remove(this.predictedBody);
+    this.scene.physicsWorld.remove(this.reconciledBody);
   }
 
   public predict(dir: Vec2): void {
@@ -72,20 +75,16 @@ export default class PredictPositionComponent extends SceneComponent<WorldScene>
     this.initPosition.x = this.gameObject.x;
     this.initPosition.y = this.gameObject.y;
 
-    this.bodyFactory.setPosition(
-      this.predictedBody,
-      this.calcNextPosition(this.predictedBody.position, dir)
-    );
+    const nextPredictedPos = this.calcNextPosition(this.reconciledBody, dir);
+    this.predictedBody.setPosition(nextPredictedPos.x, nextPredictedPos.y);
 
-    this.bodyFactory.setPosition(
-      this.reconciledBody,
-      this.calcNextPosition(this.reconciledBody.position, dir)
-    );
+    const nextReconciledPos = this.calcNextPosition(this.reconciledBody, dir);
+    this.reconciledBody.setPosition(nextReconciledPos.x, nextReconciledPos.y);
 
-    this.scene.matter.world.step(this.simulationDelta);
+    this.scene.physicsWorld.step();
 
-    this.targetPosition.x = this.predictedBody.position.x;
-    this.targetPosition.y = this.predictedBody.position.y;
+    this.targetPosition.x = this.predictedBody.x;
+    this.targetPosition.y = this.predictedBody.y;
 
     const now = Date.now();
 
@@ -117,12 +116,12 @@ export default class PredictPositionComponent extends SceneComponent<WorldScene>
 
       const progress = Math.min(this.errorTimer / this.config.clientSmoothPosMs, 1);
 
-      interpolate(this.predictedBody.position, this.reconciledBody.position, progress, this.targetPosition);
+      interpolate(this.predictedBody, this.reconciledBody, progress, this.targetPosition);
 
-      const error = deltaVec2(this.targetPosition, this.reconciledBody.position);
+      const error = deltaVec2(this.targetPosition, this.reconciledBody);
 
       if (this.withinSmoothPosErrorPrecision(error)) {
-        this.bodyFactory.setPosition(this.predictedBody, this.targetPosition);
+        this.predictedBody.setPosition(this.targetPosition.x, this.targetPosition.y);
 
         this.errorTimer = -1;
       }
@@ -144,23 +143,21 @@ export default class PredictPositionComponent extends SceneComponent<WorldScene>
 
     this.inputs.splice(0, ackIndex + 1);
 
-    this.bodyFactory.setPosition(
-      this.reconciledBody,
-      this.server.getLastState().gameObject
+    this.reconciledBody.setPosition(
+      this.server.getLastState().gameObject.x,
+      this.server.getLastState().gameObject.y,
     );
 
-    this.scene.matter.world.step(this.simulationDelta);
+    this.scene.physicsWorld.step();
 
     for (let i = 0; i < this.inputs.length; i++) {
       const input = this.inputs[i];
 
-      this.bodyFactory.setPosition(
-        this.reconciledBody,
-        this.calcNextPosition(this.reconciledBody.position, input.dir)
-      );
+      const nextReconciledPos = this.calcNextPosition(this.reconciledBody, input.dir)
+      this.reconciledBody.setPosition(nextReconciledPos.x, nextReconciledPos.y);
 
       // TODO: step by real lerpDuration?
-      this.scene.matter.world.step(this.simulationDelta);
+      this.scene.physicsWorld.step();
     }
 
     this.refreshError();
@@ -169,7 +166,7 @@ export default class PredictPositionComponent extends SceneComponent<WorldScene>
   }
 
   private refreshError() {
-    const error = deltaVec2(this.predictedBody.position, this.reconciledBody.position, TMP_VEC2);
+    const error = deltaVec2(this.predictedBody, this.reconciledBody, TMP_VEC2);
 
     if (this.withinSmoothPosErrorPrecision(error)) {
       this.errorTimer = -1;
@@ -179,8 +176,8 @@ export default class PredictPositionComponent extends SceneComponent<WorldScene>
           this.errorTimer = 0;
         }
       } else {
-        this.gameObject.x = this.reconciledBody.position.x;
-        this.gameObject.y = this.reconciledBody.position.y;
+        this.gameObject.x = this.reconciledBody.x;
+        this.gameObject.y = this.reconciledBody.y;
 
         this.reset();
 
@@ -206,37 +203,26 @@ export default class PredictPositionComponent extends SceneComponent<WorldScene>
     this.initPosition.x = this.targetPosition.x = this.gameObject.x;
     this.initPosition.y = this.targetPosition.y = this.gameObject.y;
 
-    this.bodyFactory.setPosition(
-      this.predictedBody,
-      this.gameObject
+    this.predictedBody.setPosition(
+      this.gameObject.x, this.gameObject.y
     );
 
-    this.bodyFactory.setPosition(
-      this.reconciledBody,
-      this.gameObject
+    this.reconciledBody.setPosition(
+      this.gameObject.x, this.gameObject.y
     );
 
     this.errorTimer = -1;
   }
 
-  private createBody(): MatterJS.BodyType {
-    const body = this.scene.matter.add.rectangle(0, 0, CHAR_WIDTH, CHAT_HEIGHT, {
-      collisionFilter: {
-        category: CollisionCategory.PLAYER,
-        mask: CollisionCategory.WALL
-      }
-    });
-
-    body.inertia = Infinity;
-
-    return body;
+  private createBody(): Body {
+    return new Body({x: this.gameObject.x, y: this.gameObject.y, width: CHAR_WIDTH, height: CHAT_HEIGHT});
   }
 
   private calcNextPosition(pos: Vec2, dir: Vec2): Vec2 {
-    const mag = dir.x != 0 || dir.y != 0 ? Math.sqrt(1) : 1;
+    const mag = (dir.x != 0 && dir.y != 0) ? Math.sqrt(2) : 1;
 
-    TMP_VEC2.x = pos.x + dir.x * this.config.charSpeed * this.simulationDelta / 1000 * mag;
-    TMP_VEC2.y = pos.y + dir.y * this.config.charSpeed * this.simulationDelta / 1000 * mag;
+    TMP_VEC2.x = pos.x + dir.x * this.config.charSpeed * this.simulationDelta / 1000 / mag;
+    TMP_VEC2.y = pos.y + dir.y * this.config.charSpeed * this.simulationDelta / 1000 / mag;
 
     return TMP_VEC2;
   }

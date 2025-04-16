@@ -37,8 +37,8 @@ export default class World {
   public step() {
     for(const body of this.dynamicBodies) {
       if (body.dx !== 0 || body.dy !== 0) {
-        const stepX = body.x / World.STEPS;
-        const stepY = body.y / World.STEPS;
+        const stepX = body.dx / World.STEPS;
+        const stepY = body.dy / World.STEPS;
 
         for(let i = 0; i < World.STEPS; i++) {
           body.x += stepX;

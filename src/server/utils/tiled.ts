@@ -1,8 +1,7 @@
 import CaltheraMap from "../../assets/map/calthera.json";
-import Matter, { Bodies } from "matter-js";
-import { CollisionCategory } from "../../shared/Constants";
+import Body from "../../shared/physics/Body";
 
-export function createBodiesFromObjectGroups(tiledMap: typeof CaltheraMap): Matter.Body[] {
+export function createBodiesFromObjectGroups(tiledMap: typeof CaltheraMap): Body[] {
   const objectMap = new Map();
   for (const tileset of tiledMap.tilesets) {
     const tiles = tileset.tiles;
@@ -18,7 +17,7 @@ export function createBodiesFromObjectGroups(tiledMap: typeof CaltheraMap): Matt
   const tilewidth = tiledMap.tilewidth;
   const tileheight = tiledMap.tileheight;
 
-  const bodies = [] as Matter.Body[];
+  const bodies = [] as Body[];
 
   for(const layer of tiledMap.layers) {
     const chunks = layer.chunks;
@@ -36,15 +35,12 @@ export function createBodiesFromObjectGroups(tiledMap: typeof CaltheraMap): Matt
 
               for (const object of objects) {
                 bodies.push(
-                  Bodies.rectangle(tileX + object.x + object.width / 2, tileY + object.y + object.height / 2, object.width, object.height, {
-                    isStatic: true,
-                    collisionFilter: {
-                      category: CollisionCategory.WALL,
-                      mask: CollisionCategory.WALL | CollisionCategory.PLAYER
-                    },
-                    chamfer: {
-                      radius: 2
-                    }
+                  new Body({
+                    x: tileX + object.x + object.width / 2,
+                    y: tileY + object.y + object.height / 2,
+                    width: object.width,
+                    height: object.height,
+                    isStatic: true
                   })
                 );
               }

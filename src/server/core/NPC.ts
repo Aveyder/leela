@@ -2,7 +2,7 @@ import WorldGameObject from "./WorldGameObject";
 import World from "../world/World";
 import ModelComponent from "./ModelComponent";
 import MovementComponent from "./MovementComponent";
-import MatterBodyComponent from "./MatterBodyComponent";
+import PhysicsBodyComponent from "./PhysicsBodyComponent";
 import NPCMovementComponent from "./NPCMovementComponent";
 
 export default class NPC extends WorldGameObject {
@@ -16,7 +16,7 @@ export default class NPC extends WorldGameObject {
       new ModelComponent(),
       new NPCMovementComponent(),
       new MovementComponent(world.config),
-      new MatterBodyComponent(world),
+      new PhysicsBodyComponent(world),
     ]);
   }
 }

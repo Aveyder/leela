@@ -9,10 +9,13 @@ import { MODELS } from "../../resource/Model";
 import Graphics = Phaser.GameObjects.Graphics;
 import { CHAR_WIDTH, CHAT_HEIGHT } from "../../shared/Constants";
 import ServerComponent from "../core/ServerComponent";
+import PhysicsWorld from "../../shared/physics/World";
 
 export default class WorldScene extends Phaser.Scene {
 
   private session!: WorldSession;
+
+  public physicsWorld!: PhysicsWorld;
 
   private _keys!: Keys;
   private _objects!: GameObjectManager;
@@ -38,6 +41,8 @@ export default class WorldScene extends Phaser.Scene {
     } else {
       this.scene.launch("JoinScene", {session: this.session});
     }
+
+    this.physicsWorld = new PhysicsWorld();
 
     const init = new InitService(this);
 

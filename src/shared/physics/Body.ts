@@ -40,7 +40,7 @@ export default class Body implements BodyData {
   }
 
   public setPosition(x: number, y: number) {
-    this.dx = this.x - x;
-    this.dy = this.y - y;
+    this.dx = x - this.x;
+    this.dy = y - this.y;
   }
 }

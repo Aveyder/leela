@@ -6,13 +6,10 @@ import WorldPacket from "../../protocol/WorldPacket";
 import { Opcode } from "../../protocol/Opcode";
 import Codec from "../../protocol/Codec";
 import WorldGameObjectManager from "../core/WorldGameObjectManager";
-import Matter, { Bodies, Body, World as MatterWorld } from "matter-js";
 import CaltheraMap from '../../assets/map/calthera.json';
-import * as matterUtils from "../utils/matter";
-import MatterBodyComponent from "../core/MatterBodyComponent";
-import NPC from "../core/NPC";
-import ModelComponent from "../core/ModelComponent";
-import { MODELS } from "../../resource/Model";
+import * as tiledUtils from "../utils/tiled";
+import PhysicsBodyComponent from "../core/PhysicsBodyComponent";
+import PhysicsWorld from "../../shared/physics/World";
 
 export default class World {
 
@@ -22,7 +19,7 @@ export default class World {
     public readonly sessions: Map<string, WorldSession>;
     public readonly objects: WorldGameObjectManager;
 
-    public readonly matterEngine: Matter.Engine;
+    public readonly physicsWorld: PhysicsWorld;
 
     constructor(server: WorldServer) {
         this.server = server;
@@ -31,14 +28,9 @@ export default class World {
         this.sessions = new Map();
         this.objects = new WorldGameObjectManager(this);
 
-        this.matterEngine = Matter.Engine.create({
-            gravity: {x: 0, y: 0}
-        });
+        this.physicsWorld = new PhysicsWorld();
 
-        MatterWorld.add(this.matterEngine.world, Body.create({
-            parts: matterUtils.createBodiesFromObjectGroups(CaltheraMap),
-            isStatic: true
-        }));
+        tiledUtils.createBodiesFromObjectGroups(CaltheraMap).forEach(body => this.physicsWorld.add(body));
 
         this.loop.start(delta => this.update(delta), this.config.simulationRate);
 
@@ -76,11 +68,10 @@ export default class World {
 
         this.objects.update(delta);
 
-        // TODO: move this responsibility into a separate service/component called 'Physics/Matter'
-        Matter.Engine.update(this.matterEngine, delta * 1000);
+        this.physicsWorld.step();
 
         this.objects.forEach(gameObject =>
-          gameObject.getComponent(MatterBodyComponent)?.syncGameObjectPosition()
+          gameObject.getComponent(PhysicsBodyComponent)?.syncGameObjectPosition()
         );
 
         this.objects.captureState();

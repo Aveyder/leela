@@ -26,9 +26,9 @@ export default class MovementComponent extends Component {
     this.dx = dir.x;
     this.dy = dir.y;
 
-    const mag = dir.x != 0 || dir.y != 0 ? Math.sqrt(1) : 1;
+    const mag = (dir.x != 0 && dir.y != 0) ? Math.sqrt(2) : 1;
 
-    this.gameObject.x += this.dx * this.speed / this.simulationRate * mag;
-    this.gameObject.y += this.dy * this.speed / this.simulationRate * mag;
+    this.gameObject.x += this.dx * this.speed / this.simulationRate / mag;
+    this.gameObject.y += this.dy * this.speed / this.simulationRate / mag;
   }
 }
