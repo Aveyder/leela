@@ -22,7 +22,7 @@ export default class PhysicsBodyComponent extends Component {
       height: CHAT_HEIGHT
     });
 
-    this.world.physicsWorld.add(this.body);
+    this.world.phys.add(this.body);
   }
 
   update() {
@@ -35,6 +35,6 @@ export default class PhysicsBodyComponent extends Component {
   }
 
   destroy() {
-    this.world.physicsWorld.remove(this.body);
+    this.world.phys.remove(this.body);
   }
 }

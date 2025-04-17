@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev:client": "cross-env NODE_ENV=development webpack serve",
-    "dev:server": "tsc-watch -b --onSuccess \"cross-env ENV_DIR=\"./src/config\" NODE_ENV=development node dist/server/server/server.js\"",
+    "dev:server": "tsc-watch -b --onSuccess \"cross-env ENV_DIR=\"./src/config\" NODE_ENV=development node dist/server/server/index.js\"",
     "build:client": "cross-env NODE_ENV=development webpack",
     "build:server": "tsc -b",
     "lint": "eslint src/**/*.ts",

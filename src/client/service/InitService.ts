@@ -45,7 +45,7 @@ export default class InitService {
     foregroundLayer.depth = Layer.FOREGROUND.zIndex;
 
     // tilemap physics
-    tiledUtils.createBodiesFromObjectGroups(CaltheraMap).forEach(body => this.scene.physicsWorld.add(body));
+    tiledUtils.createBodiesFromObjectGroups(CaltheraMap).forEach(body => this.scene.phys.add(body));
   }
 
   private initKeys(): void {

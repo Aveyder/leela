@@ -1,21 +1,21 @@
 import { Keys } from "../resource/Keys";
 import InitService from "../service/InitService";
 import GameObjectManager from "../../core/GameObjectManager";
-import PhaserLayer = Phaser.GameObjects.Layer;
 import WorldSession from "../WorldSession";
 import Join from "../../entity/Join";
 import { Opcode } from "../../protocol/Opcode";
 import { MODELS } from "../../resource/Model";
+import Physics from "../../shared/physics/World";
+import PhaserLayer = Phaser.GameObjects.Layer;
 import Graphics = Phaser.GameObjects.Graphics;
 import { CHAR_WIDTH, CHAT_HEIGHT } from "../../shared/Constants";
 import ServerComponent from "../core/ServerComponent";
-import PhysicsWorld from "../../shared/physics/World";
 
 export default class WorldScene extends Phaser.Scene {
 
   private session!: WorldSession;
 
-  public physicsWorld!: PhysicsWorld;
+  public phys!: Physics;
 
   private _keys!: Keys;
   private _objects!: GameObjectManager;
@@ -42,7 +42,7 @@ export default class WorldScene extends Phaser.Scene {
       this.scene.launch("JoinScene", {session: this.session});
     }
 
-    this.physicsWorld = new PhysicsWorld();
+    this.phys = new Physics();
 
     const init = new InitService(this);
 

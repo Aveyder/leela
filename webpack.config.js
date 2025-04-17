@@ -10,7 +10,7 @@ module.exports = {
     mode: process.env.NODE_ENV === "production" ? "production" : "development",
     devtool: "eval-source-map",
     entry: {
-        index: "./src/client/client.ts"
+        index: "./src/client/index.ts"
     },
     devServer: {
         open: false,

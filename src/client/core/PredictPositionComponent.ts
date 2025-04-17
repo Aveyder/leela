@@ -7,7 +7,7 @@ import WorldClientConfig from "../WorldClientConfig";
 import ServerComponent from "./ServerComponent";
 import Body from "../../shared/physics/Body";
 
-type Input = {dir: Vec2, tick: number};
+type Input = {dir: Vec2, tick: number, prediction: Vec2};
 
 export default class PredictPositionComponent extends SceneComponent<WorldScene> {
 
@@ -24,8 +24,8 @@ export default class PredictPositionComponent extends SceneComponent<WorldScene>
 
   private lerpStartTime: number;
   private lerpDuration: number;
-  private initPosition: Vec2;
-  private targetPosition: Vec2;
+  private readonly initPosition: Vec2;
+  private readonly targetPosition: Vec2;
 
   private errorTimer: number;
 
@@ -54,24 +54,20 @@ export default class PredictPositionComponent extends SceneComponent<WorldScene>
     this.server = this.gameObject.getComponent(ServerComponent);
 
     this.predictedBody = this.createBody();
-    this.scene.physicsWorld.add(this.predictedBody);
+    this.scene.phys.add(this.predictedBody);
 
     this.reconciledBody = this.createBody();
-    this.scene.physicsWorld.add(this.reconciledBody);
+    this.scene.phys.add(this.reconciledBody);
 
     this.reset();
   }
 
   destroy() {
-    this.scene.physicsWorld.remove(this.predictedBody);
-    this.scene.physicsWorld.remove(this.reconciledBody);
+    this.scene.phys.remove(this.predictedBody);
+    this.scene.phys.remove(this.reconciledBody);
   }
 
   public predict(dir: Vec2): void {
-    this.inputs.push(
-      {tick: this.session.tick, dir}
-    );
-
     this.initPosition.x = this.gameObject.x;
     this.initPosition.y = this.gameObject.y;
 
@@ -81,7 +77,7 @@ export default class PredictPositionComponent extends SceneComponent<WorldScene>
     const nextReconciledPos = this.calcNextPosition(this.reconciledBody, dir);
     this.reconciledBody.setPosition(nextReconciledPos.x, nextReconciledPos.y);
 
-    this.scene.physicsWorld.step();
+    this.scene.phys.step();
 
     this.targetPosition.x = this.predictedBody.x;
     this.targetPosition.y = this.predictedBody.y;
@@ -97,6 +93,17 @@ export default class PredictPositionComponent extends SceneComponent<WorldScene>
     }
 
     this.lerpStartTime = now;
+
+    this.inputs.push(
+      {
+        tick: this.session.tick,
+        dir,
+        prediction: {
+          x: this.predictedBody.x,
+          y: this.predictedBody.y,
+        }
+      }
+    );
   }
 
   update(delta: number): void {
@@ -129,6 +136,8 @@ export default class PredictPositionComponent extends SceneComponent<WorldScene>
   }
 
   public reconcile(): void {
+    if (this.lastAckTick === -1) return;
+
     const lastProcessedTick = this.session.scope.lastProcessedTick;
 
     if (this.lastAckTick === lastProcessedTick) return;
@@ -141,14 +150,22 @@ export default class PredictPositionComponent extends SceneComponent<WorldScene>
       }
     }
 
-    this.inputs.splice(0, ackIndex + 1);
+    if (ackIndex === -1) {
+      throw new Error("Illegal state, ack input was not found!");
+    }
 
-    this.reconciledBody.setPosition(
-      this.server.getLastState().gameObject.x,
-      this.server.getLastState().gameObject.y,
-    );
+    const ackInput = this.inputs.splice(0, ackIndex + 1).at(-1)!;
+    const lastState = this.server.getLastState().gameObject;
 
-    this.scene.physicsWorld.step();
+    const error = deltaVec2(ackInput.prediction, lastState, TMP_VEC2);
+
+    if (this.withinSmoothPosErrorThreshold(error)) {
+      return;
+    }
+
+    this.reconciledBody.setPosition(lastState.x, lastState.y);
+
+    this.scene.phys.step();
 
     for (let i = 0; i < this.inputs.length; i++) {
       const input = this.inputs[i];
@@ -156,8 +173,7 @@ export default class PredictPositionComponent extends SceneComponent<WorldScene>
       const nextReconciledPos = this.calcNextPosition(this.reconciledBody, input.dir)
       this.reconciledBody.setPosition(nextReconciledPos.x, nextReconciledPos.y);
 
-      // TODO: step by real lerpDuration?
-      this.scene.physicsWorld.step();
+      this.scene.phys.step();
     }
 
     this.refreshError();
@@ -203,13 +219,8 @@ export default class PredictPositionComponent extends SceneComponent<WorldScene>
     this.initPosition.x = this.targetPosition.x = this.gameObject.x;
     this.initPosition.y = this.targetPosition.y = this.gameObject.y;
 
-    this.predictedBody.setPosition(
-      this.gameObject.x, this.gameObject.y
-    );
-
-    this.reconciledBody.setPosition(
-      this.gameObject.x, this.gameObject.y
-    );
+    this.predictedBody.setPosition(this.gameObject.x, this.gameObject.y);
+    this.reconciledBody.setPosition(this.gameObject.x, this.gameObject.y);
 
     this.errorTimer = -1;
   }

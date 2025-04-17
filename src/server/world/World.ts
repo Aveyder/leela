@@ -9,7 +9,10 @@ import WorldGameObjectManager from "../core/WorldGameObjectManager";
 import CaltheraMap from '../../assets/map/calthera.json';
 import * as tiledUtils from "../utils/tiled";
 import PhysicsBodyComponent from "../core/PhysicsBodyComponent";
-import PhysicsWorld from "../../shared/physics/World";
+import Physics from "../../shared/physics/World";
+import ModelComponent from "../core/ModelComponent";
+import { MODELS } from "../../resource/Model";
+import NPC from "../core/NPC";
 
 export default class World {
 
@@ -19,7 +22,7 @@ export default class World {
     public readonly sessions: Map<string, WorldSession>;
     public readonly objects: WorldGameObjectManager;
 
-    public readonly physicsWorld: PhysicsWorld;
+    public readonly phys: Physics;
 
     constructor(server: WorldServer) {
         this.server = server;
@@ -28,13 +31,13 @@ export default class World {
         this.sessions = new Map();
         this.objects = new WorldGameObjectManager(this);
 
-        this.physicsWorld = new PhysicsWorld();
+        this.phys = new Physics();
 
-        tiledUtils.createBodiesFromObjectGroups(CaltheraMap).forEach(body => this.physicsWorld.add(body));
+        tiledUtils.createBodiesFromObjectGroups(CaltheraMap).forEach(body => this.phys.add(body));
 
         this.loop.start(delta => this.update(delta), this.config.simulationRate);
 
-        // for(let i = 0; i < 100; i++) {
+        // for(let i = 0; i < 1000; i++) {
         //     const npc = new NPC(this, this.objects.guid());
         //
         //     npc.x = Math.random() * 600 + 100;
@@ -68,7 +71,7 @@ export default class World {
 
         this.objects.update(delta);
 
-        this.physicsWorld.step();
+        this.phys.step();
 
         this.objects.forEach(gameObject =>
           gameObject.getComponent(PhysicsBodyComponent)?.syncGameObjectPosition()
