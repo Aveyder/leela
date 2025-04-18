@@ -10,6 +10,7 @@ import PhaserLayer = Phaser.GameObjects.Layer;
 import Graphics = Phaser.GameObjects.Graphics;
 import { CHAR_WIDTH, CHAT_HEIGHT } from "../../shared/Constants";
 import ServerComponent from "../core/ServerComponent";
+import { Layer } from "../../resource/map/Layer";
 
 export default class WorldScene extends Phaser.Scene {
 
@@ -52,6 +53,7 @@ export default class WorldScene extends Phaser.Scene {
     this.session.init(this);
 
     this.graphics = this.add.graphics();
+    this.graphics.depth = Layer.UI.zIndex;
   }
 
   public update(time: number, delta: number): void {
