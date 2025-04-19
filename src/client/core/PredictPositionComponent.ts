@@ -1,6 +1,6 @@
 import { deltaVec2, interpolate, TMP_VEC2, Vec2 } from "../../utils/math";
 import WorldSession from "../WorldSession";
-import SceneComponent from "./phaser/SceneComponent";
+import PhaserAwareComponent from "./phaser/PhaserAwareComponent";
 import WorldScene from "../scene/WorldScene";
 import { CHAR_WIDTH, CHAT_HEIGHT } from "../../shared/Constants";
 import WorldClientConfig from "../WorldClientConfig";
@@ -9,12 +9,13 @@ import Body from "../../shared/physics/Body";
 
 type Input = {dir: Vec2, tick: number, prediction: Vec2};
 
-export default class PredictPositionComponent extends SceneComponent<WorldScene> {
+export default class PredictPositionComponent extends PhaserAwareComponent {
 
   private readonly session: WorldSession;
   private readonly config: WorldClientConfig;
   private readonly simulationDelta: number;
 
+  private scene!: WorldScene;
   private server!: ServerComponent;
 
   private predictedBody!: Body;
@@ -51,6 +52,7 @@ export default class PredictPositionComponent extends SceneComponent<WorldScene>
   }
 
   start() {
+    this.scene = WorldScene.get(this.game);
     this.server = this.gameObject.getComponent(ServerComponent);
 
     this.predictedBody = this.createBody();

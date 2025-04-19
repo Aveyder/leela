@@ -1,4 +1,4 @@
-import SceneGameObject from "./phaser/SceneGameObject";
+import PhaserAwareGameObject from "./phaser/PhaserAwareGameObject";
 import WorldScene from "../scene/WorldScene";
 import ModelComponent from "./ModelComponent";
 import ControlComponent from "./ControlComponent";
@@ -7,13 +7,13 @@ import WorldSession from "../WorldSession";
 import ServerModelComponent from "./ServerModelComponent";
 import PredictPositionComponent from "./PredictPositionComponent";
 
-export default class Player extends SceneGameObject<WorldScene> {
+export default class Player extends PhaserAwareGameObject {
 
   constructor(session: WorldSession) {
-    super(session.scene);
+    super(session.game);
 
     this.addComponents([
-      new SpriteComponent(),
+      new SpriteComponent(WorldScene.KEY),
       new ModelComponent(),
       new ControlComponent(session),
       new PredictPositionComponent(session),

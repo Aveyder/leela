@@ -1,17 +1,16 @@
-import { Scene } from "phaser";
 import GameObjectComponent from "./GameObjectComponent";
 import { Image } from "../../../resource/Image";
-import Sprite = Phaser.GameObjects.Sprite;
 import { Layer } from "../../../resource/map/Layer";
+import Sprite = Phaser.GameObjects.Sprite;
 
-export default class SpriteComponent<S extends Scene> extends GameObjectComponent<Sprite, S> {
+export default class SpriteComponent extends GameObjectComponent<Sprite> {
 
-  constructor() {
-    super();
+  constructor(sceneKey: string) {
+    super(sceneKey);
   }
 
   init() {
-    this._phaserGameObject = this.scene.make.sprite({key: Image.PLACEHOLDER});
+    this._phaserGameObject = this.getScene().make.sprite({key: Image.PLACEHOLDER});
     this._phaserGameObject.depth = Layer.BUILDING_EXTERIOR.zIndex;
   }
 

@@ -6,14 +6,14 @@ import WorldPacket from "../protocol/WorldPacket";
 import OpcodeTable from "./OpcodeTable";
 import Codec from "../protocol/Codec";
 import WorldSessionScope from "./WorldSessionScope";
-import WorldScene from "./scene/WorldScene";
+import { Game } from "phaser";
 
 export default class WorldSession {
 
   public readonly socket: WorldSocket;
   public readonly config: WorldClientConfig;
 
-  public scene!: WorldScene;
+  public game!: Game;
 
   public readonly serverStartTime: number;
 
@@ -44,8 +44,8 @@ export default class WorldSession {
     this.ready = false;
   }
 
-  public init(scene: WorldScene): void {
-    this.scene = scene;
+  public init(game: Game): void {
+    this.game = game;
 
     this.scope = new WorldSessionScope(this);
 

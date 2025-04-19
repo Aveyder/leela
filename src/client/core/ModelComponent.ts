@@ -1,11 +1,11 @@
 import { Model, ModelDescriptor } from "../../resource/Model";
 import SpriteComponent from "./phaser/SpriteComponent";
 import { Image } from "../../resource/Image";
-import SceneComponent from "./phaser/SceneComponent";
+import PhaserAwareComponent from "./phaser/PhaserAwareComponent";
 import WorldScene from "../scene/WorldScene";
 import Sprite = Phaser.GameObjects.Sprite;
 
-export default class ModelComponent extends SceneComponent<WorldScene> {
+export default class ModelComponent extends PhaserAwareComponent {
 
   private sprite!: Sprite;
   private _model: ModelDescriptor;
@@ -22,7 +22,7 @@ export default class ModelComponent extends SceneComponent<WorldScene> {
 
   public start(): void {
     this.sprite = this.gameObject.getComponent(SpriteComponent).sprite;
-    this.scene.charLayer.add(this.sprite);
+    WorldScene.get(this.game).charLayer.add(this.sprite);
 
     this.setModel(this._model);
   }

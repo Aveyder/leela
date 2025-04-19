@@ -1,6 +1,6 @@
 import { Keys } from "../resource/Keys";
 import { Vec2 } from "../../utils/math";
-import SceneComponent from "./phaser/SceneComponent";
+import PhaserAwareComponent from "./phaser/PhaserAwareComponent";
 import WorldScene from "../scene/WorldScene";
 import WorldSession from "../WorldSession";
 import { Opcode } from "../../protocol/Opcode";
@@ -8,7 +8,7 @@ import Move from "../../entity/Move";
 import ModelComponent from "./ModelComponent";
 import PredictPositionComponent from "./PredictPositionComponent";
 
-export default class ControlComponent extends SceneComponent<WorldScene> {
+export default class ControlComponent extends PhaserAwareComponent {
 
   private readonly session: WorldSession;
 
@@ -26,7 +26,7 @@ export default class ControlComponent extends SceneComponent<WorldScene> {
   }
 
   public start(): void {
-    this.keys = this.scene.keys;
+    this.keys = WorldScene.get(this.game).keys;
     this.model = this.gameObject.getComponent(ModelComponent);
     this.predictPosition = this.gameObject.getComponent(PredictPositionComponent);
   }

@@ -6,13 +6,16 @@ import Join from "../../entity/Join";
 import { Opcode } from "../../protocol/Opcode";
 import { MODELS } from "../../resource/Model";
 import Physics from "../../shared/physics/World";
-import PhaserLayer = Phaser.GameObjects.Layer;
-import Graphics = Phaser.GameObjects.Graphics;
 import { CHAR_WIDTH, CHAT_HEIGHT } from "../../shared/Constants";
 import ServerComponent from "../core/ServerComponent";
 import { Layer } from "../../resource/map/Layer";
+import { Game } from "phaser";
+import PhaserLayer = Phaser.GameObjects.Layer;
+import Graphics = Phaser.GameObjects.Graphics;
 
 export default class WorldScene extends Phaser.Scene {
+
+  public static readonly KEY = "WorldScene";
 
   private session!: WorldSession;
 
@@ -26,7 +29,7 @@ export default class WorldScene extends Phaser.Scene {
   private graphics!: Graphics;
 
   constructor() {
-    super("WorldScene");
+    super(WorldScene.KEY);
   }
 
   init(data: { session: WorldSession }) {
@@ -50,7 +53,7 @@ export default class WorldScene extends Phaser.Scene {
     this._keys = init.keys;
     this._objects = new GameObjectManager();
 
-    this.session.init(this);
+    this.session.init(this.game);
 
     this.graphics = this.add.graphics();
     this.graphics.depth = Layer.UI.zIndex;
@@ -79,5 +82,9 @@ export default class WorldScene extends Phaser.Scene {
 
   public get objects(): GameObjectManager {
     return this._objects;
+  }
+
+  public static get(game: Game): WorldScene {
+    return game.scene.getScene(WorldScene.KEY) as WorldScene
   }
 }
