@@ -6,6 +6,7 @@ import SpawnManager from "./service/SpawnManager";
 import ServerGameObjectManager from "./core/ServerGameObjectManager";
 import { GameObjectState, GameObjectStateDelta } from "../entity/GameObjectState";
 import { Game } from "phaser";
+import DataUtils from "./utils/DataUtils";
 
 export default class WorldSessionScope {
   public readonly session: WorldSession;
@@ -24,7 +25,7 @@ export default class WorldSessionScope {
     this.player = null;
     this.lastProcessedTick = -1;
 
-    this.objects = new ServerGameObjectManager(WorldScene.get(this.game).objects);
+    this.objects = new ServerGameObjectManager(DataUtils.getObjects(session.game));
     this.spawn = new SpawnManager(this);
   }
 

@@ -12,6 +12,7 @@ import { Layer } from "../../resource/map/Layer";
 import { Game } from "phaser";
 import PhaserLayer = Phaser.GameObjects.Layer;
 import Graphics = Phaser.GameObjects.Graphics;
+import DataUtils from "../utils/DataUtils";
 
 export default class WorldScene extends Phaser.Scene {
 
@@ -51,7 +52,7 @@ export default class WorldScene extends Phaser.Scene {
     const init = new InitService(this);
 
     this._keys = init.keys;
-    this._objects = new GameObjectManager();
+    this._objects = DataUtils.getObjects(this);
 
     this.session.init(this.game);
 
@@ -60,8 +61,6 @@ export default class WorldScene extends Phaser.Scene {
   }
 
   public update(time: number, delta: number): void {
-    this._objects.update(delta / 1000);
-
     this.charLayer.sort('y');
 
     this.graphics.clear();
@@ -78,10 +77,6 @@ export default class WorldScene extends Phaser.Scene {
 
   public get keys(): Keys {
     return this._keys;
-  }
-
-  public get objects(): GameObjectManager {
-    return this._objects;
   }
 
   public static get(game: Game): WorldScene {

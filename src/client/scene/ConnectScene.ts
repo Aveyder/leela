@@ -1,5 +1,5 @@
 import WorldSession from "../WorldSession";
-import WorldClientHolder from "../utils/WorldClientHolder";
+import DataUtils from "../utils/DataUtils";
 
 export default class ConnectScene extends Phaser.Scene {
   constructor() {
@@ -21,7 +21,7 @@ export default class ConnectScene extends Phaser.Scene {
       connectText.setText('Connecting...');
       connectText.disableInteractive();
 
-      WorldClientHolder.get(this).connect((session: WorldSession) => {
+      DataUtils.getWorldClient(this).connect((session: WorldSession) => {
         this.scene.start('WorldScene', { session });
       });
     });
