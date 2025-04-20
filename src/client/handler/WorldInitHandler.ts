@@ -7,7 +7,7 @@ export default class WorldInitHandler extends ObjectHandler<WorldState> {
     this.scope.resolveTimestamp(worldState);
     this.scope.lastProcessedTick = worldState.lastProcessedTick;
 
-    for (let state of worldState.objects.values()) {
+    for (const state of worldState.objects.values()) {
       this.scope.spawn.gameObject(worldState.timestamp, state);
     }
   }

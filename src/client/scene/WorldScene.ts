@@ -12,7 +12,7 @@ import { Layer } from "../../resource/map/Layer";
 import { Game } from "phaser";
 import PhaserLayer = Phaser.GameObjects.Layer;
 import Graphics = Phaser.GameObjects.Graphics;
-import DataUtils from "../utils/DataUtils";
+import GameUtils from "../utils/GameUtils";
 
 export default class WorldScene extends Phaser.Scene {
 
@@ -52,9 +52,9 @@ export default class WorldScene extends Phaser.Scene {
     const init = new InitService(this);
 
     this._keys = init.keys;
-    this._objects = DataUtils.getObjects(this);
+    this._objects = GameUtils.getObjects(this);
 
-    this.session.init(this.game);
+    this.session.accept = true;
 
     this.graphics = this.add.graphics();
     this.graphics.depth = Layer.UI.zIndex;

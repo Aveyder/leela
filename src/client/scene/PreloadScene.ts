@@ -5,7 +5,7 @@ import grassPng from "../../assets/map/tilesets/grass.png";
 import { Tilemap } from "../../resource/map/Tilemap";
 import caltheraJson from "../../assets/map/calthera.json";
 import { SPRITESHEETS } from "../../resource/Spritesheet";
-import DataUtils from "../utils/DataUtils";
+import GameUtils from "../utils/GameUtils";
 
 export default class PreloadScene extends Phaser.Scene {
   constructor() {
@@ -28,11 +28,11 @@ export default class PreloadScene extends Phaser.Scene {
       progressBar.width = 300 * value;
     });
 
-    const worldClient = DataUtils.getWorldClient(this);
+    const worldClient = GameUtils.getWorldClient(this);
 
     this.load.on('complete', () => {
       if (worldClient.config.debugMode) {
-        worldClient.connect(session => this.scene.start('WorldScene', {session}));
+        GameUtils.worldClientConnect(this);
       } else {
         this.scene.start('ConnectScene');
       }

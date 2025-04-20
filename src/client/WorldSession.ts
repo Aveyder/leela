@@ -21,7 +21,7 @@ export default class WorldSession {
   public latency: number;
   private _tick: number;
 
-  private ready: boolean;
+  public accept: boolean;
   public scope!: WorldSessionScope;
 
   private opcodeTable?: OpcodeTable;
@@ -41,7 +41,7 @@ export default class WorldSession {
     this.latency = -1;
     this._tick = -1;
 
-    this.ready = false;
+    this.accept = false;
   }
 
   public init(game: Game): void {
@@ -57,8 +57,6 @@ export default class WorldSession {
     this.simulationLoop = this.initSimulationLoop();
 
     this.pingInterval = this.startPing();
-
-    this.ready = true;
   }
 
   public sendObject<T>(opcode: Opcode, object: T): void {
@@ -70,7 +68,7 @@ export default class WorldSession {
   }
 
   public recvPacket(packet: WorldPacket): void {
-    if (!this.ready) return;
+    if (!this.accept) return;
 
     const opcode = packet[0] as Opcode;
 
