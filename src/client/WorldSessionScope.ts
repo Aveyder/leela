@@ -32,7 +32,6 @@ export default class WorldSessionScope {
     this.spawn = new SpawnManager(this.context);
   }
 
-
   public simulate(delta: number) {
     this.player?.getComponent(ControlComponent).applyControl();
   }
