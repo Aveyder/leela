@@ -3,7 +3,6 @@ import WorldScene from "../scene/WorldScene";
 import ModelComponent from "./ModelComponent";
 import ControlComponent from "./ControlComponent";
 import SpriteComponent from "./phaser/SpriteComponent";
-import WorldSession from "../WorldSession";
 import ServerModelComponent from "./ServerModelComponent";
 import PredictPositionComponent from "./PredictPositionComponent";
 import GameContext from "../GameContext";

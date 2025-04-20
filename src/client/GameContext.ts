@@ -5,11 +5,11 @@ import { Game } from "phaser";
 import WorldScene from "./scene/WorldScene";
 import { Data } from "./resource/Data";
 import WorldClientConfig from "./WorldClientConfig";
-import Events = Phaser.Core.Events;
 import WorldSessionScope from "./WorldSessionScope";
 import WorldSocket from "./WorldSocket";
 import { Socket } from "socket.io-client";
 import { TimeSync } from "timesync";
+import Events = Phaser.Core.Events;
 import DataManager = Phaser.Data.DataManager;
 
 interface RegistryHolder {
@@ -43,7 +43,7 @@ export default class GameContext {
 
     this.session.init();
 
-    this.game.scene.start('WorldScene', {context: this});
+    this.game.scene.start('WorldScene');
   }
 
   public static get(registryHolder: RegistryHolder): GameContext {

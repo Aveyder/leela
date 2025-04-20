@@ -6,7 +6,6 @@ import WorldInitHandler from "./handler/WorldInitHandler";
 import GameObjectNewHandler from "./handler/GameObjectNewHandler";
 import GameObjectDestroyHandler from "./handler/GameObjectDestroyHandler";
 import WorldUpdateHandler from "./handler/WorldUpdateHandler";
-import WorldSession from "./WorldSession";
 import { Constructor } from "../utils/Constructor";
 import GameContext from "./GameContext";
 

@@ -4,7 +4,6 @@ import ModelComponent from "./ModelComponent";
 import SpriteComponent from "./phaser/SpriteComponent";
 import ServerModelComponent from "./ServerModelComponent";
 import InterpolateComponent from "./InterpolateComponent";
-import WorldSession from "../WorldSession";
 import GameContext from "../GameContext";
 
 export default class Char extends ContextAwareGameObject {

@@ -2,7 +2,7 @@ import WorldSession from "./WorldSession";
 import World from "./world/World";
 import Player from "./core/Player";
 import { Opcode } from "../protocol/Opcode";
-import { WorldStateDelta, WorldState } from "../entity/WorldState";
+import { WorldState, WorldStateDelta } from "../entity/WorldState";
 import { DeltaWorldStateCodec } from "../protocol/codec/WorldStateCodec";
 
 export default class WorldSessionScope {

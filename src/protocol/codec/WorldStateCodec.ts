@@ -1,8 +1,8 @@
 import { WorldPacketData } from "../WorldPacket";
 import { SymmetricCodec } from "../Codec";
 import { DeltaGameObjectStateCodec, GameObjectStateCodec } from "./GameObjectStateCodec";
-import { WorldStateDelta, WorldState } from "../../entity/WorldState";
-import { GameObjectStateDelta, GameObjectState } from "../../entity/GameObjectState";
+import { WorldState, WorldStateDelta } from "../../entity/WorldState";
+import { GameObjectState, GameObjectStateDelta } from "../../entity/GameObjectState";
 
 export class WorldStateCodec implements SymmetricCodec<WorldState> {
 

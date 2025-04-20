@@ -1,7 +1,6 @@
 import { Keys } from "../resource/Keys";
 import { Vec2 } from "../../utils/math";
 import ContextAwareComponent from "./phaser/ContextAwareComponent";
-import WorldScene from "../scene/WorldScene";
 import WorldSession from "../WorldSession";
 import { Opcode } from "../../protocol/Opcode";
 import Move from "../../entity/Move";

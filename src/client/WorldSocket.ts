@@ -1,13 +1,8 @@
 import WorldSession from "./WorldSession";
 import { Socket } from "socket.io-client";
-import WorldClient, { SessionCallback } from "./WorldClient";
 import * as timesync from "timesync";
-import { TimeSync } from "timesync";
 import WorldPacket from "../protocol/WorldPacket";
 import { Opcode } from "../protocol/Opcode";
-import WorldClientConfig from "./WorldClientConfig";
-import Join from "../entity/Join";
-import { MODELS } from "../resource/Model";
 import GameContext from "./GameContext";
 
 export default class WorldSocket {

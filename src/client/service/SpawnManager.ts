@@ -1,7 +1,6 @@
 import Player from "../core/Player";
 import Char from "../core/Char";
 import { GameObjectState } from "../../entity/GameObjectState";
-import WorldSession from "../WorldSession";
 import ServerGameObjectManager from "../core/ServerGameObjectManager";
 import WorldSessionScope from "../WorldSessionScope";
 import ServerComponent from "../core/ServerComponent";

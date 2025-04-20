@@ -1,6 +1,5 @@
 import GameObjectManager from "../../core/GameObjectManager";
 import GameObject from "../../core/GameObject";
-import WorldSessionScope from "../WorldSessionScope";
 
 export default class ServerGameObjectManager {
 

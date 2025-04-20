@@ -1,9 +1,9 @@
-import { Model, MODELS } from "../../resource/Model";
+import { MODELS } from "../../resource/Model";
 import { Image } from "../../resource/Image";
-import DOMElement = Phaser.GameObjects.DOMElement;
-import WorldSession from "../WorldSession";
 import Join from "../../entity/Join";
 import { Opcode } from "../../protocol/Opcode";
+import GameContext from "../GameContext";
+import DOMElement = Phaser.GameObjects.DOMElement;
 
 export default class JoinScene extends Phaser.Scene {
 
@@ -11,14 +11,8 @@ export default class JoinScene extends Phaser.Scene {
   private nicknameInput: DOMElement;
   private modelImage: Phaser.GameObjects.Image;
 
-  private session: WorldSession;
-
   constructor() {
     super('JoinScene');
-  }
-
-  init(data: { session: WorldSession }) {
-    this.session = data.session;
   }
 
   create() {
@@ -86,7 +80,7 @@ export default class JoinScene extends Phaser.Scene {
 
       if (!nickname) return alert('Please enter a nickname.');
 
-      this.session.sendObject<Join>(Opcode.MSG_JOIN, {
+      GameContext.get(this).session.sendObject<Join>(Opcode.MSG_JOIN, {
           model: MODELS[this.currentModelIndex],
           name: nickname
       });

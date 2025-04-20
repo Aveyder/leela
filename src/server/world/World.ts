@@ -10,9 +10,6 @@ import CaltheraMap from '../../assets/map/calthera.json';
 import * as tiledUtils from "../utils/tiled";
 import PhysicsBodyComponent from "../core/PhysicsBodyComponent";
 import Physics from "../../shared/physics/World";
-import ModelComponent from "../core/ModelComponent";
-import { MODELS } from "../../resource/Model";
-import NPC from "../core/NPC";
 
 export default class World {
 

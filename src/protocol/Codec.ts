@@ -2,7 +2,6 @@ import WorldPacket, { WorldPacketData } from "./WorldPacket";
 import { Opcode } from "./Opcode";
 import MoveCodec from "./codec/MoveCodec";
 import JoinCodec from "./codec/JoinCodec";
-import { GameObjectStateCodec } from "./codec/GameObjectStateCodec";
 import { DeltaWorldStateCodec, WorldStateCodec } from "./codec/WorldStateCodec";
 import GameObjectNewCodec from "./codec/GameObjectNewCodec";
 

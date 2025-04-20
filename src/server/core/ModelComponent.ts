@@ -1,5 +1,5 @@
 import Component from "../../core/Component";
-import { Model, ModelDescriptor, MODELS } from "../../resource/Model";
+import { Model, ModelDescriptor } from "../../resource/Model";
 
 export default class ModelComponent extends Component {
 

@@ -6,7 +6,6 @@ import { MODELS } from "../../resource/Model";
 import Physics from "../../shared/physics/World";
 import GameContext from "../GameContext";
 import PhaserLayer = Phaser.GameObjects.Layer;
-import Graphics = Phaser.GameObjects.Graphics;
 
 export default class WorldScene extends Phaser.Scene {
 
@@ -24,12 +23,11 @@ export default class WorldScene extends Phaser.Scene {
     super(WorldScene.KEY);
   }
 
-  init(data: { context: GameContext }) {
-    this.context = data.context;
-    this.context.scene = this;
-  }
-
   public create(): void {
+    this.context = GameContext.get(this);
+
+    this.context.scene = this;
+
     const session = this.context.session;
 
     if (this.context.config.debugMode) {
@@ -38,7 +36,7 @@ export default class WorldScene extends Phaser.Scene {
         name: 'TEST'
       });
     } else {
-      this.scene.launch("JoinScene", {session: session});
+      this.scene.launch("JoinScene");
     }
 
     this.phys = new Physics();

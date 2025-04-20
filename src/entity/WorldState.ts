@@ -1,4 +1,4 @@
-import { GameObjectStateDelta, GameObjectState } from "./GameObjectState";
+import { GameObjectState, GameObjectStateDelta } from "./GameObjectState";
 
 export interface WorldState {
   timestamp: number;

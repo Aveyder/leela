@@ -5,7 +5,7 @@ import { ComponentSegment } from "./ComponentSegment";
 import ComponentSpecCodec from "./ComponentSpecCodec";
 import { toFixed } from "../../utils/math";
 import diff from "../../utils/diff";
-import { GameObjectStateDelta, GameObjectState } from "../../entity/GameObjectState";
+import { GameObjectState, GameObjectStateDelta } from "../../entity/GameObjectState";
 
 export class GameObjectStateCodec implements SymmetricCodec<GameObjectState> {
 

@@ -2,7 +2,6 @@ import { Model, ModelDescriptor } from "../../resource/Model";
 import SpriteComponent from "./phaser/SpriteComponent";
 import { Image } from "../../resource/Image";
 import ContextAwareComponent from "./phaser/ContextAwareComponent";
-import WorldScene from "../scene/WorldScene";
 import Sprite = Phaser.GameObjects.Sprite;
 
 export default class ModelComponent extends ContextAwareComponent {
