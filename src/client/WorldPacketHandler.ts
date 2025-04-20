@@ -1,19 +1,13 @@
-import WorldSession from "./WorldSession";
 import WorldPacket from "../protocol/WorldPacket";
 import Codec from "../protocol/Codec";
 import { Constructor } from "../utils/Constructor";
-import WorldSessionScope from "./WorldSessionScope";
-import { Game } from "phaser";
+import GameContext from "./GameContext";
 
 export default abstract class WorldPacketHandler {
-    protected readonly session: WorldSession;
-    protected readonly scope: WorldSessionScope;
-    protected readonly game: Game;
+    protected readonly context: GameContext;
 
-    public constructor(session: WorldSession) {
-        this.session = session;
-        this.scope = session.scope;
-        this.game = session.game;
+    public constructor(context: GameContext) {
+        this.context = context;
     }
 
     public abstract handle(packet: WorldPacket): void;
@@ -29,14 +23,14 @@ export abstract class ObjectHandler<T> extends WorldPacketHandler {
 }
 
 export class WorldPacketHandlerFactory {
-    private readonly session: WorldSession;
+    private readonly context: GameContext;
 
-    constructor(session: WorldSession) {
-        this.session = session;
+    constructor(context: GameContext) {
+        this.context = context;
     }
 
     public handler<T extends WorldPacketHandler>(constructor: Constructor<T>): T {
-        return new constructor(this.session);
+        return new constructor(this.context);
     }
 }
 

@@ -1,6 +1,6 @@
 import { deltaVec2, interpolate, TMP_VEC2, Vec2 } from "../../utils/math";
 import WorldSession from "../WorldSession";
-import PhaserAwareComponent from "./phaser/PhaserAwareComponent";
+import ContextAwareComponent from "./phaser/ContextAwareComponent";
 import WorldScene from "../scene/WorldScene";
 import { CHAR_WIDTH, CHAT_HEIGHT } from "../../shared/Constants";
 import WorldClientConfig from "../WorldClientConfig";
@@ -9,7 +9,7 @@ import Body from "../../shared/physics/Body";
 
 type Input = {dir: Vec2, tick: number, prediction: Vec2};
 
-export default class PredictPositionComponent extends PhaserAwareComponent {
+export default class PredictPositionComponent extends ContextAwareComponent {
 
   private readonly session: WorldSession;
   private readonly config: WorldClientConfig;
@@ -52,7 +52,7 @@ export default class PredictPositionComponent extends PhaserAwareComponent {
   }
 
   start() {
-    this.scene = WorldScene.get(this.game);
+    this.scene = this.context.worldScene;
     this.server = this.gameObject.getComponent(ServerComponent);
 
     this.predictedBody = this.createBody();
@@ -140,7 +140,7 @@ export default class PredictPositionComponent extends PhaserAwareComponent {
   public reconcile(): void {
     if (this.lastAckTick === -1) return;
 
-    const lastProcessedTick = this.session.scope.lastProcessedTick;
+    const lastProcessedTick = this.context.scope.lastProcessedTick;
 
     if (this.lastAckTick === lastProcessedTick) return;
 

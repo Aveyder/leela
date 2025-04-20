@@ -1,4 +1,3 @@
-import WorldScene from "./scene/WorldScene";
 import WorldSession from "./WorldSession";
 import Player from "./core/Player";
 import ControlComponent from "./core/ControlComponent";
@@ -6,9 +5,10 @@ import SpawnManager from "./service/SpawnManager";
 import ServerGameObjectManager from "./core/ServerGameObjectManager";
 import { GameObjectState, GameObjectStateDelta } from "../entity/GameObjectState";
 import { Game } from "phaser";
-import GameUtils from "./utils/GameUtils";
+import GameContext from "./GameContext";
 
 export default class WorldSessionScope {
+  public readonly context: GameContext;
   public readonly session: WorldSession;
 
   public playerGuid: number;
@@ -18,16 +18,20 @@ export default class WorldSessionScope {
   public readonly objects: ServerGameObjectManager;
   public readonly spawn: SpawnManager;
 
-  constructor(session: WorldSession) {
-    this.session = session;
+  constructor(context: GameContext) {
+    context.scope = this;
+
+    this.context = context;
+    this.session = context.session;
 
     this.playerGuid = -1;
     this.player = null;
     this.lastProcessedTick = -1;
 
-    this.objects = new ServerGameObjectManager(GameUtils.getObjects(session.game));
-    this.spawn = new SpawnManager(this);
+    this.objects = new ServerGameObjectManager(this.context.objects);
+    this.spawn = new SpawnManager(this.context);
   }
+
 
   public simulate(delta: number) {
     this.player?.getComponent(ControlComponent).applyControl();
@@ -48,6 +52,6 @@ export default class WorldSessionScope {
   }
 
   public get game(): Game {
-    return this.session.game;
+    return this.context.game;
   }
 }

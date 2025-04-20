@@ -6,20 +6,22 @@ import ServerGameObjectManager from "../core/ServerGameObjectManager";
 import WorldSessionScope from "../WorldSessionScope";
 import ServerComponent from "../core/ServerComponent";
 import WorldClientConfig from "../WorldClientConfig";
+import GameContext from "../GameContext";
 
 export default class SpawnManager {
 
-  private readonly scope: WorldSessionScope;
-  private readonly session: WorldSession;
-  private readonly config: WorldClientConfig;
+  private readonly context: GameContext;
 
+  private readonly scope: WorldSessionScope;
+  private readonly config: WorldClientConfig;
   private readonly objects: ServerGameObjectManager;
 
-  constructor(scope: WorldSessionScope) {
-    this.scope = scope;
-    this.session = scope.session;
-    this.config = scope.session.config;
-    this.objects = scope.objects;
+  constructor(context: GameContext) {
+    this.context = context;
+
+    this.scope = context.scope;
+    this.config = context.config;
+    this.objects = this.scope.objects;
   }
 
   public gameObject(timestamp: number, state: GameObjectState): void {
@@ -29,11 +31,11 @@ export default class SpawnManager {
 
     let gameObject;
     if (serverGuid === this.scope.playerGuid) {
-      gameObject = new Player(this.session);
+      gameObject = new Player(this.context);
 
       this.scope.player = gameObject;
     } else {
-      gameObject = new Char(this.session);
+      gameObject = new Char(this.context);
     }
 
     gameObject.x = state.gameObject.x;

@@ -21,7 +21,7 @@ export default class ConnectScene extends Phaser.Scene {
       connectText.setText('Connecting...');
       connectText.disableInteractive();
 
-      GameUtils.worldClientConnect(this);
+      GameUtils.getContext(this).worldClientConnect();
     });
   }
 }

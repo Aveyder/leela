@@ -28,11 +28,11 @@ export default class PreloadScene extends Phaser.Scene {
       progressBar.width = 300 * value;
     });
 
-    const worldClient = GameUtils.getWorldClient(this);
+    const context = GameUtils.getContext(this);
 
     this.load.on('complete', () => {
-      if (worldClient.config.debugMode) {
-        GameUtils.worldClientConnect(this);
+      if (context.config.debugMode) {
+        context.worldClientConnect();
       } else {
         this.scene.start('ConnectScene');
       }

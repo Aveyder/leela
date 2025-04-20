@@ -7,13 +7,12 @@ import OpcodeTable from "./OpcodeTable";
 import Codec from "../protocol/Codec";
 import WorldSessionScope from "./WorldSessionScope";
 import { Game } from "phaser";
+import GameContext from "./GameContext";
 
 export default class WorldSession {
 
   public readonly socket: WorldSocket;
   public readonly config: WorldClientConfig;
-
-  public game!: Game;
 
   public readonly serverStartTime: number;
 
@@ -22,7 +21,7 @@ export default class WorldSession {
   private _tick: number;
 
   public accept: boolean;
-  public scope!: WorldSessionScope;
+  private scope!: WorldSessionScope;
 
   private opcodeTable?: OpcodeTable;
 
@@ -44,12 +43,12 @@ export default class WorldSession {
     this.accept = false;
   }
 
-  public init(game: Game): void {
-    this.game = game;
+  public init(context: GameContext): void {
+    context.session = this;
 
-    this.scope = new WorldSessionScope(this);
+    this.scope = new WorldSessionScope(context);
 
-    this.opcodeTable = new OpcodeTable(this);
+    this.opcodeTable = new OpcodeTable(context);
 
     this.sendPacket([Opcode.CMSG_UPDATE_RATE, this.config.clientUpdateRate]);
 

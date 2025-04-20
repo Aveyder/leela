@@ -8,6 +8,7 @@ import GameObjectDestroyHandler from "./handler/GameObjectDestroyHandler";
 import WorldUpdateHandler from "./handler/WorldUpdateHandler";
 import WorldSession from "./WorldSession";
 import { Constructor } from "../utils/Constructor";
+import GameContext from "./GameContext";
 
 export default class OpcodeTable {
 
@@ -15,8 +16,8 @@ export default class OpcodeTable {
 
   private readonly _: WorldPacketHandlerFactory;
 
-  constructor(session: WorldSession) {
-    this._ = new WorldPacketHandlerFactory(session);
+  constructor(context: GameContext) {
+    this._ = new WorldPacketHandlerFactory(context);
 
     this.define(Opcode.SMSG_PONG, PongHandler);
     this.define(Opcode.MSG_JOIN, JoinHandler);
