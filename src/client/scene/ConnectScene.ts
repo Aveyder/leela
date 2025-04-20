@@ -1,5 +1,4 @@
-import WorldSession from "../WorldSession";
-import GameUtils from "../utils/GameUtils";
+import GameContext from "../GameContext";
 
 export default class ConnectScene extends Phaser.Scene {
   constructor() {
@@ -21,7 +20,7 @@ export default class ConnectScene extends Phaser.Scene {
       connectText.setText('Connecting...');
       connectText.disableInteractive();
 
-      GameUtils.getContext(this).worldClientConnect();
+      GameContext.get(this).client.connect();
     });
   }
 }

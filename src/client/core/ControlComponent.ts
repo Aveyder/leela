@@ -10,7 +10,7 @@ import PredictPositionComponent from "./PredictPositionComponent";
 
 export default class ControlComponent extends ContextAwareComponent {
 
-  private readonly session: WorldSession;
+  private session!: WorldSession;
 
   private keys!: Keys;
   private model!: ModelComponent;
@@ -18,15 +18,15 @@ export default class ControlComponent extends ContextAwareComponent {
 
   private prevControl: Vec2;
 
-  constructor(session: WorldSession) {
+  constructor() {
     super();
 
-    this.session = session;
     this.prevControl = {x: 0, y: 0};
   }
 
   public start(): void {
-    this.keys = this.context.worldScene.keys;
+    this.session = this.context.session;
+    this.keys = this.context.scene.keys;
     this.model = this.gameObject.getComponent(ModelComponent);
     this.predictPosition = this.gameObject.getComponent(PredictPositionComponent);
   }

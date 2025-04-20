@@ -7,14 +7,25 @@ import { Data } from "./resource/Data";
 import WorldClientConfig from "./WorldClientConfig";
 import Events = Phaser.Core.Events;
 import WorldSessionScope from "./WorldSessionScope";
+import WorldSocket from "./WorldSocket";
+import { Socket } from "socket.io-client";
+import { TimeSync } from "timesync";
+import DataManager = Phaser.Data.DataManager;
+
+interface RegistryHolder {
+  registry: DataManager;
+}
 
 export default class GameContext {
   public config!: WorldClientConfig;
   public client!: WorldClient;
+  public io!: Socket | null;
+  public socket!: WorldSocket;
+  public ts!: TimeSync;
   public objects!: GameObjectManager;
   public game!: Game;
   public session!: WorldSession;
-  public worldScene!: WorldScene;
+  public scene!: WorldScene;
   public scope!: WorldSessionScope;
 
   public init(game: Game): void {
@@ -27,12 +38,15 @@ export default class GameContext {
     });
   }
 
-  public worldClientConnect(): void {
-    this.client.connect(session => {
-      this.session = session;
-      session.init(this);
+  public addSession(session: WorldSession): void {
+    this.session = session;
 
-      this.game.scene.start('WorldScene', {context: this});
-    });
+    this.session.init();
+
+    this.game.scene.start('WorldScene', {context: this});
+  }
+
+  public static get(registryHolder: RegistryHolder): GameContext {
+    return registryHolder.registry.get(Data.CONTEXT) as GameContext;
   }
 }

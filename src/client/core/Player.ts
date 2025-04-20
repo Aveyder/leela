@@ -16,8 +16,8 @@ export default class Player extends ContextAwareGameObject {
     this.addComponents([
       new SpriteComponent(WorldScene.KEY),
       new ModelComponent(),
-      new ControlComponent(context.session),
-      new PredictPositionComponent(context.session),
+      new ControlComponent(),
+      new PredictPositionComponent(),
       new ServerModelComponent(),
     ]);
   }

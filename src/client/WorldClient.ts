@@ -1,67 +1,48 @@
 import WorldSocket from "./WorldSocket";
 import msgpack from "socket.io-msgpack-parser";
-import { io, ManagerOptions, Socket, SocketOptions } from "socket.io-client";
-import WorldClientConfig from "./WorldClientConfig";
+import { io as ioClient, ManagerOptions, SocketOptions } from "socket.io-client";
 import WorldSession from "./WorldSession";
+import GameContext from "./GameContext";
 
 export type SessionCallback = (session: WorldSession) => void;
 
 export default class WorldClient {
 
-    public readonly config: WorldClientConfig;
+    private readonly context: GameContext;
 
-    private _io: null | Socket;
-    private _socket: null | WorldSocket;
-
-    private _callback: null | SessionCallback;
-
-    constructor(config: WorldClientConfig) {
-        this.config = config;
-        this._io = null;
-        this._socket = null;
-
-        this._callback = null;
+    constructor(context: GameContext) {
+        this.context = context;
     }
 
-    public connect(callback: SessionCallback): void {
-        this._callback = callback;
+    public connect(): void {
+        let io = this.context.io;
 
-        if (this._io?.connected) return;
+        if (io?.connected) return;
 
         const opts = {} as Partial<ManagerOptions & SocketOptions>;
 
-        if (this.config.msgpackEnabled) {
+        if (this.context.config.msgpackEnabled) {
             opts.parser = msgpack;
         }
 
-        this._io = io(this.config.serverUrl, opts);
+        io = ioClient(this.context.config.serverUrl, opts);
 
-        this._io.on("connect", () => {
-            this._socket = new WorldSocket(this);
+        this.context.io = io;
 
-            this._io!.on("disconnect", () => {
-                this._socket!.destroy();
+        io.on("connect", () => {
+            this.context.socket = new WorldSocket(this.context);
 
-                this._io!.removeAllListeners("disconnect");
+            io!.on("disconnect", () => {
+                this.context.socket!.destroy();
+
+                io!.removeAllListeners("disconnect");
             });
         });
     }
 
     public disconnect(): void {
-        this._io?.disconnect();
+        this.context.io?.disconnect();
 
-        this._io = null;
-    }
-
-    public get io() {
-        return this._io;
-    }
-
-    public get socket() {
-        return this._socket;
-    }
-
-    public get callback() {
-        return this._callback;
+        this.context.io = null;
     }
 }

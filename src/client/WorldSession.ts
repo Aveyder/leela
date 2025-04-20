@@ -1,18 +1,14 @@
-import WorldSocket from "./WorldSocket";
 import Loop from "./utils/Loop";
 import { Opcode } from "../protocol/Opcode";
-import WorldClientConfig from "./WorldClientConfig";
 import WorldPacket from "../protocol/WorldPacket";
 import OpcodeTable from "./OpcodeTable";
 import Codec from "../protocol/Codec";
 import WorldSessionScope from "./WorldSessionScope";
-import { Game } from "phaser";
 import GameContext from "./GameContext";
 
 export default class WorldSession {
 
-  public readonly socket: WorldSocket;
-  public readonly config: WorldClientConfig;
+  private readonly context: GameContext;
 
   public readonly serverStartTime: number;
 
@@ -30,10 +26,8 @@ export default class WorldSession {
 
   private pingInterval?: number;
 
-  constructor(socket: WorldSocket, serverStartTime: number) {
-    this.socket = socket;
-    this.config = socket.config;
-
+  constructor(context: GameContext, serverStartTime: number) {
+    this.context = context;
     this.serverStartTime = serverStartTime;
 
     this._pingStart = null;
@@ -43,14 +37,12 @@ export default class WorldSession {
     this.accept = false;
   }
 
-  public init(context: GameContext): void {
-    context.session = this;
+  public init(): void {
+    this.scope = new WorldSessionScope(this.context);
 
-    this.scope = new WorldSessionScope(context);
+    this.opcodeTable = new OpcodeTable(this.context);
 
-    this.opcodeTable = new OpcodeTable(context);
-
-    this.sendPacket([Opcode.CMSG_UPDATE_RATE, this.config.clientUpdateRate]);
+    this.sendPacket([Opcode.CMSG_UPDATE_RATE, this.context.config.clientUpdateRate]);
 
     this.cmdLoop = this.initCmdLoop();
     this.simulationLoop = this.initSimulationLoop();
@@ -63,7 +55,7 @@ export default class WorldSession {
   }
 
   public sendPacket(packet: WorldPacket): void {
-    this.socket.sendPacket(packet, !this.config.clientCmdLoop);
+    this.context.socket.sendPacket(packet, !this.context.config.clientCmdLoop);
   }
 
   public recvPacket(packet: WorldPacket): void {
@@ -80,8 +72,8 @@ export default class WorldSession {
     const cmdLoop= new Loop();
 
     cmdLoop.start(
-      () => this.socket.sendBufferedPackets(),
-      this.config.clientCmdRate < 0 ? this.config.simulationRate : this.config.clientCmdRate
+      () => this.context.socket.sendBufferedPackets(),
+      this.context.config.clientCmdRate < 0 ? this.context.config.simulationRate : this.context.config.clientCmdRate
     );
 
     return cmdLoop;
@@ -92,14 +84,14 @@ export default class WorldSession {
 
     simulationLoop.start(
       (delta: number) => this.simulate(delta),
-      this.config.simulationRate
+      this.context.config.simulationRate
     );
 
     return simulationLoop;
   }
 
   private simulate(delta: number): void {
-    this._tick = ++this._tick % this.config.tickCap;
+    this._tick = ++this._tick % this.context.config.tickCap;
 
     this.scope!.simulate(delta);
   }
@@ -108,8 +100,8 @@ export default class WorldSession {
     return setInterval(() => {
       this._pingStart = Date.now();
 
-      this.socket.sendPacket([Opcode.CMSG_PING, this.latency], true);
-    }, this.config.pingIntervalMs) as unknown as number;
+      this.context.socket.sendPacket([Opcode.CMSG_PING, this.latency], true);
+    }, this.context.config.pingIntervalMs) as unknown as number;
   }
 
   public destroy(): void {

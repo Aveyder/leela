@@ -28,13 +28,13 @@ export default class WorldScene extends Phaser.Scene {
 
   init(data: { context: GameContext }) {
     this.context = data.context;
-    this.context.worldScene = this;
+    this.context.scene = this;
   }
 
   public create(): void {
-    const session = this.context.session;
+    const session = this.context.session!;
 
-    if (session.config.debugMode) {
+    if (this.context.config.debugMode) {
       session.sendObject<Join>(Opcode.MSG_JOIN, {
         model: MODELS[0],
         name: 'TEST'

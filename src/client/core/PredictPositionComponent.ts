@@ -11,9 +11,9 @@ type Input = {dir: Vec2, tick: number, prediction: Vec2};
 
 export default class PredictPositionComponent extends ContextAwareComponent {
 
-  private readonly session: WorldSession;
-  private readonly config: WorldClientConfig;
-  private readonly simulationDelta: number;
+  private session!: WorldSession;
+  private config!: WorldClientConfig;
+  private simulationDelta: number;
 
   private scene!: WorldScene;
   private server!: ServerComponent;
@@ -32,13 +32,10 @@ export default class PredictPositionComponent extends ContextAwareComponent {
 
   private lastAckTick: number;
 
-  constructor(session: WorldSession) {
+  constructor() {
     super();
 
-    this.session = session;
-    this.config = session.config;
-
-    this.simulationDelta = 1000 / this.config.simulationRate;
+    this.simulationDelta = -1;
 
     this.inputs = [];
     this.lerpStartTime = -1;
@@ -52,7 +49,12 @@ export default class PredictPositionComponent extends ContextAwareComponent {
   }
 
   start() {
-    this.scene = this.context.worldScene;
+    this.session = this.context.session!;
+    this.config = this.context.config;
+
+    this.simulationDelta = 1000 / this.config.simulationRate;
+
+    this.scene = this.context.scene;
     this.server = this.gameObject.getComponent(ServerComponent);
 
     this.predictedBody = this.createBody();

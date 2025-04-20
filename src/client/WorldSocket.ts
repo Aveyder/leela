@@ -8,26 +8,22 @@ import { Opcode } from "../protocol/Opcode";
 import WorldClientConfig from "./WorldClientConfig";
 import Join from "../entity/Join";
 import { MODELS } from "../resource/Model";
+import GameContext from "./GameContext";
 
 export default class WorldSocket {
 
-    public readonly io: null | Socket;
-    public readonly config: WorldClientConfig;
-    private readonly callback: SessionCallback;
+    private readonly context: GameContext;
+    private readonly io: Socket;
 
     private readonly bufferQueue: WorldPacket[];
-    private readonly _ts: TimeSync;
-    private _session: null | WorldSession;
 
-    constructor(client: WorldClient) {
-        this.io = client.io!;
-        this.config = client.config;
-        this.callback = client.callback!;
+    constructor(context: GameContext) {
+        this.context = context;
+        this.io = context.io!;
 
         this.bufferQueue = [];
 
-        this._ts = this.initTimesync();
-        this._session = null;
+        this.context.ts = this.initTimesync();
 
         this.io.on("message", (packet: WorldPacket) => this.handlePacket(packet));
 
@@ -52,9 +48,9 @@ export default class WorldSocket {
     private initTimesync() {
         const ts = timesync.create({
             server: this.io!,
-            repeat: this.config.timesyncRepeat,
-            delay: this.config.timesyncDelayMs,
-            interval: this.config.timesyncIntervalMs
+            repeat: this.context.config.timesyncRepeat,
+            delay: this.context.config.timesyncDelayMs,
+            interval: this.context.config.timesyncIntervalMs
         });
 
         ts.send = sendTimesync;
@@ -67,7 +63,7 @@ export default class WorldSocket {
     private handlePacket(packet: WorldPacket) {
         const opcode = packet[0];
 
-        if (!this._session) {
+        if (!this.context.session) {
             switch (opcode) {
                 case Opcode.SMSG_AUTH_SUCCESS: {
                     const serverStartTime = packet[1] as number;
@@ -79,19 +75,19 @@ export default class WorldSocket {
             return;
         }
 
-        this._session.recvPacket(packet);
+        this.context.session.recvPacket(packet);
     }
 
     private createSession(serverStartTime: number) {
-        this._session = new WorldSession(this, serverStartTime);
-
-        this.callback(this._session);
+        this.context.addSession(
+          new WorldSession(this.context, serverStartTime)
+        );
     }
 
     public destroy() {
-        if (this._session) {
-            this._session.destroy();
-            this._session = null;
+        if (this.context.session) {
+            this.context.session.destroy();
+            // this.context.session = null;
         }
 
         this.bufferQueue.length = 0;
@@ -99,11 +95,7 @@ export default class WorldSocket {
         this.io!.removeAllListeners("message");
         this.io!.removeAllListeners("timesync");
 
-        this._ts.destroy();
-    }
-
-    public get ts(): TimeSync {
-        return this._ts;
+        this.context.ts.destroy();
     }
 }
 

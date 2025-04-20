@@ -22,7 +22,7 @@ export default class ModelComponent extends ContextAwareComponent {
 
   public start(): void {
     this.sprite = this.gameObject.getComponent(SpriteComponent).sprite;
-    this.context.worldScene.charLayer.add(this.sprite);
+    this.context.scene.charLayer.add(this.sprite);
 
     this.setModel(this._model);
   }

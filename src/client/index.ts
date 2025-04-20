@@ -13,7 +13,7 @@ function main() {
   const context = new GameContext();
 
   context.config = WorldClientConfig.fromEnv();
-  context.client = new WorldClient(context.config);
+  context.client = new WorldClient(context);
   context.objects = new GameObjectManager();
 
   new Game({

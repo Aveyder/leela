@@ -16,7 +16,7 @@ export default class Char extends ContextAwareGameObject {
       new SpriteComponent(WorldScene.KEY),
       new ModelComponent(),
       new ServerModelComponent(),
-      new InterpolateComponent(context.client.socket!.ts, context.config)
+      new InterpolateComponent(context.ts, context.config)
     ]);
   }
 }
