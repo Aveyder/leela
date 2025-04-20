@@ -11,7 +11,7 @@ import CaltheraMap from "../../assets/map/calthera.json";
 export default class InitService {
 
   public readonly scene: WorldScene;
-  private _keys!: Keys;
+  private _keys: Keys;
 
   constructor(scene: WorldScene) {
     this.scene = scene;
@@ -32,16 +32,16 @@ export default class InitService {
     tilemap.addTilesetImage(Tileset.BASE, Image.TILESET_BASE);
     tilemap.addTilesetImage(Tileset.GRASS, Image.TILESET_GRASS);
 
-    const groundLayer = tilemap.createLayer(Layer.GROUND.name, [Tileset.BASE, Tileset.GRASS])!;
+    const groundLayer = tilemap.createLayer(Layer.GROUND.name, [Tileset.BASE, Tileset.GRASS]);
     groundLayer.depth = Layer.GROUND.zIndex;
 
-    const terrainLayer = tilemap.createLayer(Layer.TERRAIN.name, [Tileset.BASE])!;
+    const terrainLayer = tilemap.createLayer(Layer.TERRAIN.name, [Tileset.BASE]);
     terrainLayer.depth = Layer.TERRAIN.zIndex;
 
-    const buildingInteriorLayer = tilemap.createLayer(Layer.BUILDING_INTERIOR.name, [Tileset.BASE])!;
+    const buildingInteriorLayer = tilemap.createLayer(Layer.BUILDING_INTERIOR.name, [Tileset.BASE]);
     buildingInteriorLayer.depth = Layer.BUILDING_INTERIOR.zIndex;
 
-    const foregroundLayer = tilemap.createLayer(Layer.FOREGROUND.name, [Tileset.BASE])!;
+    const foregroundLayer = tilemap.createLayer(Layer.FOREGROUND.name, [Tileset.BASE]);
     foregroundLayer.depth = Layer.FOREGROUND.zIndex;
 
     // tilemap physics
@@ -49,7 +49,7 @@ export default class InitService {
   }
 
   private initKeys(): void {
-    this._keys = this.scene.input.keyboard!.addKeys("W,A,S,D,up,left,down,right,Z", false) as Keys;
+    this._keys = this.scene.input.keyboard.addKeys("W,A,S,D,up,left,down,right,Z", false) as Keys;
   }
 
   private initCharLayer(): void {

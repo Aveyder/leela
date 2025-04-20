@@ -3,7 +3,7 @@ import { Game } from "phaser";
 
 export default class Loop {
 
-    private timestep!: TimeStep;
+    private timestep: TimeStep;
 
     public start(callback: (delta: number) => void, tickrate: number): void {
         this.timestep = new TimeStep({} as Game, {

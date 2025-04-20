@@ -11,15 +11,15 @@ type Input = {dir: Vec2, tick: number, prediction: Vec2};
 
 export default class PredictPositionComponent extends ContextAwareComponent {
 
-  private session!: WorldSession;
-  private config!: WorldClientConfig;
+  private session: WorldSession;
+  private config: WorldClientConfig;
   private simulationDelta: number;
 
-  private scene!: WorldScene;
-  private server!: ServerComponent;
+  private scene: WorldScene;
+  private server: ServerComponent;
 
-  private predictedBody!: Body;
-  private reconciledBody!: Body;
+  private predictedBody: Body;
+  private reconciledBody: Body;
 
   private readonly inputs: Input[];
 
@@ -49,7 +49,7 @@ export default class PredictPositionComponent extends ContextAwareComponent {
   }
 
   start() {
-    this.session = this.context.session!;
+    this.session = this.context.session;
     this.config = this.context.config;
 
     this.simulationDelta = 1000 / this.config.simulationRate;
@@ -158,7 +158,7 @@ export default class PredictPositionComponent extends ContextAwareComponent {
       throw new Error("Illegal state, ack input was not found!");
     }
 
-    const ackInput = this.inputs.splice(0, ackIndex + 1).at(-1)!;
+    const ackInput = this.inputs.splice(0, ackIndex + 1).at(-1);
     const lastState = this.server.getLastState().gameObject;
 
     const error = deltaVec2(ackInput.prediction, lastState, TMP_VEC2);

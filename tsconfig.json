@@ -8,6 +8,7 @@
     "outDir": "dist/server",
     "resolveJsonModule": true,
     "strict": true,
+    "strictNullChecks": false,
     "skipLibCheck": true
   },
   "include": ["src/**/*", "types"]

@@ -19,7 +19,7 @@ export default class WorldSocket {
 
     constructor(context: GameContext) {
         this.context = context;
-        this.io = context.io!;
+        this.io = context.io;
 
         this.bufferQueue = [];
 
@@ -32,7 +32,7 @@ export default class WorldSocket {
 
     public sendPacket(packet: WorldPacket, immediate: boolean) {
         if (immediate) {
-            this.io!.send(packet);
+            this.io.send(packet);
         } else {
             this.bufferQueue.push(packet);
         }
@@ -41,13 +41,13 @@ export default class WorldSocket {
     public sendBufferedPackets() {
         if (this.bufferQueue.length === 0) return;
 
-        this.bufferQueue.forEach(packet => this.io!.send(packet));
+        this.bufferQueue.forEach(packet => this.io.send(packet));
         this.bufferQueue.length = 0;
     }
 
     private initTimesync() {
         const ts = timesync.create({
-            server: this.io!,
+            server: this.io,
             repeat: this.context.config.timesyncRepeat,
             delay: this.context.config.timesyncDelayMs,
             interval: this.context.config.timesyncIntervalMs
@@ -55,7 +55,7 @@ export default class WorldSocket {
 
         ts.send = sendTimesync;
 
-        this.io!.on("timesync", (data) => ts.receive(null, data));
+        this.io.on("timesync", (data) => ts.receive(null, data));
 
         return ts;
     }
@@ -87,13 +87,13 @@ export default class WorldSocket {
     public destroy() {
         if (this.context.session) {
             this.context.session.destroy();
-            // this.context.session = null;
+            this.context.session = null;
         }
 
         this.bufferQueue.length = 0;
 
-        this.io!.removeAllListeners("message");
-        this.io!.removeAllListeners("timesync");
+        this.io.removeAllListeners("message");
+        this.io.removeAllListeners("timesync");
 
         this.context.ts.destroy();
     }

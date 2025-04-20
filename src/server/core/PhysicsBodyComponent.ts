@@ -6,7 +6,7 @@ import Body from "../../shared/physics/Body";
 export default class PhysicsBodyComponent extends Component {
 
   private readonly world: World;
-  public body!: Body;
+  public body: Body;
 
   constructor(world: World) {
     super();

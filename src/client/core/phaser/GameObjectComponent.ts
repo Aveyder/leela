@@ -6,9 +6,9 @@ import Visible = Phaser.GameObjects.Components.Visible;
 
 export default class GameObjectComponent<G extends GameObject & Transform & Visible> extends ContextAwareComponent {
 
-  private sceneKey!: string;
+  private readonly sceneKey: string;
 
-  protected _phaserGameObject!: G;
+  protected _phaserGameObject: G;
 
   constructor(scene: string) {
     super();
@@ -35,6 +35,6 @@ export default class GameObjectComponent<G extends GameObject & Transform & Visi
   }
 
   public getScene(): Scene {
-    return this.context.game.scene.getScene(this.sceneKey)!;
+    return this.context.game.scene.getScene(this.sceneKey);
   }
 }

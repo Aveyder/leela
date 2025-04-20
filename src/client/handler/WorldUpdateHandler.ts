@@ -9,9 +9,9 @@ export default class WorldUpdateHandler extends ObjectHandler<WorldStateDelta> {
     this.context.scope.lastProcessedTick = worldStateDelta.lastProcessedTick;
 
     for (const guid of worldStateDelta.objects.keys()) {
-      const stateDelta = worldStateDelta.objects.get(guid)!;
+      const stateDelta = worldStateDelta.objects.get(guid);
 
-      const gameObject = this.context.scope.objects.get(guid)!;
+      const gameObject = this.context.scope.objects.get(guid);
 
       if (!gameObject) {
         console.warn(`Received an update for a game object with GUID ${guid}, but this game object does not exist in the world.`);

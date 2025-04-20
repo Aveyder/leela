@@ -1,9 +1,9 @@
 export default class WorldServerConfig {
-  public readonly serverPort!: number;
-  public readonly serverUpdateRate!: number;
-  public readonly simulationRate!: number;
-  public readonly msgpackEnabled!: boolean;
-  public readonly charSpeed!: number;
+  public readonly serverPort: number;
+  public readonly serverUpdateRate: number;
+  public readonly simulationRate: number;
+  public readonly msgpackEnabled: boolean;
+  public readonly charSpeed: number;
 
   public static fromEnv(): WorldServerConfig {
     return {

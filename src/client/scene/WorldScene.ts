@@ -12,15 +12,13 @@ export default class WorldScene extends Phaser.Scene {
 
   public static readonly KEY = "WorldScene";
 
-  private context!: GameContext;
+  private context: GameContext;
 
-  public phys!: Physics;
+  public phys: Physics;
 
-  private _keys!: Keys;
+  private _keys: Keys;
 
-  public charLayer!: PhaserLayer;
-
-  private graphics!: Graphics;
+  public charLayer: PhaserLayer;
 
   constructor() {
     super(WorldScene.KEY);
@@ -32,7 +30,7 @@ export default class WorldScene extends Phaser.Scene {
   }
 
   public create(): void {
-    const session = this.context.session!;
+    const session = this.context.session;
 
     if (this.context.config.debugMode) {
       session.sendObject<Join>(Opcode.MSG_JOIN, {

@@ -2,12 +2,12 @@ export default class Loop {
 
     private started: boolean;
 
-    private startCallback!: (delta: number) => void;
-    private stopCallback?: () => void;
+    private startCallback: (delta: number) => void;
+    private stopCallback: () => void;
 
-    private _tickrate!: number;
-    private interval!: number;
-    private prevTick!: number;
+    private _tickrate: number;
+    private interval: number;
+    private prevTick: number;
 
     constructor() {
         this.started = false;

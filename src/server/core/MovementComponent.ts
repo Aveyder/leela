@@ -4,8 +4,8 @@ import { Vec2 } from "../../utils/math";
 
 export default class MovementComponent extends Component {
 
-  public dx!: number;
-  public dy!: number;
+  public dx: number;
+  public dy: number;
 
   public simulationRate: number;
   public speed: number;

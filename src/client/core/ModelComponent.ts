@@ -7,7 +7,7 @@ import Sprite = Phaser.GameObjects.Sprite;
 
 export default class ModelComponent extends ContextAwareComponent {
 
-  private sprite!: Sprite;
+  private sprite: Sprite;
   private _model: ModelDescriptor;
 
   constructor() {
@@ -48,17 +48,17 @@ export default class ModelComponent extends ContextAwareComponent {
   }
 
   public stay(): void {
-    this.sprite!.anims.pause();
-    this.sprite!.setFrame(1);
+    this.sprite.anims.pause();
+    this.sprite.setFrame(1);
   }
 
   public walk(dx: number, dy: number): void {
     const walkAnim = this.getWalkAnim(dx, dy);
 
-    const sprite = this.sprite!;
+    const sprite = this.sprite;
     const anims = sprite.anims;
     if (anims.currentAnim?.key === walkAnim) {
-      anims.resume(anims.currentFrame!);
+      anims.resume(anims.currentFrame);
     } else {
       sprite.play(walkAnim);
     }

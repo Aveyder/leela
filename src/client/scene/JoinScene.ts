@@ -8,10 +8,10 @@ import { Opcode } from "../../protocol/Opcode";
 export default class JoinScene extends Phaser.Scene {
 
   private currentModelIndex: number = 0;
-  private nicknameInput!: DOMElement;
-  private modelImage!: Phaser.GameObjects.Image;
+  private nicknameInput: DOMElement;
+  private modelImage: Phaser.GameObjects.Image;
 
-  private session!: WorldSession;
+  private session: WorldSession;
 
   constructor() {
     super('JoinScene');

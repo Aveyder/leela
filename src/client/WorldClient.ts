@@ -32,10 +32,10 @@ export default class WorldClient {
         io.on("connect", () => {
             this.context.socket = new WorldSocket(this.context);
 
-            io!.on("disconnect", () => {
-                this.context.socket!.destroy();
+            io.on("disconnect", () => {
+                this.context.socket.destroy();
 
-                io!.removeAllListeners("disconnect");
+                io.removeAllListeners("disconnect");
             });
         });
     }

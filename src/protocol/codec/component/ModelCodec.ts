@@ -17,7 +17,7 @@ export default class ModelCodec implements _ComponentCodec<ModelComponent, Model
         return this.encode(delta);
     }
     decode(data: ComponentData): ModelDescriptor {
-        return MODELS_BY_ID.get(data[0] as number)!;
+        return MODELS_BY_ID.get(data[0] as number);
     }
     decodeDelta(delta: ComponentData): ModelDescriptor {
         return this.decode(delta);

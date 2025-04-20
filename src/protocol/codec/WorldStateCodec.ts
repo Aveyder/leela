@@ -44,7 +44,7 @@ export class DeltaWorldStateCodec implements SymmetricCodec<WorldStateDelta> {
 
     for (const guid of worldStateB.objects.keys()) {
       const gameObjectA = worldStateA.objects.get(guid);
-      const gameObjectB = worldStateB.objects.get(guid)!;
+      const gameObjectB = worldStateB.objects.get(guid);
 
       if (!gameObjectA) continue;
 
@@ -60,7 +60,7 @@ export class DeltaWorldStateCodec implements SymmetricCodec<WorldStateDelta> {
       deltaWorldState.lastProcessedTick
     ] as WorldPacketData;
     for (const guid of deltaWorldState.objects.keys()) {
-      const gameObjectState = deltaWorldState.objects.get(guid)!;
+      const gameObjectState = deltaWorldState.objects.get(guid);
 
       data.push([
         guid, ...DeltaGameObjectStateCodec.INSTANCE.encode(gameObjectState)

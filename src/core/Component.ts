@@ -1,7 +1,7 @@
 import GameObject from "./GameObject";
 
 export default abstract class Component {
-  public gameObject!: GameObject;
+  public gameObject: GameObject;
 
   public init(): void {
   }

@@ -6,8 +6,8 @@ import { ModelDescriptor } from "../../resource/Model";
 
 export default class ServerModelComponent extends Component {
 
-  private server!: ServerComponent;
-  private model!: ModelComponent;
+  private server: ServerComponent;
+  private model: ModelComponent;
 
   public start() {
     this.server = this.gameObject.getComponent(ServerComponent);

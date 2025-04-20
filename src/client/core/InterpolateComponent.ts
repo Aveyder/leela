@@ -19,8 +19,8 @@ export default class InterpolateComponent extends Component {
 
   private config: WorldClientConfig;
   private ts: TimeSync;
-  private server!: ServerComponent;
-  private model!: ModelComponent;
+  private server: ServerComponent;
+  private model: ModelComponent;
 
   constructor(ts: TimeSync, config: WorldClientConfig) {
     super();

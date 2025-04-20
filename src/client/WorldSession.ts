@@ -17,14 +17,14 @@ export default class WorldSession {
   private _tick: number;
 
   public accept: boolean;
-  private scope!: WorldSessionScope;
+  private scope: WorldSessionScope;
 
-  private opcodeTable?: OpcodeTable;
+  private opcodeTable: OpcodeTable;
 
-  private cmdLoop?: Loop;
-  private simulationLoop?: Loop;
+  private cmdLoop: Loop;
+  private simulationLoop: Loop;
 
-  private pingInterval?: number;
+  private pingInterval: number;
 
   constructor(context: GameContext, serverStartTime: number) {
     this.context = context;
@@ -63,7 +63,7 @@ export default class WorldSession {
 
     const opcode = packet[0] as Opcode;
 
-    const handler = this.opcodeTable!.getHandler(opcode);
+    const handler = this.opcodeTable.getHandler(opcode);
 
     handler.handle(packet);
   }
@@ -93,7 +93,7 @@ export default class WorldSession {
   private simulate(delta: number): void {
     this._tick = ++this._tick % this.context.config.tickCap;
 
-    this.scope!.simulate(delta);
+    this.scope.simulate(delta);
   }
 
   private startPing(): number {

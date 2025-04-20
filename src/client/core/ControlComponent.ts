@@ -10,11 +10,11 @@ import PredictPositionComponent from "./PredictPositionComponent";
 
 export default class ControlComponent extends ContextAwareComponent {
 
-  private session!: WorldSession;
+  private session: WorldSession;
 
-  private keys!: Keys;
-  private model!: ModelComponent;
-  private predictPosition!: PredictPositionComponent;
+  private keys: Keys;
+  private model: ModelComponent;
+  private predictPosition: PredictPositionComponent;
 
   private prevControl: Vec2;
 

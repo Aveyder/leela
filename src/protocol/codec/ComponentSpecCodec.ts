@@ -27,14 +27,14 @@ export default class ComponentSpecCodec implements SymmetricCodec<ComponentSpec>
     const deltaComponentSpec = new Map() as ComponentSpecDelta;
     for (const componentId of componentBSpec.keys()) {
       const componentSpecA = componentASpec.get(componentId);
-      const componentSpecB = componentBSpec.get(componentId)!;
+      const componentSpecB = componentBSpec.get(componentId);
 
       if (!componentSpecA) continue;
 
-      const delta = ComponentCodec.delta(componentId, componentSpecA, componentSpecB);
+      const delta = ComponentCodec.delta(componentId, componentSpecA, componentSpecB) as object;
 
       if (delta !== null) {
-        deltaComponentSpec.set(componentId, delta!);
+        deltaComponentSpec.set(componentId, delta);
       }
     }
     return deltaComponentSpec as ComponentSpecDelta;

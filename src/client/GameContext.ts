@@ -17,16 +17,16 @@ interface RegistryHolder {
 }
 
 export default class GameContext {
-  public config!: WorldClientConfig;
-  public client!: WorldClient;
-  public io!: Socket | null;
-  public socket!: WorldSocket;
-  public ts!: TimeSync;
-  public objects!: GameObjectManager;
-  public game!: Game;
-  public session!: WorldSession;
-  public scene!: WorldScene;
-  public scope!: WorldSessionScope;
+  public config: WorldClientConfig;
+  public client: WorldClient;
+  public io: Socket;
+  public socket: WorldSocket;
+  public ts: TimeSync;
+  public objects: GameObjectManager;
+  public game: Game;
+  public session: WorldSession;
+  public scope: WorldSessionScope;
+  public scene: WorldScene;
 
   public init(game: Game): void {
     this.game = game;
