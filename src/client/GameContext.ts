@@ -17,7 +17,6 @@ export default class GameContext {
   public worldScene!: WorldScene;
   public scope!: WorldSessionScope;
 
-
   public init(game: Game): void {
     this.game = game;
 
@@ -32,6 +31,7 @@ export default class GameContext {
     this.client.connect(session => {
       this.session = session;
       session.init(this);
+
       this.game.scene.start('WorldScene', {context: this});
     });
   }
