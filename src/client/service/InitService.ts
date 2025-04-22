@@ -23,7 +23,7 @@ export default class InitService {
     this.initTilemap();
     this.initKeys();
     this.initCharLayer();
-    this.initUI();
+    // this.initUI();
   }
 
   private initTilemap(): void {
