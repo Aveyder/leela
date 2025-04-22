@@ -1,2 +1,2 @@
 # Leela
-Leela is an open-source MMO game
+🎮 [Leela](http://leela.click/) is an open-source MMO game
