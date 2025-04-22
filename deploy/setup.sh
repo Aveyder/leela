@@ -38,7 +38,6 @@ chown -R "$APP_USER:$APP_USER" /var/www/html
 
 systemctl enable nginx
 systemctl start nginx
-
 systemctl status nginx
 
 npm install -g pm2

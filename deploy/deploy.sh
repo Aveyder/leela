@@ -29,6 +29,7 @@ git pull
 echo "🔧 [2/5] npm install & npm run build:*"
 npm install
 sed -i "s/^SERVER_HOST=.*/SERVER_HOST=$(hostname -I | awk '{print $1}')/" $ENV_DIR/.development.env
+sed -i "s/^GIT_REVISION=.*/GIT_REVISION=$(git rev-parse --short HEAD)/" $ENV_DIR/.development.env
 npm run build:client
 npm run build:server
 

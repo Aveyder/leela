@@ -19,6 +19,7 @@ export default class WorldClientConfig {
   public readonly clientSmoothPosErrorPrecision: number;
   public readonly clientSmoothPosErrorThreshold: number;
   public readonly debugMode: boolean;
+  public readonly rev: string;
 
   public static fromEnv(): WorldClientConfig {
     return {
@@ -42,6 +43,7 @@ export default class WorldClientConfig {
       clientSmoothPosErrorPrecision: Number(process.env.CLIENT_SMOOTH_POS_ERROR_PRECISION),
       clientSmoothPosErrorThreshold: Number(process.env.CLIENT_SMOOTH_POS_ERROR_THRESHOLD),
       debugMode: process.env.DEBUG_MODE === 'true',
+      rev: process.env.GIT_REVISION
     };
   }
 }
