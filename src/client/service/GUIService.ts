@@ -8,6 +8,7 @@ export default class GUIService {
 
   private uptimeController: GUIController;
   private latencyController: GUIController;
+  private objectsController: GUIController;
 
   constructor(context: GameContext) {
     this.context = context;
@@ -20,6 +21,7 @@ export default class GUIService {
     if (this.context.session) {
       this.uptimeController.setValue(GUIService.hoursSince(this.context.session.serverStartTime));
       this.latencyController.setValue(this.context.session.latency);
+      this.objectsController.setValue(this.context.scope.objects.gameObjects.size);
     }
   }
 
@@ -31,12 +33,16 @@ export default class GUIService {
       uptime: 'N/A'
     }, 'uptime').name('uptime');
     this.latencyController = this.gui.add({
-      latency: 'N/A'
+      latency: -1
     }, 'latency').name('latency');
+    this.objectsController = this.gui.add({
+      objects: -1
+    }, 'objects').name('objects');
 
     GUIService.makeStatic(revController);
     GUIService.makeStatic(this.uptimeController);
     GUIService.makeStatic(this.latencyController);
+    GUIService.makeStatic(this.objectsController);
   }
 
   private static hoursSince(timestamp: number) {
