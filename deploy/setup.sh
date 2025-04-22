@@ -3,9 +3,11 @@
 set -e
 
 APP_USER="leela"
+GIT_REPO="https://github.com/Aveyder/leela.git"
+WORK_DIR="/home/$APP_USER/leela"
 
 if id "$APP_USER" &>/dev/null; then
-    echo "User '$APP_USER' already exists. Exiting."
+    echo "error: user '$APP_USER' already exists"
     exit 1
 fi
 
@@ -18,7 +20,7 @@ cp /root/.ssh/authorized_keys /home/$APP_USER/.ssh/authorized_keys
 chmod 600 /home/$APP_USER/.ssh/authorized_keys
 chown -R $APP_USER:$APP_USER /home/$APP_USER/.ssh
 
-echo "User '$APP_USER' created and SSH key copied."
+echo "user '$APP_USER' created"
 
 apt-get update
 apt-get install -y curl gnupg2 ca-certificates lsb-release
@@ -41,5 +43,6 @@ systemctl status nginx
 
 npm install -g pm2
 
-sudo -u $APP_USER git clone "https://github.com/Aveyder/leela.git" "/home/$APP_USER/leela"
+sudo -u $APP_USER git clone "$GIT_REPO" "$WORK_DIR"
 
+echo "✅ setup completed"
