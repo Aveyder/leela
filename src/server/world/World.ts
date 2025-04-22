@@ -37,7 +37,7 @@ export default class World {
 
         this.loop.start(delta => this.update(delta), this.config.simulationRate);
 
-        for(let i = 0; i < 5; i++) {
+        for(let i = 0; i < 500; i++) {
             const npc = new NPC(this, this.objects.guid());
 
             npc.x = Math.random() * 600 + 100;
