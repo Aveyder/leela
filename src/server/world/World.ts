@@ -40,8 +40,8 @@ export default class World {
         for(let i = 0; i < 500; i++) {
             const npc = new NPC(this, this.objects.guid());
 
-            npc.x = Math.random() * 600 + 100;
-            npc.y = Math.random() * 600 + 100;
+            npc.x = 150;
+            npc.y = 150;
 
             const randomModel = Math.floor(MODELS.length * Math.random());
             npc.getComponent(ModelComponent).setModel(MODELS[randomModel]);
