@@ -64,8 +64,7 @@ module.exports = {
     },
     plugins: [
         new Dotenv({
-            path: path.resolve(__dirname, "src", "config", `.${process.env.NODE_ENV}.env`),
-            verbose: true
+            path: path.resolve(__dirname, "src", "config", `.${process.env.NODE_ENV}.env`)
         }),
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
