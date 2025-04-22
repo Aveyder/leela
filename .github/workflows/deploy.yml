@@ -11,17 +11,16 @@ jobs:
     environment: dev
 
     steps:
-      - name: checkout revision
+      - name: Checkout revision
         uses: actions/checkout@v4
 
-      - name: set up SSH
+      - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
-          echo ${{ vars.HOST }}
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ vars.HOST }} >> ~/.ssh/known_hosts
 
-      - name: run deploy.sh
+      - name: Run `deploy.sh`
         run: |
           ssh ${{ vars.APP_USER }}@${{ vars.HOST }} 'bash -s' < deploy/deploy.sh
