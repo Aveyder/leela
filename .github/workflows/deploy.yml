@@ -17,12 +17,11 @@ jobs:
       - name: set up SSH
         run: |
           mkdir -p ~/.ssh
-          echo $HOST
-          echo $APP_USER
+          echo ${{ vars.HOST }}
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H $HOST >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ vars.HOST }} >> ~/.ssh/known_hosts
 
       - name: run deploy.sh
         run: |
-          ssh $APP_USER@$HOST 'bash -s' < deploy/deploy.sh
+          ssh ${{ vars.APP_USER }}@${{ vars.HOST }} 'bash -s' < deploy/deploy.sh
