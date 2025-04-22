@@ -17,7 +17,6 @@ function main() {
   context.objects = new GameObjectManager();
 
   new Game({
-    type: Phaser.WEBGL,
     backgroundColor: "#83957d",
     scale: {
       width: process.env.GAME_WIDTH,
