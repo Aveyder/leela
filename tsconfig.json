@@ -4,7 +4,7 @@
     "module": "commonjs",
     "esModuleInterop": true,
     "target": "es2016",
-    "lib": ["es5", "dom"],
+    "lib": ["es5", "dom", "es2022"],
     "outDir": "dist/server",
     "resolveJsonModule": true,
     "strict": true,
