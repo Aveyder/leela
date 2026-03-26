@@ -13,8 +13,8 @@ export default class ConnectScene extends Phaser.Scene {
       fontSize: '32px',
       color: '#ffffff',
       backgroundColor: '#333',
-      padding: { x: 20, y: 10 },
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+      padding: {x: 20, y: 10},
+    }).setOrigin(0.5).setInteractive({useHandCursor: true});
 
     connectText.on('pointerdown', async () => {
       connectText.setText('Connecting...');

@@ -6,6 +6,7 @@ export default class MoveCodec implements SymmetricCodec<Move> {
   encode(move: Move): WorldPacketData {
     return [move.tick, (1 + move.dir.x) * 3 + (1 + move.dir.y)];
   }
+
   decode(data: WorldPacketData): Move {
     const tick = data[0] as number;
     const move = data[1] as number;
@@ -20,6 +21,6 @@ export default class MoveCodec implements SymmetricCodec<Move> {
     }
     dir.y = move - 4 - 3 * dir.x;
 
-    return { tick, dir };
+    return {tick, dir};
   }
 }

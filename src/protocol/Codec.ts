@@ -7,6 +7,7 @@ import GameObjectNewCodec from "./codec/GameObjectNewCodec";
 
 export interface _Codec<I, O> {
   encode(object: I): WorldPacketData;
+
   decode(data: WorldPacketData): O;
 }
 
@@ -40,9 +41,9 @@ export default class Codec {
     const codec = this.getCodec<I, O>(opcode);
 
     if (codec) {
-        return codec.decode(packet.slice(1));
+      return codec.decode(packet.slice(1));
     } else {
-        return packet[1] as O;
+      return packet[1] as O;
     }
   }
 

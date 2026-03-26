@@ -69,7 +69,7 @@ export default class WorldSession {
   }
 
   private initCmdLoop(): Loop {
-    const cmdLoop= new Loop();
+    const cmdLoop = new Loop();
 
     cmdLoop.start(
       () => this.context.socket.sendBufferedPackets(),
@@ -80,7 +80,7 @@ export default class WorldSession {
   }
 
   private initSimulationLoop(): Loop {
-    const simulationLoop= new Loop();
+    const simulationLoop = new Loop();
 
     simulationLoop.start(
       (delta: number) => this.simulate(delta),

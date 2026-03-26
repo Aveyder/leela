@@ -4,13 +4,13 @@ import MovementComponent from "../core/MovementComponent";
 
 export default class MoveHandler extends ObjectHandler<Move> {
 
-    public handleObject(move: Move): void {
-      const player = this.scope.player;
+  public handleObject(move: Move): void {
+    const player = this.scope.player;
 
-      const movement = player.getComponent(MovementComponent);
+    const movement = player.getComponent(MovementComponent);
 
-      movement.move(move.dir);
+    movement.move(move.dir);
 
-      this.session.scope.lastProcessedTick = move.tick;
-    }
+    this.session.scope.lastProcessedTick = move.tick;
+  }
 }

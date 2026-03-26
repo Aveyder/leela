@@ -41,7 +41,7 @@ export default class GameObject implements GameObjectSpec {
     return this.components.get(componentClass) as T;
   }
 
-  public getComponents(){
+  public getComponents() {
     return this.components.values();
   }
 
@@ -72,7 +72,7 @@ export default class GameObject implements GameObjectSpec {
   }
 
   private forEachComponent(callback: (component: Component) => void): void {
-    for(const component of this.components.values()) {
+    for (const component of this.components.values()) {
       callback(component);
     }
   }

@@ -19,13 +19,13 @@ export function createBodiesFromObjectGroups(tiledMap: typeof CaltheraMap): Body
 
   const bodies = [] as Body[];
 
-  for(const layer of tiledMap.layers) {
+  for (const layer of tiledMap.layers) {
     const chunks = layer.chunks;
 
     if (chunks) {
-      for(const chunk of chunks) {
+      for (const chunk of chunks) {
         for (let i = 0; i < chunk.height; i++) {
-          for(let j = 0; j < chunk.width; j++) {
+          for (let j = 0; j < chunk.width; j++) {
             const tileId = chunk.data[i * chunk.width + j] - 1;
 
             const objects = objectMap.get(tileId);

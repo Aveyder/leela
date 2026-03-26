@@ -8,41 +8,41 @@ export type SessionCallback = (session: WorldSession) => void;
 
 export default class WorldClient {
 
-    private readonly context: GameContext;
+  private readonly context: GameContext;
 
-    constructor(context: GameContext) {
-        this.context = context;
+  constructor(context: GameContext) {
+    this.context = context;
+  }
+
+  public connect(): void {
+    let io = this.context.io;
+
+    if (io?.connected) return;
+
+    const opts = {} as Partial<ManagerOptions & SocketOptions>;
+
+    if (this.context.config.msgpackEnabled) {
+      opts.parser = msgpack;
     }
 
-    public connect(): void {
-        let io = this.context.io;
+    io = ioClient(this.context.config.serverUrl, opts);
 
-        if (io?.connected) return;
+    this.context.io = io;
 
-        const opts = {} as Partial<ManagerOptions & SocketOptions>;
+    io.on("connect", () => {
+      this.context.socket = new WorldSocket(this.context);
 
-        if (this.context.config.msgpackEnabled) {
-            opts.parser = msgpack;
-        }
+      io.on("disconnect", () => {
+        this.context.socket.destroy();
 
-        io = ioClient(this.context.config.serverUrl, opts);
+        io.removeAllListeners("disconnect");
+      });
+    });
+  }
 
-        this.context.io = io;
+  public disconnect(): void {
+    this.context.io?.disconnect();
 
-        io.on("connect", () => {
-            this.context.socket = new WorldSocket(this.context);
-
-            io.on("disconnect", () => {
-                this.context.socket.destroy();
-
-                io.removeAllListeners("disconnect");
-            });
-        });
-    }
-
-    public disconnect(): void {
-        this.context.io?.disconnect();
-
-        this.context.io = null;
-    }
+    this.context.io = null;
+  }
 }

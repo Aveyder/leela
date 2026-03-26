@@ -16,65 +16,65 @@ import ModelComponent from "../core/ModelComponent";
 
 export default class World {
 
-    public readonly server: WorldServer;
-    public readonly config: WorldServerConfig;
-    public readonly loop: Loop;
-    public readonly sessions: Map<string, WorldSession>;
-    public readonly objects: WorldGameObjectManager;
+  public readonly server: WorldServer;
+  public readonly config: WorldServerConfig;
+  public readonly loop: Loop;
+  public readonly sessions: Map<string, WorldSession>;
+  public readonly objects: WorldGameObjectManager;
 
-    public readonly phys: Physics;
+  public readonly phys: Physics;
 
-    constructor(server: WorldServer) {
-        this.server = server;
-        this.config = server.config;
-        this.loop = new Loop();
-        this.sessions = new Map();
-        this.objects = new WorldGameObjectManager(this);
+  constructor(server: WorldServer) {
+    this.server = server;
+    this.config = server.config;
+    this.loop = new Loop();
+    this.sessions = new Map();
+    this.objects = new WorldGameObjectManager(this);
 
-        this.phys = new Physics();
+    this.phys = new Physics();
 
-        tiledUtils.createBodiesFromObjectGroups(CaltheraMap).forEach(body => this.phys.add(body));
+    tiledUtils.createBodiesFromObjectGroups(CaltheraMap).forEach(body => this.phys.add(body));
 
-        this.loop.start(delta => this.update(delta), this.config.simulationRate);
+    this.loop.start(delta => this.update(delta), this.config.simulationRate);
+  }
+
+  public addSession(session: WorldSession): void {
+    this.sessions.set(session.socket.id, session);
+  }
+
+  public removeSession(session: WorldSession): void {
+    this.sessions.delete(session.socket.id);
+  }
+
+  public broadcastObject<T>(opcode: Opcode, object: T): void {
+    this.broadcast(Codec.encode(opcode, object));
+  }
+
+  public broadcast(packet: WorldPacket): void {
+    this.forEachSession(session => session.sendPacket(packet));
+  }
+
+  public update(delta: number): void {
+    this.applyClientUpdates(delta);
+
+    this.objects.update(delta);
+
+    this.phys.step();
+
+    this.objects.forEach(gameObject =>
+      gameObject.getComponent(PhysicsBodyComponent)?.syncGameObjectPosition()
+    );
+
+    this.objects.captureState();
+  }
+
+  private applyClientUpdates(delta: number) {
+    this.forEachSession(session => session.handleQueuedPackets(delta));
+  }
+
+  public forEachSession(callback: (session: WorldSession) => void) {
+    for (const session of this.sessions.values()) {
+      callback(session);
     }
-
-    public addSession(session: WorldSession): void {
-        this.sessions.set(session.socket.id, session);
-    }
-
-    public removeSession(session: WorldSession): void {
-        this.sessions.delete(session.socket.id);
-    }
-
-    public broadcastObject<T>(opcode: Opcode, object: T): void {
-        this.broadcast(Codec.encode(opcode, object));
-    }
-
-    public broadcast(packet: WorldPacket): void {
-        this.forEachSession(session => session.sendPacket(packet));
-    }
-
-    public update(delta: number): void {
-        this.applyClientUpdates(delta);
-
-        this.objects.update(delta);
-
-        this.phys.step();
-
-        this.objects.forEach(gameObject =>
-          gameObject.getComponent(PhysicsBodyComponent)?.syncGameObjectPosition()
-        );
-
-        this.objects.captureState();
-    }
-
-    private applyClientUpdates(delta: number) {
-        this.forEachSession(session => session.handleQueuedPackets(delta));
-    }
-
-    public forEachSession(callback: (session: WorldSession) => void) {
-        for(const session of this.sessions.values()) {
-            callback(session);
-        }
-    }
+  }
 }

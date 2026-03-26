@@ -64,7 +64,7 @@ export default class ModelComponent extends ContextAwareComponent {
   }
 
   private getWalkAnim(dx: number, dy: number): string {
-    if (Math.abs(dy)/Math.abs(dx) >= 1) {
+    if (Math.abs(dy) / Math.abs(dx) >= 1) {
       if (dy > 0) return this._model.anim.down;
       if (dy < 0) return this._model.anim.up;
     } else {

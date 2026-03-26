@@ -6,10 +6,15 @@ import MovementCodec from "./component/MovementCodec";
 
 export interface _ComponentCodec<C extends Component, S, D> {
   map(component: C): S;
+
   delta(componentA: S, componentB: S): D | null;
+
   encode(spec: S): ComponentData;
+
   encodeDelta(delta: D): ComponentData;
+
   decode(segment: ComponentData): S;
+
   decodeDelta(delta: ComponentData): D;
 }
 

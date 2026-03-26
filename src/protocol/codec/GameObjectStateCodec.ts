@@ -24,6 +24,7 @@ export class GameObjectStateCodec implements SymmetricCodec<GameObjectState> {
       components: ComponentSpecCodec.INSTANCE.map(gameObject.getComponents())
     };
   }
+
   encode(state: GameObjectState): WorldPacketData {
     return [
       state.gameObject.guid,
@@ -35,6 +36,7 @@ export class GameObjectStateCodec implements SymmetricCodec<GameObjectState> {
       ...ComponentSpecCodec.INSTANCE.encode(state.components)
     ] as WorldPacketData;
   }
+
   decode(data: WorldPacketData): GameObjectState {
     const componentSegments = data.slice(6) as ComponentSegment[];
 
@@ -63,6 +65,7 @@ export class DeltaGameObjectStateCodec implements SymmetricCodec<GameObjectState
       components: ComponentSpecCodec.INSTANCE.delta(stateA.components, stateB.components)
     } as GameObjectStateDelta;
   }
+
   encode(state: GameObjectStateDelta): WorldPacketData {
     const gameObjectData = [];
 
@@ -84,6 +87,7 @@ export class DeltaGameObjectStateCodec implements SymmetricCodec<GameObjectState
 
     return [gameObjectData, ComponentSpecCodec.INSTANCE.encodeDelta(state.components)];
   }
+
   decode(data: WorldPacketData[][]): GameObjectStateDelta {
     const state = {
       gameObject: {},

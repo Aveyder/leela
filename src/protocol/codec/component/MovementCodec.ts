@@ -11,15 +11,18 @@ export default class MovementCodec implements _ComponentCodec<MovementComponent,
       dy: component.dy,
     };
   }
+
   delta(specA: MovementSpec, specB: MovementSpec): Partial<MovementSpec> | null {
     return diff(specA, specB);
   }
+
   encode(spec: MovementComponent): ComponentData {
     return [
       spec.dx,
       spec.dy,
     ];
   }
+
   encodeDelta(delta: Partial<MovementSpec>): ComponentData {
     const data = [];
     if (delta.dx !== undefined) {
@@ -31,12 +34,14 @@ export default class MovementCodec implements _ComponentCodec<MovementComponent,
 
     return data;
   }
+
   decode(packet: ComponentData): MovementSpec {
     return {
       dx: packet[0] as number,
       dy: packet[1] as number,
     };
   }
+
   decodeDelta(data: ComponentData[]): Partial<MovementSpec> {
     const spec = {} as Partial<MovementSpec>;
 

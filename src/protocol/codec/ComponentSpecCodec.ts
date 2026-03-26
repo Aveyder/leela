@@ -13,7 +13,7 @@ export default class ComponentSpecCodec implements SymmetricCodec<ComponentSpec>
   map(components: MapIterator<Component>): ComponentSpec {
     const componentSpec = new Map<ComponentId, object>() as ComponentSpec;
 
-    for(const component of components) {
+    for (const component of components) {
       const componentId = ComponentIdMapping.get(component);
 
       if (componentId !== undefined) {
@@ -23,6 +23,7 @@ export default class ComponentSpecCodec implements SymmetricCodec<ComponentSpec>
 
     return componentSpec;
   }
+
   delta(componentASpec: ComponentSpec, componentBSpec: ComponentSpec): ComponentSpecDelta {
     const deltaComponentSpec = new Map() as ComponentSpecDelta;
     for (const componentId of componentBSpec.keys()) {
@@ -39,6 +40,7 @@ export default class ComponentSpecCodec implements SymmetricCodec<ComponentSpec>
     }
     return deltaComponentSpec as ComponentSpecDelta;
   }
+
   encode(componentSpec: ComponentSpec): WorldPacketData {
     const data = [] as WorldPacketData;
 
@@ -50,6 +52,7 @@ export default class ComponentSpecCodec implements SymmetricCodec<ComponentSpec>
 
     return data;
   }
+
   encodeDelta(deltaComponentSpec: ComponentSpecDelta): WorldPacketData {
     const data = [] as WorldPacketData;
 
@@ -61,6 +64,7 @@ export default class ComponentSpecCodec implements SymmetricCodec<ComponentSpec>
 
     return data;
   }
+
   decode(componentSegments: ComponentSegment[]): ComponentSpec {
     return componentSegments.reduce((componentSpec, segment: ComponentSegment) => {
       const componentId = segment[0];
@@ -70,6 +74,7 @@ export default class ComponentSpecCodec implements SymmetricCodec<ComponentSpec>
       return componentSpec;
     }, new Map() as ComponentSpec);
   }
+
   decodeDelta(deltaComponentSegments: ComponentSegment[]): ComponentSpecDelta {
     return deltaComponentSegments.reduce((deltaComponentSpec, segment: ComponentSegment) => {
       const componentId = segment[0];

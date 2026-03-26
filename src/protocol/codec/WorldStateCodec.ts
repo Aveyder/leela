@@ -15,6 +15,7 @@ export class WorldStateCodec implements SymmetricCodec<WorldState> {
 
     return data;
   }
+
   decode(data: WorldPacketData): WorldState {
     const timestamp = data[0] as number;
     const lastProcessedTick = data[1] as number;
@@ -54,6 +55,7 @@ export class DeltaWorldStateCodec implements SymmetricCodec<WorldStateDelta> {
     }
     return deltaWorldState;
   }
+
   encode(deltaWorldState: WorldStateDelta): WorldPacketData {
     const data = [
       deltaWorldState.timestamp,
@@ -69,6 +71,7 @@ export class DeltaWorldStateCodec implements SymmetricCodec<WorldStateDelta> {
 
     return data;
   }
+
   decode(data: WorldPacketData): WorldStateDelta {
     const timestamp = data[0] as number;
     const lastProcessedTick = data[1] as number;

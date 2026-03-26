@@ -50,7 +50,7 @@ export default class PreloadScene extends Phaser.Scene {
   }
 
   private loadModels(): void {
-    for(let i = 0; i < MODELS.length; i++) {
+    for (let i = 0; i < MODELS.length; i++) {
       const model = MODELS[i];
 
       if (model.type === ModelType.CHAR) {
@@ -80,7 +80,7 @@ export default class PreloadScene extends Phaser.Scene {
   }
 
   private createModelAnims(): void {
-    for(let i = 0; i < MODELS.length; i++) {
+    for (let i = 0; i < MODELS.length; i++) {
       const model = MODELS[i];
 
       if (model.type === ModelType.CHAR) {

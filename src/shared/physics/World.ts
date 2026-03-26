@@ -35,14 +35,14 @@ export default class World {
   }
 
   public step() {
-    for(const body of this.dynamicBodies) {
+    for (const body of this.dynamicBodies) {
       if (body.dx !== 0 || body.dy !== 0) {
         const stepX = body.dx / World.STEPS;
         const stepY = body.dy / World.STEPS;
 
-        for(let i = 0; i < World.STEPS; i++) {
+        for (let i = 0; i < World.STEPS; i++) {
           body.x += stepX;
-          for(const staticBody of this.staticBodies) {
+          for (const staticBody of this.staticBodies) {
             if (this.isColliding(body, staticBody)) {
               if (stepX > 0) {
                 body.x = staticBody.x - (staticBody.width + body.width) / 2;
@@ -54,7 +54,7 @@ export default class World {
           }
 
           body.y += stepY;
-          for(const staticBody of this.staticBodies) {
+          for (const staticBody of this.staticBodies) {
             if (this.isColliding(body, staticBody)) {
               if (stepY > 0) {
                 body.y = staticBody.y - (staticBody.height + body.height) / 2;

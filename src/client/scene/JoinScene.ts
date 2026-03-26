@@ -31,7 +31,7 @@ export default class JoinScene extends Phaser.Scene {
     const leftArrow = this.add.text(width / 2 - 100, modelY, '<', {
       fontSize: '48px',
       color: '#ffffff'
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    }).setOrigin(0.5).setInteractive({useHandCursor: true});
 
     leftArrow.on('pointerdown', () => {
       this.currentModelIndex = (this.currentModelIndex - 1 + MODELS.length) % MODELS.length;
@@ -41,7 +41,7 @@ export default class JoinScene extends Phaser.Scene {
     const rightArrow = this.add.text(width / 2 + 100, modelY, '>', {
       fontSize: '48px',
       color: '#ffffff'
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    }).setOrigin(0.5).setInteractive({useHandCursor: true});
 
     rightArrow.on('pointerdown', () => {
       this.currentModelIndex = (this.currentModelIndex + 1) % MODELS.length;
@@ -72,8 +72,8 @@ export default class JoinScene extends Phaser.Scene {
       fontSize: '26px',
       backgroundColor: '#444',
       color: '#fff',
-      padding: { x: 20, y: 10 }
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+      padding: {x: 20, y: 10}
+    }).setOrigin(0.5).setInteractive({useHandCursor: true});
 
     joinBtn.on('pointerdown', () => {
       const nickname = nicknameInput.value.trim();
@@ -81,8 +81,8 @@ export default class JoinScene extends Phaser.Scene {
       if (!nickname) return alert('Please enter a nickname.');
 
       GameContext.get(this).session.sendObject<Join>(Opcode.MSG_JOIN, {
-          model: MODELS[this.currentModelIndex],
-          name: nickname
+        model: MODELS[this.currentModelIndex],
+        name: nickname
       });
 
       this.scene.stop();

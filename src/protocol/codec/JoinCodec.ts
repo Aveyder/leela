@@ -7,6 +7,7 @@ export default class JoinCodec implements SymmetricCodec<Join> {
   encode(join: Join): WorldPacketData {
     return [join.model.id, join.name];
   }
+
   decode(data: WorldPacketData): Join {
     const modelId = data[0] as number;
     return {

@@ -7,7 +7,7 @@ import WorldClientConfig from "../WorldClientConfig";
 import ServerComponent from "./ServerComponent";
 import Body from "../../shared/physics/Body";
 
-type Input = {dir: Vec2, tick: number, prediction: Vec2};
+type Input = { dir: Vec2, tick: number, prediction: Vec2 };
 
 export default class PredictPositionComponent extends ContextAwareComponent {
 

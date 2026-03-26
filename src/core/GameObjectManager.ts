@@ -56,7 +56,7 @@ export default class GameObjectManager {
   }
 
   public forEach(callback: (gameObject: GameObject) => void): void {
-    for(const gameObject of this.gameObjects.values()) {
+    for (const gameObject of this.gameObjects.values()) {
       callback(gameObject);
     }
   }
