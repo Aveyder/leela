@@ -9,7 +9,7 @@ import WorldSessionScope from "./WorldSessionScope";
 import WorldSocket from "./WorldSocket";
 import { Socket } from "socket.io-client";
 import { TimeSync } from "timesync";
-import GUIService from "./service/GUIService";
+import GUIManager from "./manager/GUIManager";
 import Events = Phaser.Core.Events;
 import DataManager = Phaser.Data.DataManager;
 
@@ -18,7 +18,7 @@ interface RegistryHolder {
 }
 
 export default class GameContext {
-  public gui: GUIService;
+  public gui: GUIManager;
   public config: WorldClientConfig;
   public client: WorldClient;
   public io: Socket;
@@ -28,11 +28,11 @@ export default class GameContext {
   public game: Game;
   public session: WorldSession;
   public scope: WorldSessionScope;
-  public scene: WorldScene;
+  public world: WorldScene;
 
   public init(game: Game): void {
     this.game = game;
-    this.gui = new GUIService(this);
+    this.gui = new GUIManager(this);
 
     game.registry.set(Data.CONTEXT, this);
     game.events.on(Events.POST_STEP, (time: number, delta: number) => this.update(time, delta));

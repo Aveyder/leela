@@ -24,6 +24,7 @@ export default class ComponentSpecCodec implements SymmetricCodec<ComponentSpec>
     return componentSpec;
   }
 
+  // TODO: dynamic add/remove component
   delta(componentASpec: ComponentSpec, componentBSpec: ComponentSpec): ComponentSpecDelta {
     const deltaComponentSpec = new Map() as ComponentSpecDelta;
     for (const componentId of componentBSpec.keys()) {

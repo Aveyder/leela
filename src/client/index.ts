@@ -6,6 +6,7 @@ import WorldClientConfig from "./WorldClientConfig";
 import PreloadScene from "./scene/PreloadScene";
 import ConnectScene from "./scene/ConnectScene";
 import JoinScene from "./scene/JoinScene";
+import UIScene from "./scene/UIScene";
 import GameObjectManager from "../core/GameObjectManager";
 import GameContext from "./GameContext";
 
@@ -26,7 +27,7 @@ function main() {
       createContainer: true
     },
     parent: document.querySelector(".game") as HTMLElement,
-    scene: [PreloadScene, ConnectScene, WorldScene, JoinScene],
+    scene: [PreloadScene, ConnectScene, WorldScene, UIScene, JoinScene],
     callbacks: {
       preBoot: game => context.init(game)
     }

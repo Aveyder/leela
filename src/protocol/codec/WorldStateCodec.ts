@@ -47,7 +47,7 @@ export class DeltaWorldStateCodec implements SymmetricCodec<WorldStateDelta> {
       const gameObjectA = worldStateA.objects.get(guid);
       const gameObjectB = worldStateB.objects.get(guid);
 
-      if (!gameObjectA) continue;
+      if (!gameObjectA) continue; // SMSG_OBJECT
 
       const delta = DeltaGameObjectStateCodec.INSTANCE.delta(gameObjectA, gameObjectB);
 

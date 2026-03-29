@@ -54,7 +54,7 @@ export default class PredictPositionComponent extends ContextAwareComponent {
 
     this.simulationDelta = 1000 / this.config.simulationRate;
 
-    this.scene = this.context.scene;
+    this.scene = this.context.world;
     this.server = this.gameObject.getComponent(ServerComponent);
 
     this.predictedBody = this.createBody();

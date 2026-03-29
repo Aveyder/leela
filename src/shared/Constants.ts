@@ -5,3 +5,5 @@ export enum CollisionCategory {
 
 export const CHAR_WIDTH = 24;
 export const CHAT_HEIGHT = 32;
+
+export const INVENTORY_SIZE = 40;

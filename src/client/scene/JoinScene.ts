@@ -7,12 +7,14 @@ import DOMElement = Phaser.GameObjects.DOMElement;
 
 export default class JoinScene extends Phaser.Scene {
 
+  public static readonly KEY = "JoinScene";
+
   private currentModelIndex: number = 0;
   private nicknameInput: DOMElement;
   private modelImage: Phaser.GameObjects.Image;
 
   constructor() {
-    super('JoinScene');
+    super(JoinScene.KEY);
   }
 
   create() {

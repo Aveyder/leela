@@ -1,11 +1,14 @@
 import Component from "../../core/Component";
-import { ComponentId } from "./ComponentId";
+import { ComponentId, ProjectionFlag } from "./ComponentId";
 import { ComponentData, ComponentSegment } from "./ComponentSegment";
 import ModelCodec from "./component/ModelCodec";
 import MovementCodec from "./component/MovementCodec";
+import InventoryCodec from "./component/InventoryCodec";
 
 export interface _ComponentCodec<C extends Component, S, D> {
   map(component: C): S;
+
+  project?(component: S, flag: ProjectionFlag): S;
 
   delta(componentA: S, componentB: S): D | null;
 
@@ -26,6 +29,7 @@ export default class ComponentCodec {
   private static readonly _codecs: ComponentCodecMapping = {
     [ComponentId.MODEL]: new ModelCodec(),
     [ComponentId.MOVEMENT]: new MovementCodec(),
+    [ComponentId.INVENTORY]: new InventoryCodec(),
   }
 
   public static map<C extends Component, S, D>(id: ComponentId, component: C): S {

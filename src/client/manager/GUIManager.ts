@@ -1,7 +1,7 @@
 import { GUI, GUIController } from "dat.gui";
 import GameContext from "../GameContext";
 
-export default class GUIService {
+export default class GUIManager {
 
   private readonly context: GameContext;
   public readonly gui: GUI;
@@ -19,7 +19,7 @@ export default class GUIService {
 
   public update(): void {
     if (this.context.session) {
-      this.uptimeController.setValue(GUIService.hoursSince(this.context.session.serverStartTime));
+      this.uptimeController.setValue(GUIManager.hoursSince(this.context.session.serverStartTime));
       this.latencyController.setValue(this.context.session.latency);
       this.objectsController.setValue(this.context.scope.objects.gameObjects.size);
     }
@@ -39,10 +39,10 @@ export default class GUIService {
       objects: -1
     }, 'objects').name('objects');
 
-    GUIService.makeStatic(revController);
-    GUIService.makeStatic(this.uptimeController);
-    GUIService.makeStatic(this.latencyController);
-    GUIService.makeStatic(this.objectsController);
+    GUIManager.makeStatic(revController);
+    GUIManager.makeStatic(this.uptimeController);
+    GUIManager.makeStatic(this.latencyController);
+    GUIManager.makeStatic(this.objectsController);
   }
 
   private static hoursSince(timestamp: number) {

@@ -25,7 +25,7 @@ export default class ControlComponent extends ContextAwareComponent {
 
   public start(): void {
     this.session = this.context.session;
-    this.keys = this.context.scene.keys;
+    this.keys = this.context.world.keys;
     this.model = this.gameObject.getComponent(ModelComponent);
     this.predictPosition = this.gameObject.getComponent(PredictPositionComponent);
   }

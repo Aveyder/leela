@@ -1,17 +1,21 @@
 import { Keys } from "../resource/Keys";
-import InitService from "../service/InitService";
+import InitManager from "../manager/InitManager";
 import Join from "../../entity/Join";
 import { Opcode } from "../../protocol/Opcode";
 import { MODELS } from "../../resource/Model";
 import Physics from "../../shared/physics/World";
 import GameContext from "../GameContext";
 import PhaserLayer = Phaser.GameObjects.Layer;
+import UIScene from "./UIScene";
+import JoinScene from "./JoinScene";
 
 export default class WorldScene extends Phaser.Scene {
 
   public static readonly KEY = "WorldScene";
 
   private context: GameContext;
+
+  private ui: UIScene;
 
   public phys: Physics;
 
@@ -26,7 +30,10 @@ export default class WorldScene extends Phaser.Scene {
   public create(): void {
     this.context = GameContext.get(this);
 
-    this.context.scene = this;
+    this.context.world = this;
+
+    this.scene.launch(UIScene.KEY);
+    this.scene.bringToTop(UIScene.KEY);
 
     const session = this.context.session;
 
@@ -36,16 +43,22 @@ export default class WorldScene extends Phaser.Scene {
         name: 'TEST'
       });
     } else {
-      this.scene.launch("JoinScene");
+      this.scene.launch(JoinScene.KEY);
+      this.scene.bringToTop(JoinScene.KEY);
     }
 
+    this.ui = this.scene.get(UIScene.KEY) as UIScene;
     this.phys = new Physics();
 
-    const init = new InitService(this);
+    const init = new InitManager(this);
 
     this._keys = init.keys;
 
     session.accept = true;
+
+    this._keys.I.on('down', () => {
+      this.ui.inventory.toggle();
+    });
   }
 
   public update(time: number, delta: number): void {

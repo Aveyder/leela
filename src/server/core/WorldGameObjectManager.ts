@@ -20,9 +20,8 @@ export default class WorldGameObjectManager extends GameObjectManager {
   public add(gameObject: GameObject): GameObject {
     const createdGameObject = super.add(gameObject);
 
-    this.world.broadcastObject<GameObjectNew>(Opcode.SMSG_OBJECT, {
-      timestamp: this.world.server.getTimestamp(),
-      state: GameObjectStateCodec.INSTANCE.map(createdGameObject)
+    this.world.forEachSession((session) => {
+      session.scope.sendObjectInit(GameObjectStateCodec.INSTANCE.map(createdGameObject))
     });
 
     return createdGameObject;

@@ -1,10 +1,7 @@
 import WorldSocket from "./WorldSocket";
 import msgpack from "socket.io-msgpack-parser";
 import { io as ioClient, ManagerOptions, SocketOptions } from "socket.io-client";
-import WorldSession from "./WorldSession";
 import GameContext from "./GameContext";
-
-export type SessionCallback = (session: WorldSession) => void;
 
 export default class WorldClient {
 

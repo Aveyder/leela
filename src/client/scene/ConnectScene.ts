@@ -1,8 +1,11 @@
 import GameContext from "../GameContext";
 
 export default class ConnectScene extends Phaser.Scene {
+
+  public static readonly KEY = "ConnectScene";
+
   constructor() {
-    super('ConnectScene');
+    super(ConnectScene.KEY);
   }
 
   create() {

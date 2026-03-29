@@ -3,6 +3,7 @@ import World from "../world/World";
 import ModelComponent from "./ModelComponent";
 import MovementComponent from "./MovementComponent";
 import PhysicsBodyComponent from "./PhysicsBodyComponent";
+import InventoryComponent from "./InventoryComponent";
 
 export default class Player extends WorldGameObject {
 
@@ -15,6 +16,7 @@ export default class Player extends WorldGameObject {
       new ModelComponent(),
       new MovementComponent(world.config),
       new PhysicsBodyComponent(world),
+      new InventoryComponent()
     ]);
   }
 }

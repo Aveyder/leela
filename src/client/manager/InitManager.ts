@@ -8,7 +8,7 @@ import { Sprite } from "../../resource/Sprite";
 import * as tiledUtils from "../../server/utils/tiled";
 import CaltheraMap from "../../assets/map/calthera.json";
 
-export default class InitService {
+export default class InitManager {
 
   public readonly scene: WorldScene;
   private _keys: Keys;
@@ -49,7 +49,7 @@ export default class InitService {
   }
 
   private initKeys(): void {
-    this._keys = this.scene.input.keyboard.addKeys("W,A,S,D,up,left,down,right,Z", false) as Keys;
+    this._keys = this.scene.input.keyboard.addKeys("W,A,S,D,up,left,down,right,Z,I,E", false) as Keys;
   }
 
   private initCharLayer(): void {

@@ -6,10 +6,15 @@ import { Tilemap } from "../../resource/map/Tilemap";
 import caltheraJson from "../../assets/map/calthera.json";
 import { SPRITESHEETS } from "../../resource/Spritesheet";
 import GameContext from "../GameContext";
+import PS = Phaser.Input.Gamepad.Configs.DUALSHOCK_4.PS;
+import ConnectScene from "./ConnectScene";
 
 export default class PreloadScene extends Phaser.Scene {
+
+  public static readonly KEY = 'PreloadScene';
+
   constructor() {
-    super('PreloadScene');
+    super(PreloadScene.KEY);
   }
 
   preload() {
@@ -34,7 +39,7 @@ export default class PreloadScene extends Phaser.Scene {
       if (context.config.debugMode) {
         context.client.connect();
       } else {
-        this.scene.start('ConnectScene');
+        this.scene.start(ConnectScene.KEY);
       }
     });
 

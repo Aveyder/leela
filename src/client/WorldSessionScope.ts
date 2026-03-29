@@ -1,7 +1,7 @@
 import WorldSession from "./WorldSession";
 import Player from "./core/Player";
 import ControlComponent from "./core/ControlComponent";
-import SpawnManager from "./service/SpawnManager";
+import SpawnManager from "./manager/SpawnManager";
 import ServerGameObjectManager from "./core/ServerGameObjectManager";
 import { GameObjectState, GameObjectStateDelta } from "../entity/GameObjectState";
 import { Game } from "phaser";
