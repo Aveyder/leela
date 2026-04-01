@@ -42,8 +42,12 @@ export default class WorldSessionScope {
     this.player = null;
   }
 
-  public isPlayer(state: GameObjectState | GameObjectStateDelta) {
-    return state.gameObject.guid === this.playerGuid;
+  public isPlayer(state: GameObjectState) {
+    return this.isPlayerGuid(state.gameObject.guid);
+  }
+
+  public isPlayerGuid(guid: number) {
+    return guid === this.playerGuid;
   }
 
   public resolveTimestamp(state: { timestamp: number }) {

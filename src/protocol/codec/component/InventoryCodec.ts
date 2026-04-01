@@ -42,7 +42,11 @@ export default class InventoryCodec implements _ComponentCodec<InventoryComponen
     const data = [] as ComponentData;
 
     for (const slot of spec.slots) {
-      data.push(slot.item?.id ?? -1, slot.count);
+      if (slot.item) {
+        data.push(slot.item.id, slot.count);
+      } else {
+        data.push(-1);
+      }
     }
 
     return data;
@@ -55,7 +59,11 @@ export default class InventoryCodec implements _ComponentCodec<InventoryComponen
       const slot = delta.slots[index];
       const slotIndex = (slot as SlotSpecDelta).index;
 
-      data.push(slotIndex, slot.item?.id ?? -1, slot.count);
+      if (slot.item) {
+        data.push(slotIndex, slot.item.id, slot.count);
+      } else {
+        data.push(slotIndex, -1);
+      }
     }
 
     return data;
@@ -70,15 +78,24 @@ export default class InventoryCodec implements _ComponentCodec<InventoryComponen
   decodeDelta(delta: ComponentData): InventorySpecDelta {
     const slots = [] as SlotSpecDelta[];
 
-    for (let i = 0; i + 2 < delta.length; i += 3) {
-      const index = delta[i] as number;
-      const itemId = delta[i + 1] as number;
-      const count = delta[i + 2] as number;
+    let cursor = 0;
+    while (cursor < delta.length) {
+      const index = delta[cursor++] as number;
+      const itemId = delta[cursor++] as number;
 
-      slots.push({
-        index,
-        ...this.decodeSlot(itemId, count),
-      });
+      if (itemId !== -1) {
+        const count = delta[cursor++] as number;
+        slots.push({
+          index,
+          ...this.decodeSlot(itemId, count),
+        });
+      } else {
+        slots.push({
+          index,
+          item: null,
+          count: 0,
+        });
+      }
     }
 
     return {
@@ -89,11 +106,15 @@ export default class InventoryCodec implements _ComponentCodec<InventoryComponen
   private decodeSlotPairs(data: ComponentData): SlotSpec[] {
     const slots = [] as SlotSpec[];
 
-    for (let i = 0; i + 1 < data.length; i += 2) {
-      const itemId = data[i] as number;
-      const count = data[i + 1] as number;
-
-      slots.push(this.decodeSlot(itemId, count));
+    let cursor = 0;
+    while (cursor < data.length) {
+      const itemId = data[cursor++] as number;
+      if (itemId !== -1) {
+        const count = data[cursor++] as number;
+        slots.push(this.decodeSlot(itemId, count));
+      } else {
+        slots.push({ item: null, count: 0 });
+      }
     }
 
     return slots;

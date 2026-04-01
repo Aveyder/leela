@@ -12,6 +12,7 @@ import { TimeSync } from "timesync";
 import GUIManager from "./manager/GUIManager";
 import Events = Phaser.Core.Events;
 import DataManager = Phaser.Data.DataManager;
+import UIScene from "./scene/UIScene";
 
 interface RegistryHolder {
   registry: DataManager;
@@ -29,6 +30,7 @@ export default class GameContext {
   public session: WorldSession;
   public scope: WorldSessionScope;
   public world: WorldScene;
+  public ui: UIScene;
 
   public init(game: Game): void {
     this.game = game;

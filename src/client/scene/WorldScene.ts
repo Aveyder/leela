@@ -15,8 +15,6 @@ export default class WorldScene extends Phaser.Scene {
 
   private context: GameContext;
 
-  private ui: UIScene;
-
   public phys: Physics;
 
   private _keys: Keys;
@@ -35,6 +33,10 @@ export default class WorldScene extends Phaser.Scene {
     this.scene.launch(UIScene.KEY);
     this.scene.bringToTop(UIScene.KEY);
 
+    const ui = this.scene.get(UIScene.KEY) as UIScene;
+
+    this.context.ui = ui;
+
     const session = this.context.session;
 
     if (this.context.config.debugMode) {
@@ -47,7 +49,6 @@ export default class WorldScene extends Phaser.Scene {
       this.scene.bringToTop(JoinScene.KEY);
     }
 
-    this.ui = this.scene.get(UIScene.KEY) as UIScene;
     this.phys = new Physics();
 
     const init = new InitManager(this);
@@ -57,7 +58,7 @@ export default class WorldScene extends Phaser.Scene {
     session.accept = true;
 
     this._keys.I.on('down', () => {
-      this.ui.inventory.toggle();
+      ui.inventory.toggle();
     });
   }
 

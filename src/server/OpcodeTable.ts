@@ -6,6 +6,7 @@ import JoinHandler from "./handler/JoinHandler";
 import MoveHandler from "./handler/MoveHandler";
 import WorldSession from "./WorldSession";
 import { Constructor } from "../utils/Constructor";
+import SwapItemHandler from "./handler/SwapItemHandler";
 
 export default class OpcodeTable {
 
@@ -19,6 +20,7 @@ export default class OpcodeTable {
     this.define(Opcode.CMSG_UPDATE_RATE, WorldSessionStatus.STATUS_AUTHED, UpdateRateHandler);
     this.define(Opcode.MSG_JOIN, WorldSessionStatus.STATUS_AUTHED, JoinHandler);
     this.define(Opcode.CMSG_MOVE, WorldSessionStatus.STATUS_JOINED, MoveHandler);
+    this.define(Opcode.CMSG_SWAP_ITEM, WorldSessionStatus.STATUS_JOINED, SwapItemHandler);
   }
 
   private define(opcode: Opcode, sessionStatus: WorldSessionStatus, handler: Constructor<WorldPacketHandler>) {

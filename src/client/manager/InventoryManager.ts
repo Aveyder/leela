@@ -2,10 +2,13 @@ import UIScene from "../scene/UIScene";
 import { Image } from "../../resource/Image";
 import { INVENTORY_SIZE } from "../../shared/Constants";
 import { ITEM_QUALITY_COLOR, ItemDescriptor } from "../../resource/Item";
-import Rectangle = Phaser.GameObjects.Rectangle;
-import Clamp = Phaser.Math.Clamp;
 import { SlotSpec } from "../../entity/component/InventorySpec";
 import Inventory from "../../shared/Inventory";
+import GameContext from "../GameContext";
+import SwapItem from "../../entity/SwapItem";
+import { Opcode } from "../../protocol/Opcode";
+import Rectangle = Phaser.GameObjects.Rectangle;
+import Clamp = Phaser.Math.Clamp;
 
 type SlotContent = SlotSpec & {
   confirmed: boolean;
@@ -20,8 +23,6 @@ type Slot = {
 
 export default class InventoryManager {
 
-  public static readonly EVENT_SWAP = "swap";
-
   private readonly COLUMNS = 8;
   private readonly ROWS = INVENTORY_SIZE / this.COLUMNS;
 
@@ -34,9 +35,11 @@ export default class InventoryManager {
   private readonly TOOLTIP_WIDTH = 180;
   private readonly TOOLTIP_OFFSET = 2;
 
-  private container!: Phaser.GameObjects.Container;
+  private readonly context: GameContext;
   private readonly add: Phaser.GameObjects.GameObjectFactory;
   private readonly scale: Phaser.Scale.ScaleManager;
+
+  private container!: Phaser.GameObjects.Container;
 
   private readonly slots: Slot[] = [];
 
@@ -49,13 +52,10 @@ export default class InventoryManager {
   private tooltipTitle!: Phaser.GameObjects.Text;
   private tooltipDescription!: Phaser.GameObjects.Text;
 
-  public readonly events: Phaser.Events.EventEmitter;
-
   constructor(private scene: UIScene) {
+    this.context = scene.context;
     this.add = scene.add;
     this.scale = scene.scale;
-
-    this.events = new Phaser.Events.EventEmitter();
 
     this.draggedSlot = null;
     this.hoveredSlot = null;
@@ -70,13 +70,6 @@ export default class InventoryManager {
     this.scene.input.on("pointerup", this.onPointerUp, this);
 
     this.scene.events.once("shutdown", this.destroy, this);
-
-    this.events.on(InventoryManager.EVENT_SWAP, (data: {src: number, dest: number}) => {
-      setTimeout(() => {
-        this.markSlotConfirmed(data.src);
-        this.markSlotConfirmed(data.dest);
-      }, 2000)
-    });
 
     this.hide();
   }
@@ -296,8 +289,8 @@ export default class InventoryManager {
     }
 
     let isDropAllowed = this.hoveredSlot !== null &&
-      this.draggedSlot !== this.hoveredSlot &&
-      this.canDropIntoSlot(this.hoveredSlot);
+      this.hoveredSlot.confirmed &&
+      this.draggedSlot !== this.hoveredSlot;
 
     if (isDropAllowed) {
       this.swapSlots(this.draggedSlot, this.hoveredSlot);
@@ -341,17 +334,16 @@ export default class InventoryManager {
     icon.setDisplaySize(this.SLOT_SIZE - this.ICON_PADDING * 2, this.SLOT_SIZE - this.ICON_PADDING * 2);
   }
 
-  private canDropIntoSlot(slot: Slot): boolean {
-    return !slot.item && slot.confirmed;
-  }
-
   private swapSlots(srcSlot: Slot, destSlot: Slot): void {
     const { src, dest } = Inventory.swapSlots(srcSlot, destSlot);
 
     this.setSlotContent(srcSlot.index, src);
     this.setSlotContent(destSlot.index, dest);
 
-    this.events.emit(InventoryManager.EVENT_SWAP, {src: srcSlot.index, dest: destSlot.index});
+    this.context.session.sendObject<SwapItem>(Opcode.CMSG_SWAP_ITEM, {
+      src: srcSlot.index,
+      dest: destSlot.index
+    });
   }
 
   private markSlotPending(index: number): void {
@@ -383,7 +375,6 @@ export default class InventoryManager {
   private clearSlot(slot: Slot): void {
     slot.item = null;
     slot.count = -1;
-    slot.confirmed = false;
 
     this.hideSlotContent(slot);
   }

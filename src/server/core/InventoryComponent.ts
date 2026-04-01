@@ -40,6 +40,7 @@ export default class InventoryComponent extends Component {
   }
 
   public swapSlots(srcIndex: number, destIndex: number): boolean {
+    console.log(`Swap ${srcIndex} -> ${destIndex}`);
     if (srcIndex === destIndex) {
       return false;
     }
