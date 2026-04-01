@@ -96,6 +96,10 @@ export default class InventoryManager {
 
     const slot = this.slots[index];
 
+    if (slot === this.draggedSlot) {
+      this.stopDragging();
+    }
+
     if (count > 0 && item) {
       slot.item = item;
       slot.count = Clamp(count, 0, item.stackSize);
@@ -300,6 +304,10 @@ export default class InventoryManager {
 
     this.showTooltip(this.hoveredSlot.item, pointer);
 
+    this.stopDragging();
+  }
+
+  private stopDragging(): void {
     this.draggedSlot = null;
     this.draggedIcon.setVisible(false);
   }
