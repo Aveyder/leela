@@ -6,8 +6,9 @@ import { Tilemap } from "../../resource/map/Tilemap";
 import caltheraJson from "../../assets/map/calthera.json";
 import { SPRITESHEETS } from "../../resource/Spritesheet";
 import GameContext from "../GameContext";
-import PS = Phaser.Input.Gamepad.Configs.DUALSHOCK_4.PS;
 import ConnectScene from "./ConnectScene";
+import { CHAR_ANIMS } from "../../resource/Anim";
+import AnimationFrame = Phaser.Types.Animations.AnimationFrame;
 
 export default class PreloadScene extends Phaser.Scene {
 
@@ -47,26 +48,15 @@ export default class PreloadScene extends Phaser.Scene {
   }
 
   private doPreload(): void {
-    this.loadModels();
     this.loadTilemap();
     this.loadTextures();
 
     this.load.on("complete", () => this.createAnims());
   }
 
-  private loadModels(): void {
-    for (let i = 0; i < MODELS.length; i++) {
-      const model = MODELS[i];
-
-      if (model.type === ModelType.CHAR) {
-        this.loadCharModel(model);
-      }
-    }
-  }
-
   private loadCharModel(model: ModelDescriptor): void {
-    const unitUri = require(`../../assets/model/${model.asset}`);
-    this.load.spritesheet(model.imageKey, unitUri, {frameWidth: 32, frameHeight: 32});
+    const unitUri = require(`../../assets/model/${model.assetPrefix}`);
+    this.load.atlas(model.imageKey, unitUri, {frameWidth: 32, frameHeight: 32});
   }
 
   private loadTilemap(): void {
@@ -85,41 +75,19 @@ export default class PreloadScene extends Phaser.Scene {
   }
 
   private createModelAnims(): void {
-    for (let i = 0; i < MODELS.length; i++) {
-      const model = MODELS[i];
-
-      if (model.type === ModelType.CHAR) {
-        this.createCharAnim(model);
-      }
-    }
+    MODELS.filter(model => model.type === ModelType.CHAR)
+      .forEach(model => this.createCharAnim(model));
   }
 
   private createCharAnim(model: ModelDescriptor): void {
-    const charAnimConfig = {
-      repeat: -1,
-      frameRate: 8,
-      yoyo: true
-    };
+    Object.keys(model.anim).forEach(animKey => {
+      const anim = CHAR_ANIMS[animKey];
 
-    this.anims.create({
-      key: model.anim.down,
-      frames: this.anims.generateFrameNumbers(model.imageKey, {start: 0, end: 2}),
-      ...charAnimConfig
-    });
-    this.anims.create({
-      key: model.anim.left,
-      frames: this.anims.generateFrameNames(model.imageKey, {start: 3, end: 5}),
-      ...charAnimConfig
-    });
-    this.anims.create({
-      key: model.anim.right,
-      frames: this.anims.generateFrameNames(model.imageKey, {start: 6, end: 8}),
-      ...charAnimConfig
-    });
-    this.anims.create({
-      key: model.anim.up,
-      frames: this.anims.generateFrameNames(model.imageKey, {start: 9, end: 11}),
-      ...charAnimConfig
+      this.anims.create({
+        key: `${model.assetPrefix}:${animKey}`,
+        frames: this.anims.generateFrameNames(model.imageKey, { prefix: model.assetPrefix, ...anim.frameNumbers, suffix: '.png'}) as AnimationFrame[],
+        ...anim.config
+      });
     });
   }
 

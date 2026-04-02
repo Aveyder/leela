@@ -6,12 +6,15 @@ export interface SpritesheetDescriptor {
   assetJSON: string,
 }
 
-export class Spritesheet {
-  public static readonly GENERAL = {
-    imageKey: Image.GENERAL,
-    assetImage: "general.png",
-    assetJSON: "general.json",
-  } as SpritesheetDescriptor
-}
-
-export const SPRITESHEETS: SpritesheetDescriptor[] = Object.values(Spritesheet);
+export const SPRITESHEETS = [
+  {
+    imageKey: Image.UNIT,
+    assetImage: "unit.png",
+    assetJSON: "unit.json",
+  },
+  {
+    imageKey: Image.ITEM,
+    assetImage: "item.png",
+    assetJSON: "item.json",
+  }
+] as SpritesheetDescriptor[];

@@ -1,5 +1,5 @@
 import Component from "../../core/Component";
-import { Model, ModelDescriptor } from "../../resource/Model";
+import { ModelDescriptor, MODELS } from "../../resource/Model";
 
 export default class ModelComponent extends Component {
 
@@ -8,7 +8,7 @@ export default class ModelComponent extends Component {
   constructor() {
     super();
 
-    this._model = Model.UNIT_0;
+    this._model = MODELS[0];
   }
 
   public get model(): ModelDescriptor {

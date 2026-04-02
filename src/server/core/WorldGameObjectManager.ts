@@ -32,7 +32,7 @@ export default class WorldGameObjectManager extends GameObjectManager {
   }
 
   public delete(gameObject: GameObject): void {
-    this.world.broadcast([Opcode.SMGS_OBJECT_DESTROY, gameObject.guid]);
+    this.world.broadcast([Opcode.SMSG_OBJECT_DESTROY, gameObject.guid]);
 
     super.delete(gameObject);
   }

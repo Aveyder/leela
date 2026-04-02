@@ -23,7 +23,7 @@ export default class OpcodeTable {
     this.define(Opcode.SMSG_WORLD_INIT, WorldInitHandler);
     this.define(Opcode.SMSG_WORLD_UPDATE, WorldUpdateHandler);
     this.define(Opcode.SMSG_OBJECT, GameObjectNewHandler);
-    this.define(Opcode.SMGS_OBJECT_DESTROY, GameObjectDestroyHandler);
+    this.define(Opcode.SMSG_OBJECT_DESTROY, GameObjectDestroyHandler);
   }
 
   private define(opcode: Opcode, handler: Constructor<WorldPacketHandler>) {

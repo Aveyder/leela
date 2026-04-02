@@ -41,7 +41,7 @@ export default class WorldScene extends Phaser.Scene {
 
     if (this.context.config.debugMode) {
       session.sendObject<Join>(Opcode.MSG_JOIN, {
-        model: MODELS[0],
+        model: MODELS[6],
         name: 'TEST'
       });
     } else {

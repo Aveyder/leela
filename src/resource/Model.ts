@@ -4,7 +4,7 @@ export interface ModelDescriptor {
   id: number,
   imageKey: Image,
   type: ModelType,
-  asset: string,
+  assetPrefix: string,
   anim: {
     up: string,
     down: string,
@@ -13,63 +13,62 @@ export interface ModelDescriptor {
   }
 }
 
-export enum ModelType {
-  CHAR = 0,
-}
+export const ModelType = {
+  CHAR: 0,
+} as const;
+export type ModelType = typeof ModelType[keyof typeof ModelType];
 
-export class Model {
-  public static readonly UNIT_0 = {
+export const MODELS = [
+  {
     id: 0,
-    imageKey: Image.UNIT_0,
+    imageKey: Image.UNIT,
     type: ModelType.CHAR,
-    asset: "unit_0.png",
-  } as ModelDescriptor
-  public static readonly UNIT_1 = {
+    assetPrefix: "unit_0",
+  },
+  {
     id: 1,
-    imageKey: Image.UNIT_1,
+    imageKey: Image.UNIT,
     type: ModelType.CHAR,
-    asset: "unit_1.png"
-  } as ModelDescriptor
-  public static readonly UNIT_2 = {
+    assetPrefix: "unit_1"
+  },
+  {
     id: 2,
-    imageKey: Image.UNIT_2,
+    imageKey: Image.UNIT,
     type: ModelType.CHAR,
-    asset: "unit_2.png"
-  } as ModelDescriptor
-  public static readonly UNIT_3 = {
+    assetPrefix: "unit_2"
+  },
+  {
     id: 3,
-    imageKey: Image.UNIT_3,
+    imageKey: Image.UNIT,
     type: ModelType.CHAR,
-    asset: "unit_3.png"
-  } as ModelDescriptor
-  public static readonly UNIT_4 = {
+    assetPrefix: "unit_3"
+  },
+  {
     id: 4,
-    imageKey: Image.UNIT_4,
+    imageKey: Image.UNIT,
     type: ModelType.CHAR,
-    asset: "unit_4.png"
-  } as ModelDescriptor
-  public static readonly UNIT_5 = {
+    assetPrefix: "unit_4"
+  },
+  {
     id: 5,
-    imageKey: Image.UNIT_5,
+    imageKey: Image.UNIT,
     type: ModelType.CHAR,
-    asset: "unit_5.png"
-  } as ModelDescriptor
-  public static readonly UNIT_6 = {
+    assetPrefix: "unit_5"
+  },
+  {
     id: 6,
-    imageKey: Image.UNIT_6,
+    imageKey: Image.UNIT,
     type: ModelType.CHAR,
-    asset: "unit_6.png"
-  } as ModelDescriptor
-}
-
-export const MODELS: ModelDescriptor[] = Object.values(Model);
+    assetPrefix: "unit_6"
+  }
+] as ModelDescriptor[];
 
 MODELS.forEach((model: ModelDescriptor) => {
   model.anim = {
-    up: `${model.imageKey}:up`,
-    down: `${model.imageKey}:down`,
-    left: `${model.imageKey}:left`,
-    right: `${model.imageKey}:right`,
+    up: `${model.assetPrefix}:up`,
+    down: `${model.assetPrefix}:down`,
+    left: `${model.assetPrefix}:left`,
+    right: `${model.assetPrefix}:right`,
   }
 });
 

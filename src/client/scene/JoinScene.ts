@@ -92,9 +92,9 @@ export default class JoinScene extends Phaser.Scene {
   }
 
   private updateCurrentModel() {
-    const currentModel = MODELS[this.currentModelIndex];
+    const model = MODELS[this.currentModelIndex];
 
-    this.modelImage.setTexture(currentModel.imageKey);
+    this.modelImage.setTexture(model.imageKey);
     this.modelImage.setFrame(1);
   }
 }

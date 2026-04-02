@@ -1,4 +1,4 @@
-import { Model, ModelDescriptor } from "../../resource/Model";
+import { ModelDescriptor, MODELS } from "../../resource/Model";
 import SpriteComponent from "./phaser/SpriteComponent";
 import { Image } from "../../resource/Image";
 import ContextAwareComponent from "./phaser/ContextAwareComponent";
@@ -12,10 +12,10 @@ export default class ModelComponent extends ContextAwareComponent {
   constructor() {
     super();
 
-    this._model = Model.UNIT_0;
+    this._model = MODELS[0];
   }
 
-  public get model(): Model {
+  public get model(): ModelDescriptor {
     return this._model;
   }
 
@@ -42,13 +42,12 @@ export default class ModelComponent extends ContextAwareComponent {
     if (!this.sprite) return;
 
     this.sprite.setTexture(model.imageKey);
-    this.sprite.setFrame(1);
-    this.sprite.play(model.anim.down);
+    this.resetAnim();
   }
 
   public stay(): void {
+    this.resetAnim();
     this.sprite.anims.pause();
-    this.sprite.setFrame(1);
   }
 
   public walk(dx: number, dy: number): void {
@@ -61,6 +60,11 @@ export default class ModelComponent extends ContextAwareComponent {
     } else {
       sprite.play(walkAnim);
     }
+  }
+
+  private resetAnim(): void {
+    this.sprite.play(this._model.anim.down);
+    this.sprite.setFrame(this.sprite.anims.currentAnim.getFrameAt(1).frame.name);
   }
 
   private getWalkAnim(dx: number, dy: number): string {

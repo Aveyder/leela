@@ -30,10 +30,12 @@ export interface ItemDescriptor {
   stackSize: number
 }
 
+export const MONEY_ITEM_ID = 0;
+
 export const ITEMS: ItemDescriptor[] = [
   {
-    id: 0,
-    imageKey: Image.GENERAL,
+    id: 1,
+    imageKey: Image.ITEM,
     asset: "item_1.png",
     name: "Orange Gem",
     description: "A gem that looks like an orange",
@@ -41,8 +43,8 @@ export const ITEMS: ItemDescriptor[] = [
     stackSize: 20,
   },
   {
-    id: 1,
-    imageKey: Image.GENERAL,
+    id: 2,
+    imageKey: Image.ITEM,
     asset: "item_2.png",
     name: "Green Gem",
     description: "A gem that looks green",
@@ -50,8 +52,8 @@ export const ITEMS: ItemDescriptor[] = [
     stackSize: 20
   },
   {
-    id: 2,
-    imageKey: Image.GENERAL,
+    id: 3,
+    imageKey: Image.ITEM,
     asset: "item_3.png",
     name: "Blue Gem",
     description: "A gem that looks blue",
@@ -59,8 +61,8 @@ export const ITEMS: ItemDescriptor[] = [
     stackSize: 20
   },
   {
-    id: 3,
-    imageKey: Image.GENERAL,
+    id: 4,
+    imageKey: Image.ITEM,
     asset: "item_4.png",
     name: "Pink Gem",
     description: "A gem that looks pink",
@@ -68,8 +70,8 @@ export const ITEMS: ItemDescriptor[] = [
     stackSize: 20
   },
   {
-    id: 4,
-    imageKey: Image.GENERAL,
+    id: 5,
+    imageKey: Image.ITEM,
     asset: "item_5.png",
     name: "Amber Gem",
     description: "A gem that looks amber",
@@ -77,8 +79,8 @@ export const ITEMS: ItemDescriptor[] = [
     stackSize: 20
   },
   {
-    id: 5,
-    imageKey: Image.GENERAL,
+    id: 6,
+    imageKey: Image.ITEM,
     asset: "item_6.png",
     name: "Silver Gem",
     description: "A gem that looks silver",
@@ -86,8 +88,8 @@ export const ITEMS: ItemDescriptor[] = [
     stackSize: 20
   },
   {
-    id: 6,
-    imageKey: Image.GENERAL,
+    id: 7,
+    imageKey: Image.ITEM,
     asset: "item_7.png",
     name: "Gold Coin",
     description: "A shiny gold coin",

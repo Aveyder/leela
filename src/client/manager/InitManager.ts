@@ -4,7 +4,6 @@ import { Tilemap } from "../../resource/map/Tilemap";
 import { Tileset } from "../../resource/map/Tileset";
 import { Layer } from "../../resource/map/Layer";
 import { Image } from "../../resource/Image";
-import { Sprite } from "../../resource/Sprite";
 import * as tiledUtils from "../../server/utils/tiled";
 import CaltheraMap from "../../assets/map/calthera.json";
 
@@ -55,11 +54,6 @@ export default class InitManager {
   private initCharLayer(): void {
     this.scene.charLayer = this.scene.add.layer();
     this.scene.charLayer.depth = Layer.BUILDING_INTERIOR.zIndex;
-  }
-
-  private initUI(): void {
-    const bagButton = this.scene.add.image(300, 300, Image.GENERAL, Sprite.BAG_BUTTON);
-    bagButton.depth = Layer.UI.zIndex;
   }
 
   public get keys(): Keys {

@@ -1,10 +1,12 @@
 import { ItemDescriptor } from "../../resource/Item";
 
 export default interface InventorySpec {
+  money?: number;
   slots: SlotSpec[];
 }
 
 export interface InventorySpecDelta {
+  money?: number;
   slots: SlotSpecDelta[];
 }
 

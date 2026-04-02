@@ -3,16 +3,18 @@ import Component from "../../core/Component";
 import MovementComponent from "../../server/core/MovementComponent";
 import InventoryComponent from "../../server/core/InventoryComponent";
 
-export enum ComponentId {
-  MODEL,
-  MOVEMENT,
-  INVENTORY
-}
+export const ComponentId = {
+  MODEL: 0,
+  MOVEMENT: 1,
+  INVENTORY: 2
+} as const;
+export type ComponentId = typeof ComponentId[keyof typeof ComponentId];
 
-export enum ProjectionFlag {
-  PUBLIC = 0,
-  PRIVATE = 1
-}
+export const ProjectionFlag = {
+  PUBLIC: 0,
+  PRIVATE: 1
+} as const;
+export type ProjectionFlag = typeof ProjectionFlag[keyof typeof ProjectionFlag];
 
 export class ComponentIdMapping {
   private static readonly mapping: Map<Function, ComponentId> = new Map();
