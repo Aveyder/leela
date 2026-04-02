@@ -8,11 +8,13 @@ import { INVENTORY_SIZE } from "../../../shared/Constants";
 export default class InventoryCodec implements _ComponentCodec<InventoryComponent, InventorySpec, InventorySpecDelta> {
   map(component: InventoryComponent): InventorySpec {
     return {
+      money: component.money,
       slots: this.cloneSlots(component.slots),
     };
   }
 
   delta(specA: InventorySpec, specB: InventorySpec): InventorySpecDelta | null {
+    const deltaMoney = specA.money !== specB.money ? specB.money : null;
     const deltaSlots = [] as SlotSpecDelta[];
 
     for (let index = 0; index < INVENTORY_SIZE; index++) {
@@ -31,15 +33,15 @@ export default class InventoryCodec implements _ComponentCodec<InventoryComponen
       }
     }
 
-    if (deltaSlots.length === 0) {
+    if (deltaSlots.length === 0 && deltaMoney === null) {
       return null;
     }
 
-    return { slots: deltaSlots };
+    return { money: deltaMoney, slots: deltaSlots };
   }
 
   encode(spec: InventorySpec): ComponentData {
-    const data = [] as ComponentData;
+    const data = [spec.money] as ComponentData;
 
     for (const slot of spec.slots) {
       if (slot.item) {
@@ -54,6 +56,10 @@ export default class InventoryCodec implements _ComponentCodec<InventoryComponen
 
   encodeDelta(delta: InventorySpecDelta): ComponentData {
     const data = [] as ComponentData;
+
+    if (delta.money !== null) {
+      data.push(-1, delta.money)
+    }
 
     for (let index = 0; index < delta.slots.length; index++) {
       const slot = delta.slots[index];
@@ -71,16 +77,24 @@ export default class InventoryCodec implements _ComponentCodec<InventoryComponen
 
   decode(segment: ComponentData): InventorySpec {
     return {
+      money: segment[0] as number,
       slots: this.decodeSlotPairs(segment),
     };
   }
 
   decodeDelta(delta: ComponentData): InventorySpecDelta {
+    let money = null;
     const slots = [] as SlotSpecDelta[];
 
     let cursor = 0;
     while (cursor < delta.length) {
       const index = delta[cursor++] as number;
+
+      if (index === -1) {
+        money = delta[cursor++] as number;
+        continue;
+      }
+
       const itemId = delta[cursor++] as number;
 
       if (itemId !== -1) {
@@ -99,6 +113,7 @@ export default class InventoryCodec implements _ComponentCodec<InventoryComponen
     }
 
     return {
+      money: money,
       slots: slots as SlotSpecDelta[],
     };
   }
@@ -106,7 +121,7 @@ export default class InventoryCodec implements _ComponentCodec<InventoryComponen
   private decodeSlotPairs(data: ComponentData): SlotSpec[] {
     const slots = [] as SlotSpec[];
 
-    let cursor = 0;
+    let cursor = 1;
     while (cursor < data.length) {
       const itemId = data[cursor++] as number;
       if (itemId !== -1) {

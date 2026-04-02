@@ -30,8 +30,6 @@ export interface ItemDescriptor {
   stackSize: number
 }
 
-export const MONEY_ITEM_ID = 0;
-
 export const ITEMS: ItemDescriptor[] = [
   {
     id: 1,

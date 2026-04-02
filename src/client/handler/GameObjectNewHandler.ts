@@ -23,6 +23,8 @@ export default class GameObjectNewHandler extends ObjectHandler<GameObjectNew> {
     const inventory = this.context.ui.inventory;
     const inventoryState = state.components.get(ComponentId.INVENTORY) as InventorySpec;
 
+    inventory.setMoney(inventoryState.money);
+
     inventoryState.slots.forEach((slot, index) => {
       inventory.setSlotContent(index, {
         item: slot.item,

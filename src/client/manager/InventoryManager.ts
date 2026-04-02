@@ -34,6 +34,10 @@ export default class InventoryManager {
   private readonly TOOLTIP_DESCRIPTION_MARGIN_TOP = 2;
   private readonly TOOLTIP_WIDTH = 180;
   private readonly TOOLTIP_OFFSET = 2;
+  private readonly MONEY_SECTION_HEIGHT = 16;
+  private readonly MONEY_TEXT_MARGIN_TOP = 4;
+  private readonly MONEY_ICON_SIZE = 14;
+  private readonly MONEY_ICON_TEXT_GAP = 4;
 
   private readonly context: GameContext;
   private readonly add: Phaser.GameObjects.GameObjectFactory;
@@ -51,6 +55,8 @@ export default class InventoryManager {
   private tooltipBackground!: Rectangle;
   private tooltipTitle!: Phaser.GameObjects.Text;
   private tooltipDescription!: Phaser.GameObjects.Text;
+  private moneyText!: Phaser.GameObjects.Text;
+  private moneyCoinIcon!: Phaser.GameObjects.Image;
 
   constructor(private scene: UIScene) {
     this.context = scene.context;
@@ -125,6 +131,10 @@ export default class InventoryManager {
     }
   };
 
+  public setMoney(money: number): void {
+    this.moneyText.setText(`${money}`);
+  }
+
   public markSlotConfirmed(index: number): void {
     const slot = this.slots[index];
 
@@ -143,18 +153,21 @@ export default class InventoryManager {
 
     const gridWidth = this.COLUMNS * this.SLOT_SIZE + (this.COLUMNS - 1) * this.SLOT_GAP;
     const gridHeight = this.ROWS * this.SLOT_SIZE + (this.ROWS - 1) * this.SLOT_GAP;
+    const panelWidth = gridWidth + this.OVERLAY_PADDING * 2;
+    const panelHeight = gridHeight + this.OVERLAY_PADDING * 2 + this.MONEY_SECTION_HEIGHT;
 
     const startX = -gridWidth / 2 + this.SLOT_SIZE / 2;
-    const startY = -gridHeight / 2 + this.SLOT_SIZE / 2;
+    const gridTop = -panelHeight / 2 + this.OVERLAY_PADDING;
+    const startY = gridTop + this.SLOT_SIZE / 2;
 
     this.container = this.add.container(
-      (width - gridWidth / 2 - this.OVERLAY_PADDING),
-      (height - gridHeight / 2 - this.OVERLAY_PADDING)
+      (width - panelWidth / 2 - this.OVERLAY_PADDING),
+      (height - panelHeight / 2 - this.OVERLAY_PADDING)
     );
 
     const overlay = new Rectangle(
       this.scene,
-      0, 0, gridWidth + this.OVERLAY_PADDING * 2, gridHeight + this.OVERLAY_PADDING * 2,
+      0, 0, panelWidth, panelHeight,
       0x000000, 0.8
     );
 
@@ -228,8 +241,34 @@ export default class InventoryManager {
       this.tooltipDescription
     ]).setVisible(false).setDepth(1_000);
 
+    const moneyRowY = gridTop + gridHeight + this.MONEY_TEXT_MARGIN_TOP;
+    const moneyIconX = panelWidth / 2 - this.OVERLAY_PADDING - this.MONEY_ICON_SIZE / 2;
+
+    this.moneyCoinIcon = this.add.image(
+      moneyIconX,
+      moneyRowY,
+      Image.ITEM,
+      "item_7.png"
+    ).setOrigin(0.5, 0);
+    this.moneyCoinIcon.setDisplaySize(this.MONEY_ICON_SIZE, this.MONEY_ICON_SIZE);
+
+    this.moneyText = this.add.text(
+      moneyIconX - this.MONEY_ICON_SIZE / 2 - this.MONEY_ICON_TEXT_GAP,
+      moneyRowY,
+      "",
+      {
+        fontSize: "12px",
+        color: "#ffcf33",
+        stroke: "#000000",
+        strokeThickness: 2
+      }
+    ).setOrigin(1, 0);
+    this.setMoney(0);
+
     this.container.add(overlay);
     this.container.add(this.slots.flatMap((slot) => [slot.frame, slot.icon, slot.countText]));
+    this.container.add(this.moneyCoinIcon);
+    this.container.add(this.moneyText);
     this.container.add(this.draggedIcon);
   }
 

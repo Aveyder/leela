@@ -38,7 +38,9 @@ export default class WorldUpdateHandler extends ObjectHandler<WorldStateDelta> {
 
     if (!inventoryStateDelta) return;
 
-    console.log(inventoryStateDelta.slots);
+    if (inventoryStateDelta.money !== null) {
+      inventory.setMoney(inventoryStateDelta.money);
+    }
 
     inventoryStateDelta.slots.forEach((slotDelta) => {
       inventory.setSlotContent(slotDelta.index, {

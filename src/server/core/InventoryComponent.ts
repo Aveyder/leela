@@ -7,6 +7,7 @@ import { ITEMS } from "../../resource/Item";
 
 export default class InventoryComponent extends Component {
 
+  private _money: number;
   private _slots: SlotSpec[];
 
   constructor() {
@@ -17,7 +18,12 @@ export default class InventoryComponent extends Component {
     return this._slots;
   }
 
+  public get money(): number {
+    return this._money;
+  }
+
   public init(): void {
+    this._money = 0;
     this._slots = Array.from(
       { length: INVENTORY_SIZE },
       () => ({ item: null, count: 0 } as SlotSpec),
